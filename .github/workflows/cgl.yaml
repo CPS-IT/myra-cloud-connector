@@ -42,3 +42,5 @@ jobs:
       # Linting
       - name: Lint composer.json
         run: composer lint:composer
+      - name: Lint Editorconfig
+        run: composer lint:editorconfig
