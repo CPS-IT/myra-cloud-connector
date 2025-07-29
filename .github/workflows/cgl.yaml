@@ -38,3 +38,7 @@ jobs:
       # Analyze
       - name: Analyze dependencies
         run: composer analyze:dependencies
+
+      # Linting
+      - name: Lint composer.json
+        run: composer lint:composer
