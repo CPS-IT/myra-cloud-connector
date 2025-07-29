@@ -51,4 +51,3 @@ See also
 =========
 
 :ref:`AutoClear on page / content changes <_page-update-hook>`
-
