@@ -4,7 +4,7 @@
 * [TYPO3 Site Settings](#TYPO3 Site Settings)
 * [TYPO3 Feature Settings](#TYPO3 Feature Settings)
 
-most Settings are made in    
+most Settings are made in
 `Admin Tools > Settings > Extension Configuration > cps_myra_cloud`
 
 
@@ -15,7 +15,7 @@ All Input settings can made via plaintext or `Environment injection`
 
 Every config that start with `ENV=` will be parsed and interpreted with the provided Environment Name.
 
-syntax: 
+syntax:
 ```dotenv
 ENV=MYRA_API_KEY # results in getenv('MYRA_API_KEY')
 ```
@@ -26,7 +26,7 @@ Myra API setup
 
 ### Myra API Endpoint
 
-The MyraCloud API endpoint for every request. 
+The MyraCloud API endpoint for every request.
 
 ### Myra API Key
 
@@ -42,7 +42,7 @@ To link TYPO3 with MyraCloud it's necessary to announce the used MyraCloud Domai
 
 `Site Management > Edit [SiteXYZ] > MyraCloud > Myra Domain List`
 
-This is a Comma Separated List for all Myra Domains, this particular Site supports. 
+This is a Comma Separated List for all Myra Domains, this particular Site supports.
 You Can find the correct Names in MyraCloud Backend under myracloud.com
 
 ![](img/myra_websites.png)
@@ -59,7 +59,7 @@ This is Useful to prevent clear requests from Stage / Development instances.
 
 ### Admin Only UI Elements
 
-This Checkbox disabled all UI / Context Elements for non-Admin BE-User. 
+This Checkbox disabled all UI / Context Elements for non-Admin BE-User.
 AutoClear Hooks (like Clear Page on Edit or FileList overwrite) are not affected by this.
 
 ### Disable Hooks
