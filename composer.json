@@ -16,6 +16,7 @@
 		"typo3/cms-core": "^12.4"
 	},
 	"require-dev": {
+		"ergebnis/composer-normalize": "^2.47",
 		"shipmonk/composer-dependency-analyser": "^1.8"
 	},
 	"repositories": [
@@ -51,6 +52,14 @@
 		"analyze": [
 			"@analyze:dependencies"
 		],
-		"analyze:dependencies": "composer-dependency-analyser"
+		"analyze:dependencies": "composer-dependency-analyser",
+		"fix": [
+			"@fix:composer"
+		],
+		"fix:composer": "@composer normalize --no-check-lock --no-update-lock",
+		"lint": [
+			"@lint:composer"
+		],
+		"lint:composer": "@fix:composer --dry-run"
 	}
 }
