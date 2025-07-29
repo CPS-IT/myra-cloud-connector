@@ -27,7 +27,7 @@ vendor/bin/typo3 myracloud:clear
 * allresources
 
 #### --type=page
- 
+
 `page` type require an page identifier (pid) `-i 1`.
 the pid must be numeric.
 
@@ -39,7 +39,7 @@ the pid must be numeric.
 
 `resource` clear commands are always recursive
 
-The `resource` type can also be used to clear pages. Simply Provide the site uri.     
+The `resource` type can also be used to clear pages. Simply Provide the site uri.
 (this will be recursive)
 
 #### --type=allresources
@@ -61,4 +61,3 @@ clear everything, recursive, under these folders :
 clear everything in myracloud for this TYPO3 Instance.
 
 `all` clear commands are always recursive
-

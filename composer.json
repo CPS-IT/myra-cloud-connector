@@ -16,6 +16,7 @@
 		"typo3/cms-core": "^12.4"
 	},
 	"require-dev": {
+		"armin/editorconfig-cli": "^2.1",
 		"ergebnis/composer-normalize": "^2.47",
 		"shipmonk/composer-dependency-analyser": "^1.8"
 	},
@@ -54,12 +55,16 @@
 		],
 		"analyze:dependencies": "composer-dependency-analyser",
 		"fix": [
-			"@fix:composer"
+			"@fix:composer",
+			"@fix:editorconfig"
 		],
 		"fix:composer": "@composer normalize --no-check-lock --no-update-lock",
+		"fix:editorconfig": "@lint:editorconfig --fix",
 		"lint": [
-			"@lint:composer"
+			"@lint:composer",
+			"@lint:editorconfig"
 		],
-		"lint:composer": "@fix:composer --dry-run"
+		"lint:composer": "@fix:composer --dry-run",
+		"lint:editorconfig": "ec --git-only"
 	}
 }
