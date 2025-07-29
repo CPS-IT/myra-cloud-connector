@@ -1,5 +1,19 @@
 <?php
+
 declare(strict_types=1);
+
+/*
+ * This file is part of the TYPO3 CMS extension "cps_myra_cloud".
+ *
+ * It is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, either version 2
+ * of the License, or any later version.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE.txt file that was distributed with this source code.
+ *
+ * The TYPO3 project - inspiring people to share!
+ */
 
 namespace CPSIT\CpsMyraCloud\ContextMenu;
 
@@ -13,8 +27,7 @@ class ExternalClearCacheContextMenuItemProvider extends AbstractProvider
     public function __construct(
         private readonly AdapterProvider $adapterProvider,
         private readonly PageService $pageService
-    )
-    {
+    ) {
         parent::__construct();
     }
 
@@ -26,17 +39,20 @@ class ExternalClearCacheContextMenuItemProvider extends AbstractProvider
         $canHandle = false;
         try {
             $type = $this->getCacheType();
-            if ($type <= Typo3CacheType::UNKNOWN)
+            if ($type <= Typo3CacheType::UNKNOWN) {
                 return false;
+            }
 
             $provider = $this->adapterProvider->getDefaultProviderItem();
-            if ($provider === null || !$provider->canInteract())
+            if ($provider === null || !$provider->canInteract()) {
                 return false;
+            }
 
             if ($type === Typo3CacheType::PAGE) {
                 $page = $this->pageService->getPage((int)$this->getIdentifier());
                 return $canHandle = ($page !== null);
-            } elseif ($type === Typo3CacheType::RESOURCE) {
+            }
+            if ($type === Typo3CacheType::RESOURCE) {
                 return $canHandle = !empty($this->getIdentifier());
             }
         } finally {
@@ -52,11 +68,13 @@ class ExternalClearCacheContextMenuItemProvider extends AbstractProvider
         $id = $this->identifier;
         $type = $this->getCacheType();
         if ($type === Typo3CacheType::PAGE) {
-            if(!is_numeric($id))
+            if (!is_numeric($id)) {
                 return '';
+            }
 
             return $id;
-        } elseif ($type === Typo3CacheType::RESOURCE) {
+        }
+        if ($type === Typo3CacheType::RESOURCE) {
             return $id;
         }
 
@@ -80,7 +98,7 @@ class ExternalClearCacheContextMenuItemProvider extends AbstractProvider
         $provider = $this->adapterProvider->getDefaultProviderItem();
         if ($provider) {
             return [
-                'data-callback-module' => $provider->getRequireJsNamespace()
+                'data-callback-module' => $provider->getRequireJsNamespace(),
             ];
         }
 
@@ -109,8 +127,8 @@ class ExternalClearCacheContextMenuItemProvider extends AbstractProvider
                 'type' => 'item',
                 'label' => $provider->getCacheTitle(),
                 'iconIdentifier' => $provider->getCacheIconIdentifier(),
-                'callbackAction' => 'ClearPageViaContextMenu'
-            ]
+                'callbackAction' => 'ClearPageViaContextMenu',
+            ],
         ];
     }
 
@@ -118,9 +136,10 @@ class ExternalClearCacheContextMenuItemProvider extends AbstractProvider
     {
         if ($this->table === 'pages') {
             return Typo3CacheType::PAGE;
-        } elseif (in_array($this->table, [
+        }
+        if (in_array($this->table, [
             'sys_file',
-            'sys_file_storage'
+            'sys_file_storage',
         ])) {
             return Typo3CacheType::RESOURCE;
         }
@@ -140,6 +159,6 @@ class ExternalClearCacheContextMenuItemProvider extends AbstractProvider
         }
 
         $provider = $this->adapterProvider->getDefaultProviderItem();
-        return ($itemName === $provider->getCacheId());
+        return $itemName === $provider->getCacheId();
     }
 }

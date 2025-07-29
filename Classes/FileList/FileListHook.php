@@ -1,19 +1,33 @@
 <?php
+
 declare(strict_types=1);
+
+/*
+ * This file is part of the TYPO3 CMS extension "cps_myra_cloud".
+ *
+ * It is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, either version 2
+ * of the License, or any later version.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE.txt file that was distributed with this source code.
+ *
+ * The TYPO3 project - inspiring people to share!
+ */
 
 namespace CPSIT\CpsMyraCloud\FileList;
 
 use CPSIT\CpsMyraCloud\AdapterProvider\AdapterProvider;
 use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\File\FileAdmin;
+use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\File\FileInterface as MyraFileInterface;
 use CPSIT\CpsMyraCloud\Domain\Enum\Typo3CacheType;
 use CPSIT\CpsMyraCloud\Domain\Repository\FileRepository;
 use CPSIT\CpsMyraCloud\Service\ExternalCacheService;
 use Doctrine\DBAL\Driver\Exception;
 use TYPO3\CMS\Core\Resource\DuplicationBehavior;
+use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\File\ExtendedFileUtility;
-use TYPO3\CMS\Core\Resource\FileInterface;
-use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\File\FileInterface as MyraFileInterface;
 
 class FileListHook implements SingletonInterface
 {
@@ -23,8 +37,7 @@ class FileListHook implements SingletonInterface
         private readonly ExternalCacheService $externalCacheService,
         private readonly FileRepository $fileRepository,
         private readonly AdapterProvider $provider
-    )
-    {}
+    ) {}
 
     /**
      * @param string $action
@@ -101,7 +114,7 @@ class FileListHook implements SingletonInterface
         // TODO: add other storages here not only (1:)
         $path = '1:/' . ltrim($file->getRawSlug(), '/');
         $crc = crc32($path);
-        if (!($this->pageAlreadyCleared[$crc]??false)) {
+        if (!($this->pageAlreadyCleared[$crc] ?? false)) {
             try {
                 $this->pageAlreadyCleared[$crc] = $this->externalCacheService->clear(Typo3CacheType::RESOURCE, $path);
             } catch (\Exception $_) {

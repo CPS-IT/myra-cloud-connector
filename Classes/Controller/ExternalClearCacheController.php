@@ -1,5 +1,19 @@
 <?php
+
 declare(strict_types=1);
+
+/*
+ * This file is part of the TYPO3 CMS extension "cps_myra_cloud".
+ *
+ * It is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, either version 2
+ * of the License, or any later version.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE.txt file that was distributed with this source code.
+ *
+ * The TYPO3 project - inspiring people to share!
+ */
 
 namespace CPSIT\CpsMyraCloud\Controller;
 
@@ -22,12 +36,12 @@ readonly class ExternalClearCacheController
      */
     public function clearPageCache(ServerRequestInterface $request): ResponseInterface
     {
-        $identifier = $request->getQueryParams()['id']??'0';
-        $type = Typo3CacheType::tryFrom((int)$request->getQueryParams()['type']??Typo3CacheType::UNKNOWN->value);
+        $identifier = $request->getQueryParams()['id'] ?? '0';
+        $type = Typo3CacheType::tryFrom((int)$request->getQueryParams()['type'] ?? Typo3CacheType::UNKNOWN->value);
 
         $result = $this->externalCacheService->clear($type, $identifier);
 
-        return $this->getJsonResponse(['status' => $result], (!$result?500:200));
+        return $this->getJsonResponse(['status' => $result], (!$result ? 500 : 200));
     }
 
     /**

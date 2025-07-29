@@ -1,5 +1,19 @@
 <?php
+
 declare(strict_types=1);
+
+/*
+ * This file is part of the TYPO3 CMS extension "cps_myra_cloud".
+ *
+ * It is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, either version 2
+ * of the License, or any later version.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE.txt file that was distributed with this source code.
+ *
+ * The TYPO3 project - inspiring people to share!
+ */
 
 namespace CPSIT\CpsMyraCloud\ButtonBar;
 
@@ -23,8 +37,7 @@ class ExternalClearCacheButtonBarItemProvider
         private readonly PageService $pageService,
         private readonly IconFactory $iconFactory,
         private readonly AdapterProvider $provider
-    )
-    {}
+    ) {}
 
     /**
      * Get buttons
@@ -75,18 +88,22 @@ class ExternalClearCacheButtonBarItemProvider
      */
     private function getIdentifier(): string
     {
-        if ($this->cacheId !== '')
+        if ($this->cacheId !== '') {
             return $this->cacheId;
+        }
 
-        $id = (string)($this->getRequest()->getQueryParams()['id']??'');
+        $id = (string)($this->getRequest()->getQueryParams()['id'] ?? '');
         if ($this->getCacheType() === Typo3CacheType::PAGE) {
-            if(!is_numeric($id))
+            if (!is_numeric($id)) {
                 return '';
+            }
 
             return $this->cacheId = $id;
-        } elseif ($this->getCacheType() === Typo3CacheType::RESOURCE) {
-            if ($id === '')
+        }
+        if ($this->getCacheType() === Typo3CacheType::RESOURCE) {
+            if ($id === '') {
                 $id = '1:/';
+            }
             return $this->cacheId = $id;
         }
 
@@ -110,11 +127,13 @@ class ExternalClearCacheButtonBarItemProvider
     {
         if ($this->getCacheType() === Typo3CacheType::PAGE) {
             $pageUid = (int)$this->getIdentifier();
-            if ($pageUid <= 0)
+            if ($pageUid <= 0) {
                 return false;
+            }
 
             return $this->pageService->getPage($pageUid) !== null;
-        } elseif ($this->getCacheType() === Typo3CacheType::RESOURCE) {
+        }
+        if ($this->getCacheType() === Typo3CacheType::RESOURCE) {
             $path = $this->getIdentifier();
             return !empty($path);
         }
@@ -139,10 +158,11 @@ class ExternalClearCacheButtonBarItemProvider
         $route = $this->getBackendRoute();
         if ($route === '/module/file/FilelistList') {
             return $this->cacheTypeCache = Typo3CacheType::RESOURCE;
-        } elseif (in_array($route, [
+        }
+        if (in_array($route, [
             '/module/web/layout',
             '/module/web/list',
-            '/module/web/ViewpageView'
+            '/module/web/ViewpageView',
         ])) {
             return $this->cacheTypeCache = Typo3CacheType::PAGE;
         }
@@ -155,7 +175,7 @@ class ExternalClearCacheButtonBarItemProvider
      */
     private function getBackendRoute(): string
     {
-        return $this->getRequest()->getQueryParams()['route']??'';
+        return $this->getRequest()->getQueryParams()['route'] ?? '';
     }
 
     /**
@@ -175,7 +195,7 @@ class ExternalClearCacheButtonBarItemProvider
     private function getRequest(): ServerRequestInterface
     {
         /** @var ServerRequest $request */
-        $request = $GLOBALS['TYPO3_REQUEST']??ServerRequestFactory::fromGlobals();
+        $request = $GLOBALS['TYPO3_REQUEST'] ?? ServerRequestFactory::fromGlobals();
         return $request;
     }
 }
