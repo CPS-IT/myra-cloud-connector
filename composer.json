@@ -20,6 +20,7 @@
 		"eliashaeussler/version-bumper": "^3.0",
 		"ergebnis/composer-normalize": "^2.47",
 		"shipmonk/composer-dependency-analyser": "^1.8",
+		"ssch/typo3-rector": "^3.6",
 		"typo3/coding-standards": "^0.8.0"
 	},
 	"repositories": [
@@ -72,6 +73,10 @@
 		],
 		"lint:composer": "@fix:composer --dry-run",
 		"lint:editorconfig": "ec --git-only",
-		"lint:php": "@fix:php --dry-run"
+		"lint:php": "@fix:php --dry-run",
+		"migration": [
+			"@migration:rector"
+		],
+		"migration:rector": "rector process"
 	}
 }

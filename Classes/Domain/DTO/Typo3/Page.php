@@ -19,27 +19,13 @@ namespace CPSIT\CpsMyraCloud\Domain\DTO\Typo3;
 
 class Page implements PageInterface
 {
-    private int $uid;
-    private string $title;
-    private bool $hidden;
-    private int $dokType;
-    private string $slug;
-
-    /**
-     * @param int $uid
-     * @param string $title
-     * @param bool $hidden
-     * @param int $dokType
-     * @param string $slug
-     */
-    public function __construct(int $uid, string $title, bool $hidden, int $dokType, string $slug)
-    {
-        $this->uid = $uid;
-        $this->title = $title;
-        $this->hidden = $hidden;
-        $this->dokType = $dokType;
-        $this->slug = $slug;
-    }
+    public function __construct(
+        private readonly int $uid,
+        private readonly string $title,
+        private readonly bool $hidden,
+        private readonly int $dokType,
+        private readonly string $slug,
+    ) {}
 
     public function getPageId(): int
     {

@@ -46,3 +46,7 @@ jobs:
         run: composer lint:editorconfig
       - name: Lint PHP
         run: composer lint:php -- --format checkstyle | cs2pr
+
+      # Migration
+      - name: Run Rector migration
+        run: composer migration:rector -- --dry-run

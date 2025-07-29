@@ -23,7 +23,6 @@ use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\File\FileInterface as MyraFileInterface;
 use CPSIT\CpsMyraCloud\Domain\Enum\Typo3CacheType;
 use CPSIT\CpsMyraCloud\Domain\Repository\FileRepository;
 use CPSIT\CpsMyraCloud\Service\ExternalCacheService;
-use Doctrine\DBAL\Driver\Exception;
 use TYPO3\CMS\Core\Resource\DuplicationBehavior;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\SingletonInterface;
@@ -99,7 +98,7 @@ class FileListHook implements SingletonInterface
     {
         try {
             $files = $this->fileRepository->getProcessedFilesFromFile($file);
-        } catch (\Exception | Exception $e) {
+        } catch (\Exception) {
             $files = [];
         }
 
@@ -117,7 +116,7 @@ class FileListHook implements SingletonInterface
         if (!($this->pageAlreadyCleared[$crc] ?? false)) {
             try {
                 $this->pageAlreadyCleared[$crc] = $this->externalCacheService->clear(Typo3CacheType::RESOURCE, $path);
-            } catch (\Exception $_) {
+            } catch (\Exception) {
                 $this->pageAlreadyCleared[$crc] = false;
             }
         }

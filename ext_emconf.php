@@ -21,7 +21,6 @@ $EM_CONF[$_EXTKEY] = [
     'author_email' => 'b.rannow@familie-redlich.de',
     'author_company' => 'coding. powerful. systems. CPS GmbH',
     'state' => 'alpha',
-    'clearCacheOnLoad' => 0,
     'version' => '1.0.3',
     'constraints' => [
         'depends' => [

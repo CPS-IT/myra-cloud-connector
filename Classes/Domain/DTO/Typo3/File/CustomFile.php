@@ -19,15 +19,10 @@ namespace CPSIT\CpsMyraCloud\Domain\DTO\Typo3\File;
 
 class CustomFile extends File
 {
-    private string $prefix;
-
-    /**
-     * @param string $slug
-     * @param string $prefix
-     */
-    public function __construct(string $slug, string $prefix = '/')
-    {
-        $this->prefix = $prefix;
+    public function __construct(
+        string $slug,
+        private readonly string $prefix = '/',
+    ) {
         parent::__construct($slug);
     }
 

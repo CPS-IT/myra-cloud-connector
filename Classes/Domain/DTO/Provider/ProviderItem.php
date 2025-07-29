@@ -22,15 +22,9 @@ use CPSIT\CpsMyraCloud\Domain\Enum\Typo3CacheType;
 
 class ProviderItem implements ProviderItemRegisterInterface
 {
-    private AdapterInterface $adapter;
-
-    /**
-     * @param AdapterInterface $adapter
-     */
-    public function __construct(AdapterInterface $adapter)
-    {
-        $this->adapter = $adapter;
-    }
+    public function __construct(
+        private readonly AdapterInterface $adapter,
+    ) {}
 
     public function getAdapter(): AdapterInterface
     {
