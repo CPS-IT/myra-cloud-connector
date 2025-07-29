@@ -1,0 +1,22 @@
+changelog:
+  exclude:
+    labels:
+      - duplicate
+      - 'good first issue'
+      - 'help wanted'
+      - invalid
+      - question
+      - wontfix
+  categories:
+    - title: 🚀 Improved
+      labels:
+        - enhancement
+    - title: 🚑 Fixed
+      labels:
+        - bug
+    - title: 📖 Documentation
+      labels:
+        - documentation
+    - title: Other changes
+      labels:
+        - "*"
