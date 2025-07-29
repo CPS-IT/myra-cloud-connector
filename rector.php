@@ -48,6 +48,7 @@ return RectorConfig::configure()
         AddVoidReturnTypeWhereNoReturnRector::class,
     ])
     ->withConfiguredRule(ExtEmConfRector::class, [
+        ExtEmConfRector::PHP_VERSION_CONSTRAINT => '8.1.0-8.4.99',
         ExtEmConfRector::TYPO3_VERSION_CONSTRAINT => '12.4.0-12.4.99',
         ExtEmConfRector::ADDITIONAL_VALUES_TO_BE_REMOVED => [],
     ])
