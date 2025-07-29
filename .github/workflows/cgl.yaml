@@ -30,3 +30,11 @@ jobs:
       # Validation
       - name: Validate composer.json
         run: composer validate --strict
+
+      # Install dependencies
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v3
+
+      # Analyze
+      - name: Analyze dependencies
+        run: composer analyze:dependencies
