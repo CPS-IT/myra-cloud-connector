@@ -1,14 +1,8 @@
 {
 	"name": "cpsit/cps-myra-cloud",
 	"description": "clear cache for MyraCloud",
-	"type": "typo3-cms-extension",
 	"license": "GPL-2.0-or-later",
-	"repositories": [
-		{
-			"type": "vcs",
-			"url": "git@github.com:CPS-IT/myra-web-api.git"
-		}
-	],
+	"type": "typo3-cms-extension",
 	"require": {
 		"php": "^8.1",
 		"ext-json": "*",
@@ -21,12 +15,12 @@
 		"typo3/cms-backend": "^12.4",
 		"typo3/cms-core": "^12.4"
 	},
-	"config": {
-		"allow-plugins": {
-			"typo3/class-alias-loader": true,
-			"typo3/cms-composer-installers": true
+	"repositories": [
+		{
+			"type": "vcs",
+			"url": "git@github.com:CPS-IT/myra-web-api.git"
 		}
-	},
+	],
 	"autoload": {
 		"psr-4": {
 			"CPSIT\\CpsMyraCloud\\": "Classes/"
@@ -36,6 +30,14 @@
 		"psr-4": {
 			"CPSIT\\CpsMyraCloud\\Tests\\": "Tests/"
 		}
+	},
+	"config": {
+		"allow-plugins": {
+			"ergebnis/composer-normalize": true,
+			"typo3/class-alias-loader": true,
+			"typo3/cms-composer-installers": true
+		},
+		"sort-packages": true
 	},
 	"extra": {
 		"typo3/cms": {
