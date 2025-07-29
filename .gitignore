@@ -1,2 +1,5 @@
-.Build/
-composer.lock
+/config
+/public
+/var
+/vendor
+/composer.lock
