@@ -29,7 +29,6 @@ use Myracloud\WebApi\Endpoint\AbstractEndpoint;
 use Myracloud\WebApi\Endpoint\CacheClear;
 use Myracloud\WebApi\Endpoint\DnsRecord;
 use Myracloud\WebApi\Middleware\Signature;
-use Psr\Http\Message\RequestInterface;
 
 class MyraApiAdapter extends BaseAdapter
 {
@@ -118,7 +117,7 @@ class MyraApiAdapter extends BaseAdapter
         try {
             $r = $this->getCacheClearApi()->clear($domain, $fqdn, $path, $recursive);
             self::$multiClearCacheProtection[$hash] = $success = (!empty($r) && ($r['error'] ?? true) === false);
-        } catch (GuzzleException $e) {
+        } catch (GuzzleException) {
             return false;
         }
 
@@ -152,7 +151,7 @@ class MyraApiAdapter extends BaseAdapter
                 $active = (bool)($recordItem['active'] ?? false);
                 $enable = (bool)($recordItem['enabled'] ?? false);
                 if ($active && $enable && $name !== '') {
-                    $fqdn[crc32($name)] = $name;
+                    $fqdn[crc32((string)$name)] = $name;
                 }
             }
         }
@@ -221,10 +220,8 @@ class MyraApiAdapter extends BaseAdapter
         $signature = new Signature($config[self::CONFIG_NAME_SECRET], $config[self::CONFIG_NAME_API_KEY]);
         $stack->push(
             Middleware::mapRequest(
-                function (RequestInterface $request) use ($signature) {
-                    return $signature->signRequest($request);
-                }
-            )
+                $signature->signRequest(...),
+            ),
         );
         return $this->clients[$instanceId] = new Client(
             [

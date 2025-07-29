@@ -19,17 +19,11 @@ namespace CPSIT\CpsMyraCloud\Domain\DTO\Typo3\File;
 
 abstract class File implements FileInterface
 {
-    private string $slug;
-
     abstract protected function getPrefix(): string;
 
-    /**
-     * @param string $slug
-     */
-    public function __construct(string $slug = '')
-    {
-        $this->slug = $slug;
-    }
+    public function __construct(
+        private readonly string $slug = '',
+    ) {}
 
     /**
      * @return string

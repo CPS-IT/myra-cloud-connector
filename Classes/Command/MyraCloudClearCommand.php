@@ -33,14 +33,9 @@ class MyraCloudClearCommand extends Command
         'resource' => Typo3CacheType::RESOURCE,
     ];
 
-    private ExternalCacheService $externalCacheService;
-
-    /**
-     * @param ExternalCacheService $externalCacheService
-     */
-    public function __construct(ExternalCacheService $externalCacheService)
-    {
-        $this->externalCacheService = $externalCacheService;
+    public function __construct(
+        private readonly ExternalCacheService $externalCacheService,
+    ) {
         parent::__construct();
     }
 

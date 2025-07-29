@@ -31,17 +31,12 @@ abstract class BaseAdapter implements SingletonInterface, AdapterInterface
 {
     use DomainListParserTrait;
 
-    private ExtensionConfiguration $extensionConfiguration;
     private static array $configCache = [];
     private static array $checkupCache = [];
 
-    /**
-     * @param ExtensionConfiguration $extensionConfiguration
-     */
-    public function __construct(ExtensionConfiguration $extensionConfiguration)
-    {
-        $this->extensionConfiguration = $extensionConfiguration;
-    }
+    public function __construct(
+        private readonly ExtensionConfiguration $extensionConfiguration,
+    ) {}
 
     public function getRequireJsNamespace(): string
     {
@@ -245,13 +240,13 @@ abstract class BaseAdapter implements SingletonInterface, AdapterInterface
         $data = [];
         try {
             $data = $this->extensionConfiguration->get('cps_myra_cloud');
-        } catch (\Exception $e) {
+        } catch (\Exception) {
         }
 
         foreach ($data as $key => $value) {
             $value = $this->getRealAdapterConfigValue($value);
             self::$configCache['all'][$key] = $value;
-            if (str_starts_with($key, $prefix)) {
+            if (str_starts_with((string)$key, $prefix)) {
                 self::$configCache[$prefix][$key] = $value;
             }
         }

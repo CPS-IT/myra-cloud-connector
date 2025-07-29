@@ -24,13 +24,10 @@ use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\Typo3SiteConfig;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Site\SiteFinder;
 
-readonly class SiteService implements SingletonInterface
+class SiteService implements SingletonInterface
 {
-    /**
-     * @param SiteFinder $siteFinder
-     */
     public function __construct(
-        private SiteFinder $siteFinder
+        private readonly SiteFinder $siteFinder
     ) {}
 
     /**
@@ -73,7 +70,7 @@ readonly class SiteService implements SingletonInterface
         try {
             $site = $this->siteFinder->getSiteByPageId($pageId->getPageId());
             $siteConfig = new Typo3SiteConfig($site);
-        } catch (\Exception $_) {
+        } catch (\Exception) {
             return [];
         }
 
