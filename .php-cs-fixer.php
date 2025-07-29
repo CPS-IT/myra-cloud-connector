@@ -15,15 +15,16 @@ declare(strict_types=1);
  * The TYPO3 project - inspiring people to share!
  */
 
-namespace CPSIT\CpsMyraCloud\Domain\DTO\Typo3\File;
+use PhpCsFixer\Runner\Parallel\ParallelConfigFactory;
+use TYPO3\CodingStandards\CsFixerConfig;
 
-class Typo3Temp extends File
-{
-    /**
-     * @return string
-     */
-    protected function getPrefix(): string
-    {
-        return '/typo3temp';
-    }
-}
+$config = CsFixerConfig::create();
+$config->setParallelConfig(ParallelConfigFactory::detect());
+$config->setHeader('This file is part of the TYPO3 CMS extension "cps_myra_cloud".');
+$config->getFinder()
+    ->in(__DIR__)
+    ->ignoreDotFiles(false)
+    ->ignoreVCSIgnored(true)
+;
+
+return $config;

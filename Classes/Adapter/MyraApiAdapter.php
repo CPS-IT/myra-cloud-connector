@@ -1,11 +1,24 @@
 <?php
+
 declare(strict_types=1);
+
+/*
+ * This file is part of the TYPO3 CMS extension "cps_myra_cloud".
+ *
+ * It is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, either version 2
+ * of the License, or any later version.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE.txt file that was distributed with this source code.
+ *
+ * The TYPO3 project - inspiring people to share!
+ */
 
 namespace CPSIT\CpsMyraCloud\Adapter;
 
 use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\PageSlugInterface;
 use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\SiteConfigInterface;
-use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
@@ -85,7 +98,7 @@ class MyraApiAdapter extends BaseAdapter
      */
     protected function getSendHash(string $siteRef, string $fqdn, string $path, bool $recursive = false): string
     {
-        return md5($siteRef .'_'. $fqdn .'_'. $path . '_' . $recursive);
+        return md5($siteRef . '_' . $fqdn . '_' . $path . '_' . $recursive);
     }
 
     /**
@@ -98,31 +111,31 @@ class MyraApiAdapter extends BaseAdapter
     protected function clearCacheDomain(string $domain, string $fqdn, string $path = '/', bool $recursive = false): bool
     {
         $hash = $this->getSendHash($domain, $fqdn, $path, $recursive);
-        if ((self::$multiClearCacheProtection[$hash]??false) === true) {
+        if ((self::$multiClearCacheProtection[$hash] ?? false) === true) {
             return true;
         }
 
         try {
             $r = $this->getCacheClearApi()->clear($domain, $fqdn, $path, $recursive);
-            self::$multiClearCacheProtection[$hash] = $success = (!empty($r) && ($r['error']??true) === false);
+            self::$multiClearCacheProtection[$hash] = $success = (!empty($r) && ($r['error'] ?? true) === false);
         } catch (GuzzleException $e) {
             return false;
         }
 
-        $this->writeLog('User %s has cleared the MYRA_CLOUD cache for domain %s => %s%s (recursive: %s) (success: %s)',
+        $this->writeLog(
+            'User %s has cleared the MYRA_CLOUD cache for domain %s => %s%s (recursive: %s) (success: %s)',
             [
                 $this->getBEUser()->user['username'] . ' (uid: ' . $this->getBEUser()->user['uid'] . ')',
                 $domain,
                 $fqdn,
                 $path,
-                ($recursive?'true':'false'),
-                ($success?'true':'false')
+                ($recursive ? 'true' : 'false'),
+                ($success ? 'true' : 'false'),
             ]
         );
 
         return $success;
     }
-
 
     /**
      * @param string $domainIdentifier
@@ -135,9 +148,9 @@ class MyraApiAdapter extends BaseAdapter
         $fqdn = [];
         if (!empty($r) && $r['error'] === false) {
             foreach ($r['list'] as $recordItem) {
-                $name = $recordItem['name']??'';
-                $active = (bool)($recordItem['active']??false);
-                $enable = (bool)($recordItem['enabled']??false);
+                $name = $recordItem['name'] ?? '';
+                $active = (bool)($recordItem['active'] ?? false);
+                $enable = (bool)($recordItem['enabled'] ?? false);
                 if ($active && $enable && $name !== '') {
                     $fqdn[crc32($name)] = $name;
                 }
@@ -158,7 +171,7 @@ class MyraApiAdapter extends BaseAdapter
         $r = [];
         try {
             $r = $st->getList($domain);
-        } catch (Exception|GuzzleException) {
+        } catch (\Exception|GuzzleException) {
         }
 
         return $r;
@@ -186,7 +199,7 @@ class MyraApiAdapter extends BaseAdapter
         $client = $this->getMyraClient();
         try {
             return $client !== null ? new $className($client) : null;
-        } catch (Exception) {
+        } catch (\Exception) {
             return null;
         }
     }

@@ -1,5 +1,19 @@
 <?php
+
 declare(strict_types=1);
+
+/*
+ * This file is part of the TYPO3 CMS extension "cps_myra_cloud".
+ *
+ * It is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, either version 2
+ * of the License, or any later version.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE.txt file that was distributed with this source code.
+ *
+ * The TYPO3 project - inspiring people to share!
+ */
 
 namespace CPSIT\CpsMyraCloud\Adapter;
 
@@ -54,7 +68,7 @@ abstract class BaseAdapter implements SingletonInterface, AdapterInterface
      */
     protected function getBEUser(): ?BackendUserAuthentication
     {
-        if (($GLOBALS['BE_USER']??null) instanceof BackendUserAuthentication) {
+        if (($GLOBALS['BE_USER'] ?? null) instanceof BackendUserAuthentication) {
             return $GLOBALS['BE_USER'];
         }
 
@@ -139,14 +153,16 @@ abstract class BaseAdapter implements SingletonInterface, AdapterInterface
         }
 
         /** @var BackendUserAuthentication $backendUser */
-        $backendUser = $GLOBALS['BE_USER']??null;
-        if (!$backendUser)
+        $backendUser = $GLOBALS['BE_USER'] ?? null;
+        if (!$backendUser) {
             return self::$checkupCache[__METHOD__] = false;
+        }
 
         $allConfigData = $this->getAdapterConfig(true);
         $only = ($allConfigData['onlyAdmin'] ?? '1') === '1';
-        if ($only)
+        if ($only) {
             return self::$checkupCache[__METHOD__] = $backendUser->isAdmin();
+        }
 
         return self::$checkupCache[__METHOD__] = true;
     }
@@ -162,8 +178,9 @@ abstract class BaseAdapter implements SingletonInterface, AdapterInterface
 
         $allConfigData = $this->getAdapterConfig(true);
         $only = ($allConfigData['onlyLive'] ?? '1') === '1';
-        if ($only)
+        if ($only) {
             return self::$checkupCache[__METHOD__] = Environment::getContext()->isProduction();
+        }
 
         return self::$checkupCache[__METHOD__] = true;
     }
@@ -199,7 +216,7 @@ abstract class BaseAdapter implements SingletonInterface, AdapterInterface
 
         $allConfigData = $this->getAdapterConfig(true);
         foreach ($allConfigData as $key => $value) {
-            if (strpos($key, $this->getAdapterConfigPrefix()) === 0) {
+            if (str_starts_with($key, $this->getAdapterConfigPrefix())) {
                 if (empty($this->getRealAdapterConfigValue($value))) {
                     return self::$checkupCache[__METHOD__] = false;
                 }
@@ -219,7 +236,8 @@ abstract class BaseAdapter implements SingletonInterface, AdapterInterface
         if (!empty(self::$configCache)) {
             if ($ignorePrefix) {
                 return self::$configCache['all'];
-            } elseif (!empty(self::$configCache[$prefix])) {
+            }
+            if (!empty(self::$configCache[$prefix])) {
                 return self::$configCache[$prefix];
             }
         }
@@ -227,12 +245,13 @@ abstract class BaseAdapter implements SingletonInterface, AdapterInterface
         $data = [];
         try {
             $data = $this->extensionConfiguration->get('cps_myra_cloud');
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
 
         foreach ($data as $key => $value) {
             $value = $this->getRealAdapterConfigValue($value);
             self::$configCache['all'][$key] = $value;
-            if (strpos($key, $prefix) === 0) {
+            if (str_starts_with($key, $prefix)) {
                 self::$configCache[$prefix][$key] = $value;
             }
         }
