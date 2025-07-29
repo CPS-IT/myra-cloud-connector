@@ -1,53 +1,40 @@
 {
-  "name": "cpsit/cps-myra-cloud",
-  "description": "clear cache for MyraCloud",
-  "type": "typo3-cms-extension",
-  "keywords": [
-    "TYPO3"
-  ],
-  "homepage": "https://www.cps-it.de/",
-  "license": "GPL-3.0+",
-
+	"name": "cpsit/cps-myra-cloud",
+	"description": "clear cache for MyraCloud",
+	"type": "typo3-cms-extension",
+	"license": "GPL-2.0-or-later",
 	"repositories": [
-		{"type": "vcs", "url": "git@github.com:CPS-IT/myra-web-api.git"}
+		{
+			"type": "vcs",
+			"url": "git@github.com:CPS-IT/myra-web-api.git"
+		}
 	],
-
-  "require": {
-    "php": "^8.1 | ^8.2",
-    "ext-json": "*",
-    "typo3/cms-core": "^12.4",
-    "typo3/minimal": "^12.4",
-    "cpsit/myra-web-api": "^1"
-  },
-  "scripts": {
-    "post-autoload-dump": [
-      "TYPO3\\TestingFramework\\Composer\\ExtensionTestEnvironment::prepare"
-    ]
-  },
-  "config": {
-    "vendor-dir": ".Build/vendor",
-    "bin-dir": ".Build/bin",
-    "allow-plugins": {
-      "typo3/class-alias-loader": true,
-      "typo3/cms-composer-installers": true
-    }
-  },
-  "autoload": {
-    "psr-4": {
-      "CPSIT\\CpsMyraCloud\\": "Classes/"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "CPSIT\\CpsMyraCloud\\Tests\\": "Tests/"
-    }
-  },
-  "extra": {
-    "typo3/cms": {
-      "extension-key": "cps_myra_cloud",
-      "cms-package-dir": "{$vendor-dir}/typo3/cms",
-      "app-dir": ".Build",
-      "web-dir": ".Build/public"
-    }
-  }
+	"require": {
+		"php": "^8.1",
+		"ext-json": "*",
+		"typo3/cms-core": "^12.4",
+		"typo3/minimal": "^12.4",
+		"cpsit/myra-web-api": "^1.0"
+	},
+	"config": {
+		"allow-plugins": {
+			"typo3/class-alias-loader": true,
+			"typo3/cms-composer-installers": true
+		}
+	},
+	"autoload": {
+		"psr-4": {
+			"CPSIT\\CpsMyraCloud\\": "Classes/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"CPSIT\\CpsMyraCloud\\Tests\\": "Tests/"
+		}
+	},
+	"extra": {
+		"typo3/cms": {
+			"extension-key": "cps_myra_cloud"
+		}
+	}
 }
