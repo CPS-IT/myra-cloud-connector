@@ -34,8 +34,8 @@ return RectorConfig::configure()
         __DIR__ . '/ext_localconf.php',
         __DIR__ . '/ext_tables.php',
     ])
-    ->withPhpSets(php81: true)
-    ->withPhpVersion(PhpVersion::PHP_81)
+    ->withPhpSets(php82: true)
+    ->withPhpVersion(PhpVersion::PHP_82)
     ->withSets([
         Typo3SetList::CODE_QUALITY,
         Typo3SetList::GENERAL,
@@ -48,7 +48,7 @@ return RectorConfig::configure()
         AddVoidReturnTypeWhereNoReturnRector::class,
     ])
     ->withConfiguredRule(ExtEmConfRector::class, [
-        ExtEmConfRector::PHP_VERSION_CONSTRAINT => '8.1.0-8.4.99',
+        ExtEmConfRector::PHP_VERSION_CONSTRAINT => '8.2.0-8.4.99',
         ExtEmConfRector::TYPO3_VERSION_CONSTRAINT => '12.4.0-12.4.99',
         ExtEmConfRector::ADDITIONAL_VALUES_TO_BE_REMOVED => [],
     ])

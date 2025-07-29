@@ -2,7 +2,7 @@
 
 ### Requirements
 
-* php: ^8.1
+* php: ^8.2
 * ext-json: *
 * cpsit/myra-web-api: *
 * typo3/cms-core: ^12.4
