@@ -1,21 +1,21 @@
 # Setup
 
-* [Myra Settings](#Myra Settings)
-* [TYPO3 Site Settings](#TYPO3 Site Settings)
-* [TYPO3 Feature Settings](#TYPO3 Feature Settings)
+* [Myra Settings](#myra-settings)
+* [TYPO3 Site Settings](#typo3-site-settings)
+* [TYPO3 Feature Settings](#typo3-feature-settings)
 
-most Settings are made in
+most Settings are made in    
 `Admin Tools > Settings > Extension Configuration > cps_myra_cloud`
 
 
 ### Environment injection
-All Input settings can made via plaintext or `Environment injection`
+All Input settings can be made via plaintext or `Environment injection`
 
 ![Env Settings](img/env_inject.png)
 
 Every config that start with `ENV=` will be parsed and interpreted with the provided Environment Name.
 
-syntax:
+syntax: 
 ```dotenv
 ENV=MYRA_API_KEY # results in getenv('MYRA_API_KEY')
 ```
@@ -26,7 +26,7 @@ Myra API setup
 
 ### Myra API Endpoint
 
-The MyraCloud API endpoint for every request.
+The MyraCloud API endpoint for every request. 
 
 ### Myra API Key
 
@@ -42,8 +42,8 @@ To link TYPO3 with MyraCloud it's necessary to announce the used MyraCloud Domai
 
 `Site Management > Edit [SiteXYZ] > MyraCloud > Myra Domain List`
 
-This is a Comma Separated List for all Myra Domains, this particular Site supports.
-You Can find the correct Names in MyraCloud Backend under myracloud.com
+This is a Comma Separated List for all Myra Domains, this particular Site supports. 
+You Can find the correct Names in MyraSecurity Backend under myrasecurity.com
 
 ![](img/myra_websites.png)
 
@@ -59,12 +59,12 @@ This is Useful to prevent clear requests from Stage / Development instances.
 
 ### Admin Only UI Elements
 
-This Checkbox disabled all UI / Context Elements for non-Admin BE-User.
+This Checkbox disabled all UI / Context Elements for non-Admin BE-User. 
 AutoClear Hooks (like Clear Page on Edit or FileList overwrite) are not affected by this.
 
 ### Disable Hooks
 
-This Checkbox disbale all AutoClear Hooks (like Clear Page on Edit or FileList overwrite).
+This Checkbox disable all AutoClear Hooks (like Clear Page on Edit or FileList overwrite).
 
 ### Domain Blacklist
 
