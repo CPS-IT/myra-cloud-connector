@@ -23,11 +23,13 @@ use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\FileInterface as MyraFileInte
 use CPSIT\MyraCloudConnector\Domain\Enum\Typo3CacheType;
 use CPSIT\MyraCloudConnector\Domain\Repository\FileRepository;
 use CPSIT\MyraCloudConnector\Service\ExternalCacheService;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use TYPO3\CMS\Core\Resource\DuplicationBehavior;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\File\ExtendedFileUtility;
 
+#[Autoconfigure(public: true)]
 class FileListHook implements SingletonInterface
 {
     private array $pageAlreadyCleared = [];

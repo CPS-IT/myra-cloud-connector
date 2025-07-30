@@ -22,7 +22,9 @@ use CPSIT\MyraCloudConnector\Service\ExternalCacheService;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
+#[Autoconfigure(public: true)]
 readonly class ExternalClearCacheController
 {
     public function __construct(
@@ -37,7 +39,7 @@ readonly class ExternalClearCacheController
     public function clearPageCache(ServerRequestInterface $request): ResponseInterface
     {
         $identifier = $request->getQueryParams()['id'] ?? '0';
-        $type = Typo3CacheType::tryFrom((int)$request->getQueryParams()['type'] ?? Typo3CacheType::UNKNOWN->value);
+        $type = Typo3CacheType::tryFrom((int)($request->getQueryParams()['type'] ?? Typo3CacheType::UNKNOWN->value));
 
         $result = $this->externalCacheService->clear($type, $identifier);
 

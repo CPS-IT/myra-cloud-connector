@@ -20,9 +20,11 @@ namespace CPSIT\MyraCloudConnector\DataHandler;
 use CPSIT\MyraCloudConnector\AdapterProvider\AdapterProvider;
 use CPSIT\MyraCloudConnector\Domain\Enum\Typo3CacheType;
 use CPSIT\MyraCloudConnector\Service\ExternalCacheService;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\SingletonInterface;
 
+#[Autoconfigure(public: true)]
 class DataHandlerHook implements SingletonInterface
 {
     private array $pageAlreadyCleared = [];

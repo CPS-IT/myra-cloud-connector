@@ -30,7 +30,9 @@ use Myracloud\WebApi\Endpoint\AbstractEndpoint;
 use Myracloud\WebApi\Endpoint\CacheClear;
 use Myracloud\WebApi\Endpoint\DnsRecord;
 use Myracloud\WebApi\Middleware\Signature;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
+#[AutoconfigureTag('cpsit.external.cache.adapter')]
 class MyraApiAdapter extends BaseAdapter
 {
     protected array $clients;
