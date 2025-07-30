@@ -8,26 +8,6 @@ services:
     resource: '../Classes/*'
     exclude: ['../Classes/Domain/{DTO,Enum}']
 
-  CPSIT\MyraCloudConnector\ButtonBar\ExternalClearCacheButtonBarItemProvider:
-    public: true
-
-  CPSIT\MyraCloudConnector\Controller\ExternalClearCacheController:
-    public: true
-
-  CPSIT\MyraCloudConnector\FileList\FileListHook:
-    public: true
-
-  CPSIT\MyraCloudConnector\DataHandler\DataHandlerHook:
-    public: true
-
-  CPSIT\MyraCloudConnector\AdapterProvider\AdapterProvider:
-    arguments:
-      $adapters: !tagged_iterator 'cpsit.external.cache.adapter'
-
-  CPSIT\MyraCloudConnector\Adapter\MyraApiAdapter:
-    tags:
-      - { name: 'cpsit.external.cache.adapter' }
-
   CPSIT\MyraCloudConnector\Command\MyraCloudClearCommand:
     tags:
       - name: 'console.command'
