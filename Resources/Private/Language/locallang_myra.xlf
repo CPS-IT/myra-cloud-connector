@@ -4,16 +4,16 @@
 		<header/>
 		<body>
 			<trans-unit id="title" resname="title">
-				<source>MyraCloud clear cache</source>
+				<source>Myra Cloud clear cache</source>
 			</trans-unit>
 			<trans-unit id="description" resname="description">
-				<source>Clear the entire MyraCloud cache</source>
+				<source>Clear the entire Myra Cloud cache</source>
 			</trans-unit>
 			<trans-unit id="title.resource" resname="title">
-				<source>MyraCloud clear Resources Cache</source>
+				<source>Myra Cloud clear Resources Cache</source>
 			</trans-unit>
 			<trans-unit id="description.resource" resname="description">
-				<source>Clear the resources MyraCloud cache [/fileadmin/*, /typo3temp/*, /typo3conf/*]</source>
+				<source>Clear the resources Myra Cloud cache [/fileadmin/*, /typo3temp/*, /typo3conf/*]</source>
 			</trans-unit>
 			<trans-unit id="tca.site.cache.identifier" resname="tca.site.cache.identifier">
 				<source>Myra Domain List (comma separated)</source>

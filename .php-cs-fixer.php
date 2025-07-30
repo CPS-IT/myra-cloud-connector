@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /*
- * This file is part of the TYPO3 CMS extension "cps_myra_cloud".
+ * This file is part of the TYPO3 CMS extension "myra_cloud_connector".
  *
  * It is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License, either version 2
@@ -20,7 +20,7 @@ use TYPO3\CodingStandards\CsFixerConfig;
 
 $config = CsFixerConfig::create();
 $config->setParallelConfig(ParallelConfigFactory::detect());
-$config->setHeader('This file is part of the TYPO3 CMS extension "cps_myra_cloud".');
+$config->setHeader('This file is part of the TYPO3 CMS extension "myra_cloud_connector".');
 $config->getFinder()
     ->in(__DIR__)
     ->ignoreDotFiles(false)

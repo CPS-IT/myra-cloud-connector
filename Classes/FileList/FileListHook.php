@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /*
- * This file is part of the TYPO3 CMS extension "cps_myra_cloud".
+ * This file is part of the TYPO3 CMS extension "myra_cloud_connector".
  *
  * It is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License, either version 2
@@ -15,14 +15,14 @@ declare(strict_types=1);
  * The TYPO3 project - inspiring people to share!
  */
 
-namespace CPSIT\CpsMyraCloud\FileList;
+namespace CPSIT\MyraCloudConnector\FileList;
 
-use CPSIT\CpsMyraCloud\AdapterProvider\AdapterProvider;
-use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\File\FileAdmin;
-use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\File\FileInterface as MyraFileInterface;
-use CPSIT\CpsMyraCloud\Domain\Enum\Typo3CacheType;
-use CPSIT\CpsMyraCloud\Domain\Repository\FileRepository;
-use CPSIT\CpsMyraCloud\Service\ExternalCacheService;
+use CPSIT\MyraCloudConnector\AdapterProvider\AdapterProvider;
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\FileAdmin;
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\FileInterface as MyraFileInterface;
+use CPSIT\MyraCloudConnector\Domain\Enum\Typo3CacheType;
+use CPSIT\MyraCloudConnector\Domain\Repository\FileRepository;
+use CPSIT\MyraCloudConnector\Service\ExternalCacheService;
 use TYPO3\CMS\Core\Resource\DuplicationBehavior;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\SingletonInterface;

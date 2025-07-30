@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /*
- * This file is part of the TYPO3 CMS extension "cps_myra_cloud".
+ * This file is part of the TYPO3 CMS extension "myra_cloud_connector".
  *
  * It is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License, either version 2
@@ -15,10 +15,10 @@ declare(strict_types=1);
  * The TYPO3 project - inspiring people to share!
  */
 
-namespace CPSIT\CpsMyraCloud\Domain\DTO\Provider;
+namespace CPSIT\MyraCloudConnector\Domain\DTO\Provider;
 
-use CPSIT\CpsMyraCloud\Adapter\AdapterInterface;
-use CPSIT\CpsMyraCloud\Domain\Enum\Typo3CacheType;
+use CPSIT\MyraCloudConnector\Adapter\AdapterInterface;
+use CPSIT\MyraCloudConnector\Domain\Enum\Typo3CacheType;
 
 class ProviderItem implements ProviderItemRegisterInterface
 {

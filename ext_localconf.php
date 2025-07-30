@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the TYPO3 CMS extension "cps_myra_cloud".
+ * This file is part of the TYPO3 CMS extension "myra_cloud_connector".
  *
  * It is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License, either version 2
@@ -24,4 +24,4 @@ defined('TYPO3') or die();
         TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
         ['source' => 'EXT:' . $extKey . '/Resources/Public/Icons/myra.svg']
     );
-})('cps_myra_cloud');
+})('myra_cloud_connector');

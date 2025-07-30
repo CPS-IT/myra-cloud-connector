@@ -1,4 +1,4 @@
-# CPS MyraCloud
+# Myra Cloud Connector
 
 ### Requirements
 
@@ -9,21 +9,21 @@
 
 ## Usage
 
-Clear MyraCloud Remote-Caches out of TYPO3 Backend.
+Clear Myra Cloud Remote-Caches out of TYPO3 Backend.
 
 ## Basic functionality
 
-The MyraCloud Clear listen on different event trigger, for example the MyraCloud-ClearCache-Button im Cache Menu or
+The Myra Cloud Clear listen on different event trigger, for example the Myra Cloud-ClearCache-Button im Cache Menu or
 the clear Page cache Hook.
 
 for a successful ClearCache, we need at least 3 things,
-* MyraCloud-Config Domain
+* Myra Cloud-Config Domain
 * fqdn
 * resource/uri
 
-the [fqdn's](https://en.wikipedia.org/wiki/Fully_qualified_domain_name) are acquired via MyraCloud API (DNS-Records) for the given Domain.
+the [fqdn's](https://en.wikipedia.org/wiki/Fully_qualified_domain_name) are acquired via Myra Cloud API (DNS-Records) for the given Domain.
 
-after all requirements are loaded the MyraCloud Cache for every Domain (alias domain), every fqdn (subdomain), every uri are cleared.
+after all requirements are loaded the Myra Cloud Cache for every Domain (alias domain), every fqdn (subdomain), every uri are cleared.
 
 ### Logging
 
