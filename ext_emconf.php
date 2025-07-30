@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the TYPO3 CMS extension "cps_myra_cloud".
+ * This file is part of the TYPO3 CMS extension "myra_cloud_connector".
  *
  * It is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License, either version 2
@@ -14,8 +14,8 @@
  */
 
 $EM_CONF[$_EXTKEY] = [
-    'title' => 'MyraCloud Connector',
-    'description' => 'Clear-Cache for MyraCloud systems',
+    'title' => 'Myra Cloud Connector',
+    'description' => 'Clear-Cache for Myra Cloud systems',
     'category' => 'be',
     'author' => 'coding. powerful. systems. CPS GmbH',
     'author_email' => 'b.rannow@familie-redlich.de',

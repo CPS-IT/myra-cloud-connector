@@ -20,4 +20,4 @@ Page Clear requests are not recursive.
 
 a file via TYPO3 > Filelist to overwrite will trigger this hook.
 
-it loads also all processed files and clear them in MyraCloud.
+it loads also all processed files and clear them in Myra Cloud.

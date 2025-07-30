@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the TYPO3 CMS extension "cps_myra_cloud".
+ * This file is part of the TYPO3 CMS extension "myra_cloud_connector".
  *
  * It is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License, either version 2
@@ -15,7 +15,7 @@
 
 return [
     'external_cache_clear' => [
-        'path' => '/cps_myra_cloud/external/clear_cache_page',
-        'target' => CPSIT\CpsMyraCloud\Controller\ExternalClearCacheController::class . '::clearPageCache',
+        'path' => '/myra_cloud_connector/external/clear_cache_page',
+        'target' => CPSIT\MyraCloudConnector\Controller\ExternalClearCacheController::class . '::clearPageCache',
     ],
 ];

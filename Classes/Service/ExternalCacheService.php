@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /*
- * This file is part of the TYPO3 CMS extension "cps_myra_cloud".
+ * This file is part of the TYPO3 CMS extension "myra_cloud_connector".
  *
  * It is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License, either version 2
@@ -15,20 +15,20 @@ declare(strict_types=1);
  * The TYPO3 project - inspiring people to share!
  */
 
-namespace CPSIT\CpsMyraCloud\Service;
+namespace CPSIT\MyraCloudConnector\Service;
 
-use CPSIT\CpsMyraCloud\Adapter\AdapterInterface;
-use CPSIT\CpsMyraCloud\AdapterProvider\AdapterProvider;
-use CPSIT\CpsMyraCloud\Domain\DTO\Provider\ProviderItemRegisterInterface;
-use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\File\CustomFile;
-use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\File\FileAdmin;
-use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\File\FileInterface;
-use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\File\Typo3Conf;
-use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\File\Typo3Core;
-use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\File\Typo3Temp;
-use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\PageSlugInterface;
-use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\SiteConfigInterface;
-use CPSIT\CpsMyraCloud\Domain\Enum\Typo3CacheType;
+use CPSIT\MyraCloudConnector\Adapter\AdapterInterface;
+use CPSIT\MyraCloudConnector\AdapterProvider\AdapterProvider;
+use CPSIT\MyraCloudConnector\Domain\DTO\Provider\ProviderItemRegisterInterface;
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\CustomFile;
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\FileAdmin;
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\FileInterface;
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\Typo3Conf;
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\Typo3Core;
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\Typo3Temp;
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\PageSlugInterface;
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\SiteConfigInterface;
+use CPSIT\MyraCloudConnector\Domain\Enum\Typo3CacheType;
 
 readonly class ExternalCacheService
 {

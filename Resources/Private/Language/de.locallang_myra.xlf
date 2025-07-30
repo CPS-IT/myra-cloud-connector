@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-	<file source-language="en" target-language="de" datatype="plaintext" original="EXT:cps_myra_cloud/Resources/Private/Language/locallang_myra.xlf">
+	<file source-language="en" target-language="de" datatype="plaintext" original="EXT:myra_cloud_connector/Resources/Private/Language/locallang_myra.xlf">
 		<header/>
 		<body>
 			<trans-unit id="title" resname="title">
-				<source>MyraCloud clear cache</source>
-				<target>MyraCloud Cache leeren</target>
+				<source>Myra Cloud clear cache</source>
+				<target>Myra Cloud Cache leeren</target>
 			</trans-unit>
 			<trans-unit id="description" resname="description">
-				<source>Clear the entire MyraCloud cache</source>
-				<target>Leert den gesamten MyraCloud Cache</target>
+				<source>Clear the entire Myra Cloud cache</source>
+				<target>Leert den gesamten Myra Cloud Cache</target>
 			</trans-unit>
 			<trans-unit id="title.resource" resname="title">
-				<source>MyraCloud clear Resources Cache</source>
-				<target>MyraCloud Ressourcen Cache leeren</target>
+				<source>Myra Cloud clear Resources Cache</source>
+				<target>Myra Cloud Ressourcen Cache leeren</target>
 			</trans-unit>
 			<trans-unit id="description.resource" resname="description">
-				<source>Clear the resources MyraCloud cache [/fileadmin/*, /typo3/*, /typo3temp/*, /typo3conf/*]</source>
-				<target>Leert den gesamten MyraCloud Cache [/fileadmin/*, /typo3/*, /typo3temp/*, /typo3conf/*]</target>
+				<source>Clear the resources Myra Cloud cache [/fileadmin/*, /typo3/*, /typo3temp/*, /typo3conf/*]</source>
+				<target>Leert den gesamten Myra Cloud Cache [/fileadmin/*, /typo3/*, /typo3temp/*, /typo3conf/*]</target>
 			</trans-unit>
 			<trans-unit id="tca.site.cache.identifier" resname="tca.site.cache.identifier">
 				<source>Myra Domain List (comma separated)</source>

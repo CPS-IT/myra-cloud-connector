@@ -1,6 +1,6 @@
 {
 	"name": "cpsit/cps-myra-cloud",
-	"description": "clear cache for MyraCloud",
+	"description": "clear cache for Myra Cloud",
 	"license": "GPL-2.0-or-later",
 	"type": "typo3-cms-extension",
 	"require": {
@@ -31,12 +31,12 @@
 	],
 	"autoload": {
 		"psr-4": {
-			"CPSIT\\CpsMyraCloud\\": "Classes/"
+			"CPSIT\\MyraCloudConnector\\": "Classes/"
 		}
 	},
 	"autoload-dev": {
 		"psr-4": {
-			"CPSIT\\CpsMyraCloud\\Tests\\": "Tests/"
+			"CPSIT\\MyraCloudConnector\\Tests\\": "Tests/"
 		}
 	},
 	"config": {
@@ -50,7 +50,7 @@
 	},
 	"extra": {
 		"typo3/cms": {
-			"extension-key": "cps_myra_cloud"
+			"extension-key": "myra_cloud_connector"
 		}
 	},
 	"scripts": {

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the TYPO3 CMS extension "cps_myra_cloud".
+ * This file is part of the TYPO3 CMS extension "myra_cloud_connector".
  *
  * It is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License, either version 2
@@ -14,7 +14,7 @@
  */
 
 $GLOBALS['SiteConfiguration']['site']['columns']['myra_host'] = [
-    'label' => 'LLL:EXT:cps_myra_cloud/Resources/Private/Language/locallang_myra.xlf:tca.site.cache.identifier',
+    'label' => 'LLL:EXT:myra_cloud_connector/Resources/Private/Language/locallang_myra.xlf:tca.site.cache.identifier',
     'config' => [
         'type' => 'input',
         'default' => '',
@@ -23,4 +23,4 @@ $GLOBALS['SiteConfiguration']['site']['columns']['myra_host'] = [
     ],
 ];
 
-$GLOBALS['SiteConfiguration']['site']['types']['0']['showitem'] .= ',--div--;MyraCloud,myra_host';
+$GLOBALS['SiteConfiguration']['site']['types']['0']['showitem'] .= ',--div--;Myra Cloud,myra_host';
