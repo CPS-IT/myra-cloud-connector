@@ -1,12 +1,12 @@
-=======================
-Myra Security Connector
-=======================
+====================
+Myra Cloud Connector
+====================
 
 :Extension key:
-    :t3ext:`myra_security_connector <myra_security_connector>`
+    :t3ext:`myra_cloud_connector <myra_cloud_connector>`
 
 :Package name:
-    :composer:`cpsit/myra-security-connector`
+    :composer:`cpsit/myra-cloud-connector`
 
 :Version:
     |release|

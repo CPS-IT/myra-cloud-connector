@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /*
- * This file is part of the TYPO3 CMS extension "cps_myra_cloud".
+ * This file is part of the TYPO3 CMS extension "myra_cloud_connector".
  *
  * It is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License, either version 2
@@ -15,9 +15,9 @@ declare(strict_types=1);
  * The TYPO3 project - inspiring people to share!
  */
 
-namespace CPSIT\CpsMyraCloud\Domain\Repository;
+namespace CPSIT\MyraCloudConnector\Domain\Repository;
 
-use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\File\FileAdmin;
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\FileAdmin;
 use Doctrine\DBAL\ParameterType;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;

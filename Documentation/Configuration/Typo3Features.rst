@@ -11,7 +11,7 @@ Toggle TYPO3 features.
 Production only
 ~~~~~~~~~~~~~~~
 
-If checked, this prevents any MyraCloud clear request and disables all UI elements if the applicationContext is not "Production".
+If checked, this prevents any Myra Cloud clear request and disables all UI elements if the applicationContext is not "Production".
 This is useful to prevent clear requests from stage or development instances.
 
 .. _admin-only:
@@ -33,7 +33,7 @@ If checked, both AutoClear hooks (Page update and FileList replace) are disabled
 Domain Blacklist
 ~~~~~~~~~~~~~~~~
 
-A comma separated blacklist of Domain names, prevents any MyraCloud clear request and disables all UI alements if TYPO3 is used from a domain in this list.
+A comma separated blacklist of Domain names, prevents any Myra Cloud clear request and disables all UI alements if TYPO3 is used from a domain in this list.
 
 .. note::
     This does not affect the CLI command.

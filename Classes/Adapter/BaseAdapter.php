@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /*
- * This file is part of the TYPO3 CMS extension "cps_myra_cloud".
+ * This file is part of the TYPO3 CMS extension "myra_cloud_connector".
  *
  * It is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License, either version 2
@@ -15,9 +15,10 @@ declare(strict_types=1);
  * The TYPO3 project - inspiring people to share!
  */
 
-namespace CPSIT\CpsMyraCloud\Adapter;
+namespace CPSIT\MyraCloudConnector\Adapter;
 
-use CPSIT\CpsMyraCloud\Traits\DomainListParserTrait;
+use CPSIT\MyraCloudConnector\Extension;
+use CPSIT\MyraCloudConnector\Traits\DomainListParserTrait;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Core\Environment;
@@ -40,7 +41,7 @@ abstract class BaseAdapter implements SingletonInterface, AdapterInterface
 
     public function getRequireJsNamespace(): string
     {
-        return 'TYPO3/CMS/CpsMyraCloud/ContextMenuActions';
+        return 'TYPO3/CMS/MyraCloudConnector/ContextMenuActions';
     }
 
     public function getRequireJsFunction(): string
@@ -239,7 +240,7 @@ abstract class BaseAdapter implements SingletonInterface, AdapterInterface
 
         $data = [];
         try {
-            $data = $this->extensionConfiguration->get('cps_myra_cloud');
+            $data = $this->extensionConfiguration->get(Extension::KEY);
         } catch (\Exception) {
         }
 

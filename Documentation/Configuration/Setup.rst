@@ -4,7 +4,7 @@ Extension Setup
 
 Most settings are made in
 
-``Admin Tools > Settings > Extension Configuration > cps_myra_cloud``
+``Admin Tools > Settings > Extension Configuration > myra_cloud_connector``
 
 Use of environment variables
 ---------------------
@@ -30,12 +30,12 @@ Myra API setup
 Myra API Endpoint
 ~~~~~~~~~~~~~~~~~
 
-The MyraCloud API endpoint for every request.
+The Myra Cloud API endpoint for every request.
 
 Myra API Key
 ~~~~~~~~~~~~
 
-a MyraCloud User API KEY (who has the permissions to clear the domain).
+a Myra Cloud User API KEY (who has the permissions to clear the domain).
 
 Myra API Secret
 ~~~~~~~~~~~~~~~
@@ -45,11 +45,12 @@ the matching Secret for the API-key.
 TYPO3 Site Settings
 ~~~~~~~~~~~~~~~~~~~
 
-To link TYPO3 with MyraCloud it's necessary to announce the used MyraCloud Domains for a TYPO3 Site Entity.
+To link TYPO3 with Myra Cloud it's necessary to announce the used Myra Cloud Domains for a TYPO3 Site Entity.
 
-``Site Management > Edit [SiteXYZ] > MyraCloud > Myra Domain List``
+``Site Management > Edit [SiteXYZ] > Myra Cloud > Myra Domain List``
 
-This is a comma separated list of all Myra domains, this particular site supports. You can find the correct names in MyraSecurity Backend under myrasecurity.com.
+This is a comma separated list of all Myra domains, this particular site supports. You can find the correct names in
+`Myra Cloud Backend <https://dashboard.myracloud.com>`__.
 
 .. image:: ../img/myra_websites.png
     :alt: Myra Backend Website List

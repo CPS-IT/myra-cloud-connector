@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the TYPO3 CMS extension "myra_cloud_connector".
  *
@@ -13,14 +15,15 @@
  * The TYPO3 project - inspiring people to share!
  */
 
-$GLOBALS['SiteConfiguration']['site']['columns']['myra_host'] = [
-    'label' => 'LLL:EXT:myra_cloud_connector/Resources/Private/Language/locallang_myra.xlf:tca.site.cache.identifier',
-    'config' => [
-        'type' => 'input',
-        'default' => '',
-        'placeholder' => '',
-        'size' => 255,
-    ],
-];
+namespace CPSIT\MyraCloudConnector;
 
-$GLOBALS['SiteConfiguration']['site']['types']['0']['showitem'] .= ',--div--;Myra Cloud,myra_host';
+/**
+ * Extension
+ *
+ * @author Elias Häußler <e.haeussler@familie-redlich.de>
+ * @license GPL-2.0-or-later
+ */
+final readonly class Extension
+{
+    public const KEY = 'myra_cloud_connector';
+}

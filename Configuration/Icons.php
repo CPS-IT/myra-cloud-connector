@@ -13,14 +13,13 @@
  * The TYPO3 project - inspiring people to share!
  */
 
-$GLOBALS['SiteConfiguration']['site']['columns']['myra_host'] = [
-    'label' => 'LLL:EXT:myra_cloud_connector/Resources/Private/Language/locallang_myra.xlf:tca.site.cache.identifier',
-    'config' => [
-        'type' => 'input',
-        'default' => '',
-        'placeholder' => '',
-        'size' => 255,
+use TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider;
+
+defined('TYPO3') or die();
+
+return [
+    'ext-myra-cloud-connector-myra' => [
+        'provider' => SvgIconProvider::class,
+        'source' => 'EXT:myra_cloud_connector/Resources/Public/Icons/myra.svg',
     ],
 ];
-
-$GLOBALS['SiteConfiguration']['site']['types']['0']['showitem'] .= ',--div--;Myra Cloud,myra_host';
