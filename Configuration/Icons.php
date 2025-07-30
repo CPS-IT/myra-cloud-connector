@@ -13,15 +13,13 @@
  * The TYPO3 project - inspiring people to share!
  */
 
+use TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider;
+
 defined('TYPO3') or die();
 
-(function ($extKey) {
-    $iconRegistry = TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
-        TYPO3\CMS\Core\Imaging\IconRegistry::class
-    );
-    $iconRegistry->registerIcon(
-        'cps-cache-myra',
-        TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
-        ['source' => 'EXT:' . $extKey . '/Resources/Public/Icons/myra.svg']
-    );
-})('myra_cloud_connector');
+return [
+    'cps-cache-myra' => [
+        'provider' => SvgIconProvider::class,
+        'source' => 'EXT:myra_cloud_connector/Resources/Public/Icons/myra.svg',
+    ],
+];
