@@ -19,13 +19,10 @@ namespace CPSIT\MyraCloudConnector\Domain\DTO\Provider;
 
 use CPSIT\MyraCloudConnector\Adapter\AdapterInterface;
 use CPSIT\MyraCloudConnector\Adapter\AdapterRegisterInterface;
-use CPSIT\MyraCloudConnector\Domain\Enum\Typo3CacheType;
 
 interface ProviderItemRegisterInterface extends AdapterRegisterInterface
 {
     public function getAdapter(): AdapterInterface;
-
-    public function getRequireJsCall(string $id, Typo3CacheType $type = Typo3CacheType::UNKNOWN): string;
 
     public function getTypo3CssClass(): string;
 
