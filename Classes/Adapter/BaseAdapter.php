@@ -17,6 +17,7 @@ declare(strict_types=1);
 
 namespace CPSIT\MyraCloudConnector\Adapter;
 
+use CPSIT\MyraCloudConnector\Extension;
 use CPSIT\MyraCloudConnector\Traits\DomainListParserTrait;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
@@ -239,7 +240,7 @@ abstract class BaseAdapter implements SingletonInterface, AdapterInterface
 
         $data = [];
         try {
-            $data = $this->extensionConfiguration->get('myra_cloud_connector');
+            $data = $this->extensionConfiguration->get(Extension::KEY);
         } catch (\Exception) {
         }
 

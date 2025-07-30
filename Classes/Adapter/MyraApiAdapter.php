@@ -19,6 +19,7 @@ namespace CPSIT\MyraCloudConnector\Adapter;
 
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\PageSlugInterface;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\SiteConfigInterface;
+use CPSIT\MyraCloudConnector\Extension;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
@@ -41,7 +42,7 @@ class MyraApiAdapter extends BaseAdapter
 
     public function getCacheId(): string
     {
-        return 'myra_cloud_connector';
+        return Extension::KEY;
     }
 
     public function getCacheIconIdentifier(): string
