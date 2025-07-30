@@ -18,7 +18,7 @@ use TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider;
 defined('TYPO3') or die();
 
 return [
-    'cps-cache-myra' => [
+    'ext-myra-cloud-connector-myra' => [
         'provider' => SvgIconProvider::class,
         'source' => 'EXT:myra_cloud_connector/Resources/Public/Icons/myra.svg',
     ],

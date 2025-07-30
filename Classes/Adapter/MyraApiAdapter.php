@@ -47,7 +47,7 @@ class MyraApiAdapter extends BaseAdapter
 
     public function getCacheIconIdentifier(): string
     {
-        return 'cps-cache-myra';
+        return 'ext-myra-cloud-connector-myra';
     }
 
     public function getCacheTitle(): string
