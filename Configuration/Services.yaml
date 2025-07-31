@@ -27,3 +27,9 @@ services:
     tags:
       - name: event.listener
         identifier: 'cpsit/myra-cloud-connector/external-clear-cache-menu-item'
+
+  # @todo Migrate to attribute once support for TYPO3 v12 is dropped
+  CPSIT\MyraCloudConnector\EventListener\ExternalClearResourceCacheListener:
+    tags:
+      - name: event.listener
+        identifier: 'cpsit/myra-cloud-connector/external-clear-resource-cache'

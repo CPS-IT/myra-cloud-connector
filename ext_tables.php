@@ -15,9 +15,7 @@
 
 use CPSIT\MyraCloudConnector\DataHandler\DataHandlerHook;
 use CPSIT\MyraCloudConnector\Extension;
-use CPSIT\MyraCloudConnector\FileList\FileListHook;
 
 defined('TYPO3') or die();
 
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_extfilefunc.php']['processData'][Extension::KEY] = FileListHook::class;
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['clearCachePostProc'][Extension::KEY] = DataHandlerHook::class . '->clearCachePostProc';

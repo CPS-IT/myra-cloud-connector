@@ -15,7 +15,7 @@ declare(strict_types=1);
  * The TYPO3 project - inspiring people to share!
  */
 
-namespace CPSIT\MyraCloudConnector\FileList;
+namespace CPSIT\MyraCloudConnector\EventListener;
 
 use CPSIT\MyraCloudConnector\AdapterProvider\AdapterProvider;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\FileAdmin;
@@ -23,52 +23,35 @@ use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\FileInterface as MyraFileInte
 use CPSIT\MyraCloudConnector\Domain\Enum\Typo3CacheType;
 use CPSIT\MyraCloudConnector\Domain\Repository\FileRepository;
 use CPSIT\MyraCloudConnector\Service\ExternalCacheService;
-use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
 use TYPO3\CMS\Core\Resource\DuplicationBehavior;
+use TYPO3\CMS\Core\Resource\Event\AfterFileCommandProcessedEvent;
 use TYPO3\CMS\Core\Resource\FileInterface;
-use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Core\Utility\File\ExtendedFileUtility;
 
-#[Autoconfigure(public: true)]
-class FileListHook implements SingletonInterface
+final readonly class ExternalClearResourceCacheListener
 {
-    private array $pageAlreadyCleared = [];
-
     public function __construct(
-        private readonly ExternalCacheService $externalCacheService,
-        private readonly FileRepository $fileRepository,
-        private readonly AdapterProvider $provider
+        private ExternalCacheService $externalCacheService,
+        private FileRepository $fileRepository,
+        private AdapterProvider $provider,
+        #[Autowire('@cache.runtime')]
+        private FrontendInterface $cache,
     ) {}
 
-    /**
-     * @param string $action
-     * @param array $cmdArr
-     * @param array $result
-     * @param ExtendedFileUtility $parentObject
-     */
-    public function processData_postProcessAction($action, array $cmdArr, array $result, ExtendedFileUtility $parentObject): void
+    public function __invoke(AfterFileCommandProcessedEvent $event): void
     {
-        if ($action === 'upload' && $parentObject->getExistingFilesConflictMode() === DuplicationBehavior::REPLACE) {
+        $action = array_key_first($event->getCommand());
+
+        if ($action === 'upload' && $event->getConflictMode() === DuplicationBehavior::REPLACE) {
             $provider = $this->provider->getDefaultProviderItem();
+
             if ($provider && $provider->canAutomated()) {
-                $this->clearCacheForFileGroups($result);
+                $this->clearCacheForFiles($event->getResult());
             }
         }
     }
 
-    /**
-     * @param array $groups
-     */
-    private function clearCacheForFileGroups(array $groups): void
-    {
-        foreach ($groups as $group) {
-            $this->clearCacheForFiles($group);
-        }
-    }
-
-    /**
-     * @param array $files
-     */
     private function clearCacheForFiles(array $files): void
     {
         foreach ($files as $file) {
@@ -78,9 +61,6 @@ class FileListHook implements SingletonInterface
         }
     }
 
-    /**
-     * @param FileInterface $file
-     */
     private function clearCacheForFile(FileInterface $file): void
     {
         $path = $file->getIdentifier();
@@ -92,10 +72,6 @@ class FileListHook implements SingletonInterface
         }
     }
 
-    /**
-     * @param FileInterface $file
-     * @return array
-     */
     private function getProcessedFiles(FileInterface $file): array
     {
         try {
@@ -107,19 +83,19 @@ class FileListHook implements SingletonInterface
         return $files;
     }
 
-    /**
-     * @param MyraFileInterface $file
-     */
     private function clearMyraFile(MyraFileInterface $file): void
     {
         // TODO: add other storages here not only (1:)
         $path = '1:/' . ltrim($file->getRawSlug(), '/');
-        $crc = crc32($path);
-        if (!($this->pageAlreadyCleared[$crc] ?? false)) {
+        $cacheIdentifier = 'myra-cloud-file-list-' . crc32($path);
+
+        if ($this->cache->get($cacheIdentifier) === false) {
             try {
-                $this->pageAlreadyCleared[$crc] = $this->externalCacheService->clear(Typo3CacheType::RESOURCE, $path);
+                $this->cache->set(
+                    $cacheIdentifier,
+                    $this->externalCacheService->clear(Typo3CacheType::RESOURCE, $path),
+                );
             } catch (\Exception) {
-                $this->pageAlreadyCleared[$crc] = false;
             }
         }
     }
