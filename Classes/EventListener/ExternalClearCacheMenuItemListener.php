@@ -15,69 +15,73 @@ declare(strict_types=1);
  * The TYPO3 project - inspiring people to share!
  */
 
-namespace CPSIT\MyraCloudConnector\CacheActionMenu;
+namespace CPSIT\MyraCloudConnector\EventListener;
 
 use CPSIT\MyraCloudConnector\AdapterProvider\AdapterProvider;
 use CPSIT\MyraCloudConnector\Domain\Enum\Typo3CacheType;
+use TYPO3\CMS\Backend\Backend\Event\ModifyClearCacheActionsEvent;
 use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 
-readonly class ExternalClearCacheMenuItemProvider
+final readonly class ExternalClearCacheMenuItemListener
 {
     public function __construct(
         private AdapterProvider $provider,
-        private UriBuilder $uriBuilder
+        private UriBuilder $uriBuilder,
     ) {}
 
     /**
-     * @param $cacheActions
-     * @param $optionValues
      * @throws RouteNotFoundException
      */
-    public function manipulateCacheActions(&$cacheActions, &$optionValues): void
+    public function __invoke(ModifyClearCacheActionsEvent $event): void
     {
-        $this->setClearAllCacheButton($cacheActions, $optionValues);
-        $this->setClearAllResourcesCacheButton($cacheActions, $optionValues);
+        $this->addClearAllCacheButton($event);
+        $this->addClearAllResourcesCacheButton($event);
     }
 
     /**
-     * @param array $cacheActions
-     * @param array $optionValues
      * @throws RouteNotFoundException
      */
-    public function setClearAllCacheButton(array &$cacheActions, array &$optionValues): void
+    private function addClearAllCacheButton(ModifyClearCacheActionsEvent $event): void
     {
         $provider = $this->provider->getDefaultProviderItem();
+
         if ($provider && $provider->canInteract()) {
-            $cacheActions[] = [
+            $event->addCacheActionIdentifier($provider->getCacheId());
+            $event->addCacheAction([
                 'id' => $provider->getCacheId(),
                 'title' => $provider->getCacheTitle(),
                 'description' => $provider->getCacheDescription(),
-                'href' => (string)$this->uriBuilder->buildUriFromRoute('ajax_external_cache_clear', ['type' => Typo3CacheType::ALL_PAGE->value, 'id' => '-1']),
+                'href' => (string)$this->uriBuilder->buildUriFromRoute(
+                    'ajax_external_cache_clear',
+                    ['type' => Typo3CacheType::ALL_PAGE->value, 'id' => '-1'],
+                ),
                 'iconIdentifier' => $provider->getCacheIconIdentifier(),
-            ];
-            $optionValues[] = $provider->getCacheId();
+            ]);
         }
     }
 
     /**
-     * @param array $cacheActions
-     * @param array $optionValues
      * @throws RouteNotFoundException
      */
-    public function setClearAllResourcesCacheButton(array &$cacheActions, array &$optionValues): void
+    private function addClearAllResourcesCacheButton(ModifyClearCacheActionsEvent $event): void
     {
         $provider = $this->provider->getDefaultProviderItem();
+
         if ($provider && $provider->canInteract()) {
             $id = $provider->getCacheId() . '_resources';
-            $cacheActions[] = [
+
+            $event->addCacheActionIdentifier($id);
+            $event->addCacheAction([
                 'id' => $id,
                 'title' => $provider->getCacheTitle() . '.resource',
                 'description' => $provider->getCacheDescription() . '.resource',
-                'href' => (string)$this->uriBuilder->buildUriFromRoute('ajax_external_cache_clear', ['type' => Typo3CacheType::ALL_RESOURCES->value, 'id' => '-1']),
+                'href' => (string)$this->uriBuilder->buildUriFromRoute(
+                    'ajax_external_cache_clear',
+                    ['type' => Typo3CacheType::ALL_RESOURCES->value, 'id' => '-1'],
+                ),
                 'iconIdentifier' => $provider->getCacheIconIdentifier(),
-            ];
-            $optionValues[] = $id;
+            ]);
         }
     }
 }
