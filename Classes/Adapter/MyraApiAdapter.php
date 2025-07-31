@@ -127,7 +127,7 @@ class MyraApiAdapter extends BaseAdapter
         $this->writeLog(
             'User %s has cleared the MYRA_CLOUD cache for domain %s => %s%s (recursive: %s) (success: %s)',
             [
-                $this->getBEUser()->user['username'] . ' (uid: ' . $this->getBEUser()->user['uid'] . ')',
+                $this->getBackendUser()->user['username'] . ' (uid: ' . $this->getBackendUser()->user['uid'] . ')',
                 $domain,
                 $fqdn,
                 $path,

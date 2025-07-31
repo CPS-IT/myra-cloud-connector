@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace CPSIT\MyraCloudConnector\Domain\DTO\Provider;
 
 use CPSIT\MyraCloudConnector\Adapter\AdapterInterface;
-use CPSIT\MyraCloudConnector\Domain\Enum\Typo3CacheType;
+use TYPO3\CMS\Core\Page\JavaScriptModuleInstruction;
 
 class ProviderItem implements ProviderItemRegisterInterface
 {
@@ -51,24 +51,24 @@ class ProviderItem implements ProviderItemRegisterInterface
         return $this->getAdapter()->getCacheDescription();
     }
 
-    public function getRequireJsNamespace(): string
+    public function getJavaScriptModule(): string
     {
-        return $this->getAdapter()->getRequireJsNamespace();
+        return $this->getAdapter()->getJavaScriptModule();
     }
 
-    public function getRequireJsFunction(): string
+    public function getJavaScriptModuleInstruction(): JavaScriptModuleInstruction
     {
-        return $this->getAdapter()->getRequireJsFunction();
+        return $this->getAdapter()->getJavaScriptModuleInstruction();
     }
 
-    public function getRequireJsCall(string $id, Typo3CacheType $type = Typo3CacheType::UNKNOWN): string
+    public function getJavaScriptMethod(): string
     {
-        return 'require(["' . $this->getRequireJsNamespace() . '"],function(c){c.' . $this->getRequireJsFunction() . '(' . $type->value . ', \'' . $id . '\');});return false;';
+        return $this->getAdapter()->getJavaScriptMethod();
     }
 
     public function getTypo3CssClass(): string
     {
-        return 't3js-clear-page-cache';
+        return 't3js-clear-myra-cache';
     }
 
     public function canExecute(): bool

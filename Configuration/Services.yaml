@@ -15,3 +15,9 @@ services:
         description: 'TYPO3/Myra Cloud Interface'
         hidden: false
         schedulable: false
+
+  # @todo Migrate to attribute once support for TYPO3 v12 is dropped
+  CPSIT\MyraCloudConnector\EventListener\ExternalClearCacheButtonListener:
+    tags:
+      - name: event.listener
+        identifier: 'cpsit/myra-cloud-connector/external-clear-cache-button'

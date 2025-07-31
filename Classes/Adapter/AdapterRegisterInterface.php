@@ -17,6 +17,8 @@ declare(strict_types=1);
 
 namespace CPSIT\MyraCloudConnector\Adapter;
 
+use TYPO3\CMS\Core\Page\JavaScriptModuleInstruction;
+
 interface AdapterRegisterInterface
 {
     public function getCacheId(): string;
@@ -27,7 +29,9 @@ interface AdapterRegisterInterface
 
     public function getCacheDescription(): string;
 
-    public function getRequireJsNamespace(): string;
+    public function getJavaScriptModule(): string;
 
-    public function getRequireJsFunction(): string;
+    public function getJavaScriptModuleInstruction(): JavaScriptModuleInstruction;
+
+    public function getJavaScriptMethod(): string;
 }
