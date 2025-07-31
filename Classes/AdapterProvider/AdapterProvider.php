@@ -30,7 +30,7 @@ final class AdapterProvider
      * @param AdapterInterface[] $adapters
      */
     public function __construct(
-        #[AutowireIterator('cpsit.external.cache.adapter')]
+        #[AutowireIterator('myra_cloud.external.cache.adapter')]
         private readonly iterable $adapters,
     ) {}
 

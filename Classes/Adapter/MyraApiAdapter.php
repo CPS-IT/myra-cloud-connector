@@ -32,7 +32,7 @@ use Myracloud\WebApi\Endpoint\DnsRecord;
 use Myracloud\WebApi\Middleware\Signature;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
-#[AutoconfigureTag('cpsit.external.cache.adapter')]
+#[AutoconfigureTag('myra_cloud.external.cache.adapter')]
 class MyraApiAdapter extends BaseAdapter
 {
     protected array $clients;
