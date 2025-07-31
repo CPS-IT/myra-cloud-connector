@@ -19,10 +19,12 @@ namespace CPSIT\MyraCloudConnector\Adapter;
 
 use CPSIT\MyraCloudConnector\Extension;
 use CPSIT\MyraCloudConnector\Traits\DomainListParserTrait;
+use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Http\ServerRequestFactory;
+use TYPO3\CMS\Core\Page\JavaScriptModuleInstruction;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\SysLog\Action\Cache as SystemLogCacheAction;
 use TYPO3\CMS\Core\SysLog\Error as SystemLogErrorClassification;
@@ -39,45 +41,37 @@ abstract class BaseAdapter implements SingletonInterface, AdapterInterface
         private readonly ExtensionConfiguration $extensionConfiguration,
     ) {}
 
-    public function getRequireJsNamespace(): string
+    public function getJavaScriptModule(): string
     {
-        return 'TYPO3/CMS/MyraCloudConnector/ContextMenuActions';
+        return '@cpsit/myra-cloud-connector/clear-cache-actions';
     }
 
-    public function getRequireJsFunction(): string
+    public function getJavaScriptModuleInstruction(): JavaScriptModuleInstruction
     {
-        return 'ClearExternalCache';
+        return JavaScriptModuleInstruction::create($this->getJavaScriptModule() . '.js');
     }
 
-    abstract public function getCacheId(): string;
-
-    abstract public function getCacheIconIdentifier(): string;
-
-    abstract public function getCacheTitle(): string;
-
-    abstract public function getCacheDescription(): string;
+    public function getJavaScriptMethod(): string
+    {
+        return 'clearExternalCache';
+    }
 
     abstract protected function getAdapterConfigPrefix(): string;
 
-    /**
-     * @return BackendUserAuthentication|null
-     */
-    protected function getBEUser(): ?BackendUserAuthentication
+    protected function getBackendUser(): ?BackendUserAuthentication
     {
-        if (($GLOBALS['BE_USER'] ?? null) instanceof BackendUserAuthentication) {
-            return $GLOBALS['BE_USER'];
+        $backendUser = $GLOBALS['BE_USER'] ?? null;
+
+        if ($backendUser instanceof BackendUserAuthentication) {
+            return $backendUser;
         }
 
         return null;
     }
 
-    /**
-     * @param string $message
-     * @param array $arguments
-     */
     protected function writeLog(string $message, array $arguments): void
     {
-        $beUser = $this->getBEUser();
+        $beUser = $this->getBackendUser();
         if ($beUser) {
             $beUser->writeLog(
                 SystemLogType::CACHE,
@@ -85,48 +79,26 @@ abstract class BaseAdapter implements SingletonInterface, AdapterInterface
                 SystemLogErrorClassification::MESSAGE,
                 0,
                 $message,
-                $arguments
+                $arguments,
             );
         }
     }
 
-    /**
-     * @return bool
-     */
     public function canExecute(): bool
     {
-        return !(
-            !$this->setupConfigCondition() ||
-            !$this->liveOnlyCondition() ||
-            !$this->domainNotBlacklisted()
-        );
+        return $this->setupConfigCondition() && $this->liveOnlyCondition() && $this->domainNotBlacklisted();
     }
 
-    /**
-     * @return bool
-     */
     public function canInteract(): bool
     {
-        return !(
-            !$this->adminOnlyCondition() ||
-            !$this->canExecute()
-        );
+        return $this->adminOnlyCondition() && $this->canExecute();
     }
 
-    /**
-     * @return bool
-     */
     public function canAutomated(): bool
     {
-        return !(
-            !$this->isAutomatedAllowedCondition() ||
-            !$this->canExecute()
-        );
+        return $this->isAutomatedAllowedCondition() && $this->canExecute();
     }
 
-    /**
-     * @return bool
-     */
     private function isAutomatedAllowedCondition(): bool
     {
         if (isset(self::$checkupCache[__METHOD__])) {
@@ -134,28 +106,26 @@ abstract class BaseAdapter implements SingletonInterface, AdapterInterface
         }
 
         $allConfigData = $this->getAdapterConfig(true);
-        $hooksDisabled = ($allConfigData['disableHooks'] ?? '0') === '1';
+        $hooksDisabled = (int)($allConfigData['disableHooks'] ?? 0) === 1;
 
         return self::$checkupCache[__METHOD__] = !$hooksDisabled;
     }
 
-    /**
-     * @return bool
-     */
     private function adminOnlyCondition(): bool
     {
         if (isset(self::$checkupCache[__METHOD__])) {
             return self::$checkupCache[__METHOD__];
         }
 
-        /** @var BackendUserAuthentication $backendUser */
-        $backendUser = $GLOBALS['BE_USER'] ?? null;
+        $backendUser = $this->getBackendUser();
+
         if (!$backendUser) {
             return self::$checkupCache[__METHOD__] = false;
         }
 
         $allConfigData = $this->getAdapterConfig(true);
-        $only = ($allConfigData['onlyAdmin'] ?? '1') === '1';
+        $only = (int)($allConfigData['onlyAdmin'] ?? 1) === 1;
+
         if ($only) {
             return self::$checkupCache[__METHOD__] = $backendUser->isAdmin();
         }
@@ -163,9 +133,6 @@ abstract class BaseAdapter implements SingletonInterface, AdapterInterface
         return self::$checkupCache[__METHOD__] = true;
     }
 
-    /**
-     * @return bool
-     */
     private function liveOnlyCondition(): bool
     {
         if (isset(self::$checkupCache[__METHOD__])) {
@@ -173,7 +140,8 @@ abstract class BaseAdapter implements SingletonInterface, AdapterInterface
         }
 
         $allConfigData = $this->getAdapterConfig(true);
-        $only = ($allConfigData['onlyLive'] ?? '1') === '1';
+        $only = (int)($allConfigData['onlyLive'] ?? 1) === 1;
+
         if ($only) {
             return self::$checkupCache[__METHOD__] = Environment::getContext()->isProduction();
         }
@@ -181,9 +149,6 @@ abstract class BaseAdapter implements SingletonInterface, AdapterInterface
         return self::$checkupCache[__METHOD__] = true;
     }
 
-    /**
-     * @return bool
-     */
     private function domainNotBlacklisted(): bool
     {
         if (isset(self::$checkupCache[__METHOD__])) {
@@ -196,14 +161,12 @@ abstract class BaseAdapter implements SingletonInterface, AdapterInterface
 
         $blacklistString = $this->getAdapterConfig(true)['domainBlacklist'] ?? '';
         $blackList = $this->parseCommaList($blacklistString);
-        $request = $GLOBALS['TYPO3_REQUEST'] ?? ServerRequestFactory::fromGlobals();
+        $request = $this->getServerRequest();
         $currentDomainContext = $request->getUri()->getHost();
-        return self::$checkupCache[__METHOD__] = (empty($blackList) || !in_array($currentDomainContext, $blackList));
+
+        return self::$checkupCache[__METHOD__] = (empty($blackList) || !in_array($currentDomainContext, $blackList, true));
     }
 
-    /**
-     * @return bool
-     */
     private function setupConfigCondition(): bool
     {
         if (isset(self::$checkupCache[__METHOD__])) {
@@ -212,41 +175,39 @@ abstract class BaseAdapter implements SingletonInterface, AdapterInterface
 
         $allConfigData = $this->getAdapterConfig(true);
         foreach ($allConfigData as $key => $value) {
-            if (str_starts_with($key, $this->getAdapterConfigPrefix())) {
-                if (empty($this->getRealAdapterConfigValue($value))) {
-                    return self::$checkupCache[__METHOD__] = false;
-                }
+            if (str_starts_with($key, $this->getAdapterConfigPrefix()) && empty($this->getRealAdapterConfigValue($value))) {
+                return self::$checkupCache[__METHOD__] = false;
             }
         }
 
         return self::$checkupCache[__METHOD__] = true;
     }
 
-    /**
-     * @param bool $ignorePrefix
-     * @return array
-     */
     protected function getAdapterConfig(bool $ignorePrefix = false): array
     {
         $prefix = $this->getAdapterConfigPrefix();
+
         if (!empty(self::$configCache)) {
             if ($ignorePrefix) {
                 return self::$configCache['all'];
             }
+
             if (!empty(self::$configCache[$prefix])) {
                 return self::$configCache[$prefix];
             }
         }
 
-        $data = [];
         try {
             $data = $this->extensionConfiguration->get(Extension::KEY);
         } catch (\Exception) {
+            $data = [];
         }
 
         foreach ($data as $key => $value) {
             $value = $this->getRealAdapterConfigValue($value);
+
             self::$configCache['all'][$key] = $value;
+
             if (str_starts_with((string)$key, $prefix)) {
                 self::$configCache[$prefix][$key] = $value;
             }
@@ -259,11 +220,12 @@ abstract class BaseAdapter implements SingletonInterface, AdapterInterface
         return self::$configCache[$prefix];
     }
 
-    /**
-     * @param string $value
-     * @return string
-     */
-    private function getRealAdapterConfigValue(string $value): string
+    protected function getServerRequest(): ServerRequestInterface
+    {
+        return $GLOBALS['TYPO3_REQUEST'] ?? ServerRequestFactory::fromGlobals();
+    }
+
+    protected function getRealAdapterConfigValue(string $value): string
     {
         if (stripos($value, 'ENV=') === 0) {
             return (string)getenv(substr($value, 4));

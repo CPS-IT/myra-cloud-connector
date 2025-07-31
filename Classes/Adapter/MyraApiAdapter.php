@@ -30,7 +30,9 @@ use Myracloud\WebApi\Endpoint\AbstractEndpoint;
 use Myracloud\WebApi\Endpoint\CacheClear;
 use Myracloud\WebApi\Endpoint\DnsRecord;
 use Myracloud\WebApi\Middleware\Signature;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
+#[AutoconfigureTag('myra_cloud.external.cache.adapter')]
 class MyraApiAdapter extends BaseAdapter
 {
     protected array $clients;
@@ -125,7 +127,7 @@ class MyraApiAdapter extends BaseAdapter
         $this->writeLog(
             'User %s has cleared the MYRA_CLOUD cache for domain %s => %s%s (recursive: %s) (success: %s)',
             [
-                $this->getBEUser()->user['username'] . ' (uid: ' . $this->getBEUser()->user['uid'] . ')',
+                $this->getBackendUser()->user['username'] . ' (uid: ' . $this->getBackendUser()->user['uid'] . ')',
                 $domain,
                 $fqdn,
                 $path,

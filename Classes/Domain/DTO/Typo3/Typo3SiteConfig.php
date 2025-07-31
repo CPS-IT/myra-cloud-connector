@@ -24,7 +24,7 @@ class Typo3SiteConfig implements SiteConfigInterface
 {
     use DomainListParserTrait;
 
-    private ?array $myraDomainList = [];
+    private ?array $myraDomainList = null;
 
     /**
      * @param SiteInterface $site

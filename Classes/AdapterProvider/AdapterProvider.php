@@ -20,6 +20,7 @@ namespace CPSIT\MyraCloudConnector\AdapterProvider;
 use CPSIT\MyraCloudConnector\Adapter\AdapterInterface;
 use CPSIT\MyraCloudConnector\Domain\DTO\Provider\ProviderItem;
 use CPSIT\MyraCloudConnector\Domain\DTO\Provider\ProviderItemRegisterInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 final class AdapterProvider
 {
@@ -29,7 +30,8 @@ final class AdapterProvider
      * @param AdapterInterface[] $adapters
      */
     public function __construct(
-        private readonly iterable $adapters
+        #[AutowireIterator('myra_cloud.external.cache.adapter')]
+        private readonly iterable $adapters,
     ) {}
 
     public function getAllProviderItems(): iterable
