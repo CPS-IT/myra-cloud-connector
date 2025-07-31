@@ -1,4 +1,10 @@
+<div align="center">
+
+![EXT:myra_cloud_connector extension icon](Resources/Public/Icons/Extension.svg)
+
 # Myra Cloud Connector
+
+</div>
 
 ### Requirements
 
