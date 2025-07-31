@@ -1,5 +1,5 @@
 {
-	"name": "cpsit/cps-myra-cloud",
+	"name": "cpsit/myra-cloud-connector",
 	"description": "clear cache for Myra Cloud",
 	"license": "GPL-2.0-or-later",
 	"type": "typo3-cms-extension",
@@ -23,6 +23,9 @@
 		"shipmonk/composer-dependency-analyser": "^1.8",
 		"ssch/typo3-rector": "^3.6",
 		"typo3/coding-standards": "^0.8.0"
+	},
+	"replace": {
+		"cpsit/cps-myra-cloud": "self.version"
 	},
 	"repositories": [
 		{
