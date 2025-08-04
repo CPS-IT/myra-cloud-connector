@@ -10,3 +10,10 @@ Hooks and CLI command.
 
     AutoClear-Hooks
     CLI-Command
+
+
+----------------------
+Myra Security Platform API Reference
+----------------------
+
+https://apiv2.myracloud.com/api/doc
