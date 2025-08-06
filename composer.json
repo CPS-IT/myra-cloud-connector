@@ -28,12 +28,6 @@
 	"replace": {
 		"cpsit/cps-myra-cloud": "self.version"
 	},
-	"repositories": [
-		{
-			"type": "vcs",
-			"url": "git@github.com:CPS-IT/myra-web-api.git"
-		}
-	],
 	"autoload": {
 		"psr-4": {
 			"CPSIT\\MyraCloudConnector\\": "Classes/"
