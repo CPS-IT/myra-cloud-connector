@@ -19,6 +19,13 @@ namespace CPSIT\MyraCloudConnector\Domain\Enum;
 
 enum Typo3CacheType: int
 {
+    private const NAME_MAP = [
+        'all' => self::ALL_PAGE,
+        'allresources' => self::ALL_RESOURCES,
+        'page' => self::PAGE,
+        'resource' => self::RESOURCE,
+    ];
+
     case INVALID = -1;
     case UNKNOWN = 0;
     case PAGE = 1;
@@ -29,5 +36,29 @@ enum Typo3CacheType: int
     public function isKnown(): bool
     {
         return $this->value > self::UNKNOWN->value;
+    }
+
+    public static function fromName(string $name): self
+    {
+        return self::NAME_MAP[\strtolower($name)]
+            ?? throw new \InvalidArgumentException('Unknown cache type: ' . $name, 1754466009)
+        ;
+    }
+
+    public static function tryFromName(string $name): ?self
+    {
+        try {
+            return self::fromName($name);
+        } catch (\InvalidArgumentException) {
+            return null;
+        }
+    }
+
+    /**
+     * @return list<string>
+     */
+    public static function names(): array
+    {
+        return \array_keys(self::NAME_MAP);
     }
 }

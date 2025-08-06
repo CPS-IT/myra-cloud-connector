@@ -23,16 +23,10 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
-class MyraCloudClearCommand extends Command
+final class MyraCloudClearCommand extends Command
 {
-    private array $typeMap = [
-        'all' => Typo3CacheType::ALL_PAGE,
-        'allresources' => Typo3CacheType::ALL_RESOURCES,
-        'page' => Typo3CacheType::PAGE,
-        'resource' => Typo3CacheType::RESOURCE,
-    ];
-
     public function __construct(
         private readonly ExternalCacheService $externalCacheService,
     ) {
@@ -55,33 +49,31 @@ class MyraCloudClearCommand extends Command
             '-t all ' . "\t\t" . ' clear everything in myracloud for this TYPO3 Instance (does not need a identifier)' . LF .
             '-t allresources ' . "\t" . ' clear everything, recursive, under these folders (does not need a identifier): ' . LF .
             "\t\t\t" . ' /fileadmin/*, /typo3/*, /typo3temp/*, /typo3conf/*' . LF);
-        $this->addOption('type', 't', InputArgument::OPTIONAL, 'types: ' . implode(', ', array_keys($this->typeMap)), '');
+        $this->addOption('type', 't', InputArgument::OPTIONAL, 'types: ' . implode(', ', Typo3CacheType::names()), '');
         $this->addOption('identifier', 'i', InputArgument::OPTIONAL, 'page id or resource path for (page / resource type)', '');
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $io = new SymfonyStyle($input, $output);
         $type = trim((string)$input->getOption('type'));
         $identifier = trim((string)$input->getOption('identifier'));
-        $typeId = $this->typeMap[$type] ?? Typo3CacheType::INVALID;
+        $typeId = Typo3CacheType::tryFromName($type) ?? Typo3CacheType::INVALID;
 
-        if ($typeId > Typo3CacheType::UNKNOWN) {
-            $result = ($this->externalCacheService->clear($typeId, $identifier) ? Command::SUCCESS : Command::FAILURE);
+        if (!$typeId->isKnown()) {
+            $io->error('Invalid options provided.');
 
-            if ($result === Command::FAILURE) {
-                $output->writeln('<error>some or all operations failed</error>');
-            }
-
-            return $result;
+            return self::INVALID;
         }
 
-        $output->writeln('<error>invalid options provided</error>');
+        if (!$this->externalCacheService->clear($typeId, $identifier)) {
+            $io->error('Some or all operations failed.');
 
-        return Command::INVALID;
+            return self::FAILURE;
+        }
+
+        $io->success('Cache clear request was successful.');
+
+        return self::SUCCESS;
     }
 }
