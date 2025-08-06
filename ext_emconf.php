@@ -18,8 +18,7 @@ $EM_CONF[$_EXTKEY] = [
     'description' => 'Clear-Cache for Myra Cloud systems',
     'category' => 'be',
     'author' => 'coding. powerful. systems. CPS GmbH',
-    'author_email' => 'b.rannow@familie-redlich.de',
-    'author_company' => 'coding. powerful. systems. CPS GmbH',
+    'author_email' => 'info@cps-it.de',
     'state' => 'beta',
     'version' => '2.0.0',
     'constraints' => [
@@ -27,7 +26,5 @@ $EM_CONF[$_EXTKEY] = [
             'typo3' => '12.4.0-12.4.99',
             'php' => '8.2.0-8.4.99',
         ],
-        'conflicts' => [],
-        'suggests' => [],
     ],
 ];
