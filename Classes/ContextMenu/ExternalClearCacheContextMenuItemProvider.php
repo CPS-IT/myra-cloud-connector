@@ -41,14 +41,12 @@ class ExternalClearCacheContextMenuItemProvider extends AbstractProvider
 
         $provider = $this->adapterProvider->getDefaultProviderItem();
 
-        if ($provider === null || !$provider->canInteract()) {
+        if ($provider?->canInteract() !== true) {
             return false;
         }
 
         if ($type === Typo3CacheType::PAGE) {
-            $page = $this->pageService->getPage((int)$this->getIdentifier());
-
-            return $page !== null;
+            return $this->pageService->getPage((int)$this->getIdentifier()) !== null;
         }
 
         if ($type === Typo3CacheType::RESOURCE) {
@@ -63,15 +61,13 @@ class ExternalClearCacheContextMenuItemProvider extends AbstractProvider
         $id = $this->identifier;
         $type = $this->getCacheType();
 
-        if ($type === Typo3CacheType::PAGE) {
-            if (!is_numeric($id)) {
-                return '';
-            }
-
+        if ($type === Typo3CacheType::PAGE && is_numeric($id)) {
             return $id;
         }
 
-        if ($type === Typo3CacheType::RESOURCE) {
+        // Enable clear cache action for folders only
+        // (clear cache for files is already available in file list actions dropdown)
+        if ($type === Typo3CacheType::RESOURCE && str_ends_with($id, '/')) {
             return $id;
         }
 
@@ -84,7 +80,7 @@ class ExternalClearCacheContextMenuItemProvider extends AbstractProvider
     }
 
     /**
-     * @return string[]
+     * @return array{data-callback-module?: string}
      */
     protected function getAdditionalAttributes(string $itemName): array
     {
@@ -102,25 +98,29 @@ class ExternalClearCacheContextMenuItemProvider extends AbstractProvider
     public function addItems(array $items): array
     {
         $this->initDisabledItems();
-        $localItems = $this->prepareItems($this->setupItem());
-        return $items + $localItems;
+
+        return $items + $this->prepareItems($this->setupItem());
     }
 
     /**
-     * @return array[]
+     * @return array<string, array{type: string, label: string, iconIdentifier: string, callbackAction: string}>
      */
     private function setupItem(): array
     {
         $provider = $this->adapterProvider->getDefaultProviderItem();
 
-        return $this->itemsConfiguration = [
-            $provider->getCacheId() => [
-                'type' => 'item',
-                'label' => $provider->getCacheTitle(),
-                'iconIdentifier' => $provider->getCacheIconIdentifier(),
-                'callbackAction' => 'clearPageViaContextMenu',
-            ],
-        ];
+        if ($provider !== null) {
+            $this->itemsConfiguration = [
+                $provider->getCacheId() => [
+                    'type' => 'item',
+                    'label' => $provider->getCacheTitle(),
+                    'iconIdentifier' => $provider->getCacheIconIdentifier(),
+                    'callbackAction' => 'clearPageViaContextMenu',
+                ],
+            ];
+        }
+
+        return $this->itemsConfiguration;
     }
 
     private function getCacheType(): Typo3CacheType
