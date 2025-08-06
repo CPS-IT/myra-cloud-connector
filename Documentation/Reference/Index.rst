@@ -10,6 +10,7 @@ Hooks and CLI command.
 
     AutoClear-Hooks
     CLI-Command
+    Logging
 
 
 ----------------------
