@@ -22,6 +22,7 @@
 		"ergebnis/composer-normalize": "^2.47",
 		"shipmonk/composer-dependency-analyser": "^1.8",
 		"ssch/typo3-rector": "^3.6",
+		"typo3/cms-filelist": "^12.4",
 		"typo3/coding-standards": "^0.8.0"
 	},
 	"replace": {

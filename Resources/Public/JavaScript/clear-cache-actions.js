@@ -22,11 +22,13 @@ import RegularEvent from '@typo3/core/event/regular-event.js';
 class ClearCacheActions {
   constructor() {
     DocumentService.ready().then(() => {
-      const button = document.querySelector('.t3js-clear-myra-cache');
+      const buttons = document.querySelectorAll('.t3js-clear-myra-cache');
 
-      new RegularEvent('click', (event) => {
-        ClearCacheActions.clearExternalCache(event.currentTarget.dataset.type, event.currentTarget.dataset.id);
-      }).bindTo(button);
+      buttons.forEach((button) => {
+        new RegularEvent('click', (event) => {
+          ClearCacheActions.clearExternalCache(event.currentTarget.dataset.type, event.currentTarget.dataset.id);
+        }).bindTo(button);
+      });
     });
   }
 
