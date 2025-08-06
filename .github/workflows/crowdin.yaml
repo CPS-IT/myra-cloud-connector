@@ -3,8 +3,6 @@ on:
   push:
     branches:
       - master
-      # @todo Remove once 2.x branch is merged into master
-      - 2.x
 
 jobs:
   sync:
