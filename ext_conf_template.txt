@@ -1,20 +1,20 @@
-# cat=Myra; type=string; label=API Endpoint. it's also possible to set the endpoint via environment variable: syntax ENV=YOUR_ENV_NAME or plaintext
+# cat=Myra; type=string; label=API Endpoint. It's also possible to use the value from an environment variable: syntax ENV=YOUR_ENV_NAME
 myra_endpoint = api.myracloud.com
 
-# cat=Myra; type=string; label=Myra Cloud User API-Key, user must have the correct user rights. it's also possible to set the api_key via environment variable: syntax ENV=YOUR_ENV_NAME or plaintext
+# cat=Myra; type=string; label=Myra Cloud User API-Key, user needs sufficient permissions. It's also possible to use the value from an environment variable: syntax ENV=YOUR_ENV_NAME
 myra_api_key = ENV=MYRA_API_KEY
 
-# cat=Myra; type=string; label=Myra Cloud User API-Key Secret. it's also possible to set the secret via environment variable: syntax ENV=YOUR_ENV_NAME or plaintext
+# cat=Myra; type=string; label=Myra Cloud User API-Key Secret. It's also possible to use the value from an environment variable: syntax ENV=YOUR_ENV_NAME
 myra_secret = ENV=MYRA_SECRET
 
-# cat=Typo3; type=boolean; label=Enable extension only in Production environment: default ON
+# cat=Typo3; type=boolean; label=Enable extension only when applicationContext is set to "Production": default ON
 onlyLive = 1
 
-# cat=Typo3; type=boolean; label=Enable extension Interface (active clear cache buttons) only for Admin User (did not affect auto-clear-hooks for page and filelist): default ON
+# cat=Typo3; type=boolean; label=Enable extension Interface (active clear cache buttons) only for Admin users (does not affect AutoClear-hooks for Pages and FileList): default ON
 onlyAdmin = 1
 
-# cat=Typo3; type=boolean; label=Disable auto-clear-hooks for page/content and filelist: default OFF
+# cat=Typo3; type=boolean; label=Disable AutoClear-hooks for Pages and FileList: default OFF
 disableHooks = 0
 
-# cat=Typo3; type=string; label=Disable extension in domain context (comma separated list), for example a special stage/preview/development domain
+# cat=Typo3; type=string; label=Disable extension for these domains (comma separated list, use for special stage/preview/development domains)
 domainBlacklist =
