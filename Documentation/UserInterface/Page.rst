@@ -4,22 +4,23 @@ Clear pages
 
 There are 4 ways to clear a page from the cache:
 
--  Backend CacheMenu (clear all pages)
--  Context Menu in PageTree (left/right-click)
--  ButtonBar in Menu in Page/List/View
--  Page/Content Update Hook
+-  Topbar clear cache menu (clear all)
+-  Context menu in page tree (left/right-click)
+-  Button bar in doc header within Page/List/View modules
+-  Page/Content update hook
 
-Apart from clear-all, the page clear-cache options clear a single page
-and are non-recursive.
+..  note::
+    Apart from the topbar clear cache menu, the page clear cache options clear a single page only
+    and are non-recursive.
 
-.. _cachemenu-page:
-Backend CacheMenu
------------------
+.. _topbar-page:
+Topbar clear cache menu
+-----------------------
 
-.. image:: ../img/cacheMenu.png
-    :alt: view of main cache menu showing Myra Clear Cache option
+..  figure:: /img/cacheMenu.png
+    :alt: View of main cache menu showing Myra Clear cache option
 
-Clear the entire page cache or file cache
+    Clear the entire page cache or file cache
 
 This option is admin-only by default. To allow for non-admin users, set user permissions accordingly.
 
@@ -30,20 +31,20 @@ If the menu option does not appear, check for missing Myra credentials and the s
 -  :ref:`Domain blacklist<_domain-blacklist>`
 
 .. _contextmenu-page:
-Context Menu in PageTree
-------------------------
+Context menu in page tree
+-------------------------
 
-.. image:: ../img/page_context.png
-    :alt: view of page context menu showing Myra Clear Cache option
+..  figure:: /img/page_context.png
+    :alt: View of page context menu showing Myra Clear Cache option
 
 This will clear the selected page only (no child pages). The option will not clear file resources.
 
 .. _buttonbar-page:
-ButtonBar
----------
+Button bar
+----------
 
-.. image:: ../img/page_buttonbar.png
-    :alt: view of page buttonbar showing Myra Clear Cache option
+..  figure:: /img/page_buttonbar.png
+    :alt: View of page buttonbar showing Myra Clear Cache option
 
 This will clear the current page only (no child pages). The option will not clear file resources.
 

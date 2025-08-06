@@ -15,17 +15,17 @@ Two AutoClear hooks are implemented:
 Page Update
 -----------
 
-This hook listens on the ``DataHandler->clearCachePostProc`` interface.
+This hook listens on the :php:`DataHandler->clearCachePostProc` interface.
 
 It will only clear the page itself, when the page or its elements are edited (created/updated/deleted).
-It will not clear subpages and file resources.
+It will **not** clear subpages and file resources (non-recursive).
 
 .. _file-replace-hook:
 File Replace
 --------------
 
-.. image:: ../img/context_filelist.png
-    :alt: view of fileList context menu showing Myra Clear Cache option
+..  figure:: /img/context_filelist.png
+    :alt: View of File list context menu showing Myra clear cache option
 
 Using the option "Replace" in FileList will trigger this hook. This also
 clears processed files from the cache.

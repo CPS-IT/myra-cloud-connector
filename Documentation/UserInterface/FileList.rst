@@ -4,19 +4,22 @@ Clear files
 
 There are 4 ways to clear files from the cache:
 
--  Backend CacheMenu (clear all)
--  Context Menu in FileTree (right-click)
--  Options Menu in FileList
--  FileList Update Hook
+-  Topbar clear cache menu (clear all)
+-  Context menu in file tree (left/right-click)
+-  Options menu in file list
+-  File list update hook
 
-The FileTree clear-cache commands on folders are recursive.
+..  note::
+    The file tree clear cache commands on folders are recursive.
 
-.. _cachemenu-files:
-Backend CacheMenu
------------------
+.. _topbar-files:
+Topbar clear cache menu
+-----------------------
 
-.. image:: ../img/cacheMenu.png
-    :alt: The TYPO3 cache menu showing additional myra cache options to delete all files or all pages.
+..  figure:: /img/cacheMenu.png
+    :alt: The TYPO3 cache menu showing additional Myra cache options to delete all files or all pages.
+
+    Clear the entire page cache or file cache
 
 This option is admin-only by default. To allow for non-admin users, set user permissions accordingly.
 
@@ -27,20 +30,20 @@ If the menu option does not appear, check for missing Myra credentials and the s
 -  :ref:`Domain blacklist<_domain-blacklist>`
 
 .. _contextmenu-filetree:
-Context menu in FileTree
-------------------------
+Context menu in file tree
+-------------------------
 
-.. image:: ../img/context_filetree.png
-    :alt: view of FileTree context menu showing Myra Clear Cache option
+..  figure:: /img/context_filetree.png
+    :alt: View of File tree context menu showing Myra clear cache option
 
 This will clear all files from the selected directory and all its subdirectories recursively.
 
 .. _optionsmenu-filelist:
-Options Menu in FileList
-------------------------
+Options menu in file list
+-------------------------
 
-.. image:: ../img/context_filelist.png
-    :alt: view of FileList context menu showing Myra Clear Cache option
+..  figure:: /img/context_filelist.png
+    :alt: View of File list context menu showing Myra clear cache option
 
 This will clear the selected file only.
 

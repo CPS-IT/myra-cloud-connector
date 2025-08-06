@@ -32,10 +32,10 @@ Type Parameter
 
 ``-t, --type=TYPE``
 
--  page
--  resource
--  all
--  all resources
+-  :php:`page`
+-  :php:`resource`
+-  :php:`all`
+-  :php:`allresources`
 
 .. _cli-type-page:
 --type=page
@@ -44,17 +44,19 @@ Type Parameter
 ``page`` type requires a page identifier (pid) ``-i 1``. the pid must be
 numeric.
 
-``page`` clear commands are never recursive
+..  note::
+    ``page`` clear commands are **never** recursive.
 
 .. _cli-type-resource:
 --type=resource
 ~~~~~~~~~~~~~~~
 
-``resource`` type requires a uri identifier ``-i /path/to/something``.
+``resource`` type requires a combined identifier ``-i 1:/path/to/something``.
 
-``resource`` clear commands are always recursive
+..  note::
+    ``resource`` clear commands are **always** recursive.
 
-.. note::
+..  note::
     The ``resource`` type can also be used to clear pages. Simply provide the site URI (this will be recursive!).
 
 .. _cli-type-allresources:
@@ -65,12 +67,13 @@ numeric.
 
 This will clear everything from these folders :
 
--  /fileadmin/\*
--  /typo3/\*
--  /typo3temp/\*
--  /typo3conf/\*
+-  :file:`/fileadmin/*`
+-  :file:`/typo3/*`
+-  :file:`/typo3temp/*`
+-  :file:`/typo3conf/*`
 
-The ``allresources`` clear command is recursive by default.
+..  note::
+    The ``allresources`` clear command is recursive by default.
 
 
 .. _cli-type-all:
@@ -81,4 +84,5 @@ The ``allresources`` clear command is recursive by default.
 
 This clears everything in Myra Cache for this TYPO3 Instance.
 
-The ``all`` clear command is recursive by default.
+..  note::
+    The ``all`` clear command is recursive by default.
