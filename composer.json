@@ -12,6 +12,7 @@
 		{"type": "vcs", "url": "git@github.com:CPS-IT/myra-web-api.git"}
 	],
 
+  "abandoned": "cpsit/myra-cloud-connector",
   "require": {
     "php": "^8.1 | ^8.2",
     "ext-json": "*",
