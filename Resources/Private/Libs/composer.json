@@ -1,0 +1,14 @@
+{
+	"require": {
+		"cpsit/myra-web-api": "^1.0"
+	},
+	"provide": {
+		"guzzlehttp/guzzle": "*",
+		"symfony/console": "*",
+		"symfony/yaml": "*"
+	},
+	"config": {
+		"lock": false,
+		"sort-packages": true
+	}
+}

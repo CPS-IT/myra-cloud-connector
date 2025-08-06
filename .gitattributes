@@ -11,4 +11,5 @@
 /packaging_exclude.php export-ignore
 /phpunit.xml export-ignore
 /rector.php export-ignore
+/typo3-vendor-bundler.yaml export-ignore
 /version-bumper.yaml export-ignore

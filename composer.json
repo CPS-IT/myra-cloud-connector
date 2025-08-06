@@ -70,7 +70,10 @@
 			"@fix:editorconfig",
 			"@fix:php"
 		],
-		"fix:composer": "@composer normalize --no-check-lock --no-update-lock",
+		"fix:composer": [
+			"@composer normalize --no-check-lock --no-update-lock",
+			"@composer normalize Resources/Private/Libs/composer.json --no-check-lock --no-update-lock"
+		],
 		"fix:editorconfig": "@lint:editorconfig --fix",
 		"fix:php": "php-cs-fixer fix",
 		"lint": [
