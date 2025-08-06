@@ -31,6 +31,7 @@ return [
         'DS_Store',
         'composer.lock',
         'composer-dependency-analyser.php',
+        'crowdin.yaml',
         'docker-compose.yaml',
         'editorconfig',
         'gitattributes',
