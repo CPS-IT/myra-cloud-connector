@@ -15,19 +15,15 @@ declare(strict_types=1);
  * The TYPO3 project - inspiring people to share!
  */
 
-namespace CPSIT\MyraCloudConnector\Domain\Enum;
+namespace CPSIT\MyraCloudConnector;
 
-enum Typo3CacheType: int
+/**
+ * Extension
+ *
+ * @author Elias Häußler <e.haeussler@familie-redlich.de>
+ * @license GPL-2.0-or-later
+ */
+final readonly class Extension
 {
-    case INVALID = -1;
-    case UNKNOWN = 0;
-    case PAGE = 1;
-    case RESOURCE = 2;
-    case ALL_PAGE = 30;
-    case ALL_RESOURCES = 60;
-
-    public function isKnown(): bool
-    {
-        return $this->value > self::UNKNOWN->value;
-    }
+    public const KEY = 'myra_cloud_connector';
 }

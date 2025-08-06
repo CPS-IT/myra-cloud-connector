@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the TYPO3 CMS extension "myra_cloud_connector".
  *
@@ -15,19 +13,13 @@ declare(strict_types=1);
  * The TYPO3 project - inspiring people to share!
  */
 
-namespace CPSIT\MyraCloudConnector\Domain\Enum;
+use TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider;
 
-enum Typo3CacheType: int
-{
-    case INVALID = -1;
-    case UNKNOWN = 0;
-    case PAGE = 1;
-    case RESOURCE = 2;
-    case ALL_PAGE = 30;
-    case ALL_RESOURCES = 60;
+defined('TYPO3') or die();
 
-    public function isKnown(): bool
-    {
-        return $this->value > self::UNKNOWN->value;
-    }
-}
+return [
+    'ext-myra-cloud-connector-myra' => [
+        'provider' => SvgIconProvider::class,
+        'source' => 'EXT:myra_cloud_connector/Resources/Public/Icons/myra.svg',
+    ],
+];

@@ -1,21 +1,34 @@
 <?php
+
 declare(strict_types=1);
 
-namespace CPSIT\CpsMyraCloud\Service;
+/*
+ * This file is part of the TYPO3 CMS extension "myra_cloud_connector".
+ *
+ * It is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, either version 2
+ * of the License, or any later version.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE.txt file that was distributed with this source code.
+ *
+ * The TYPO3 project - inspiring people to share!
+ */
 
+namespace CPSIT\MyraCloudConnector\Service;
 
-use CPSIT\CpsMyraCloud\Adapter\AdapterInterface;
-use CPSIT\CpsMyraCloud\AdapterProvider\AdapterProvider;
-use CPSIT\CpsMyraCloud\Domain\DTO\Provider\ProviderItemRegisterInterface;
-use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\File\CustomFile;
-use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\File\FileAdmin;
-use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\File\FileInterface;
-use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\File\Typo3Conf;
-use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\File\Typo3Core;
-use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\File\Typo3Temp;
-use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\PageSlugInterface;
-use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\SiteConfigInterface;
-use CPSIT\CpsMyraCloud\Domain\Enum\Typo3CacheType;
+use CPSIT\MyraCloudConnector\Adapter\AdapterInterface;
+use CPSIT\MyraCloudConnector\AdapterProvider\AdapterProvider;
+use CPSIT\MyraCloudConnector\Domain\DTO\Provider\ProviderItemRegisterInterface;
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\CustomFile;
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\FileAdmin;
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\FileInterface;
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\Typo3Conf;
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\Typo3Core;
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\Typo3Temp;
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\PageSlugInterface;
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\SiteConfigInterface;
+use CPSIT\MyraCloudConnector\Domain\Enum\Typo3CacheType;
 
 readonly class ExternalCacheService
 {
@@ -39,11 +52,14 @@ readonly class ExternalCacheService
 
         if ($type === Typo3CacheType::PAGE) {
             return $this->clearPage($providerItem, (int)$identifier);
-        } elseif ($type === Typo3CacheType::RESOURCE) {
+        }
+        if ($type === Typo3CacheType::RESOURCE) {
             return $this->clearFile($providerItem, trim($identifier));
-        } elseif ($type === Typo3CacheType::ALL_PAGE) {
+        }
+        if ($type === Typo3CacheType::ALL_PAGE) {
             return $this->clearAllPages($providerItem);
-        } elseif ($type === Typo3CacheType::ALL_RESOURCES) {
+        }
+        if ($type === Typo3CacheType::ALL_RESOURCES) {
             return $this->clearAllFiles($providerItem);
         }
 
@@ -114,7 +130,6 @@ readonly class ExternalCacheService
         return new CustomFile($identifier);
     }
 
-
     /**
      * @param AdapterInterface $adapter
      * @param SiteConfigInterface[] $sites
@@ -125,8 +140,9 @@ readonly class ExternalCacheService
     private function clearCacheWithAdapter(AdapterInterface $adapter, array $sites, ?PageSlugInterface $slug = null, bool $recursive = false): bool
     {
         $result = 0;
-        foreach ($sites as $site)
+        foreach ($sites as $site) {
             $result |= $adapter->clearCache($site, $slug, $recursive);
+        }
 
         return (bool)$result;
     }

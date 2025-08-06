@@ -4,34 +4,32 @@ services:
     autoconfigure: true
     public: false
 
-  CPSIT\CpsMyraCloud\:
+  CPSIT\MyraCloudConnector\:
     resource: '../Classes/*'
     exclude: ['../Classes/Domain/{DTO,Enum}']
 
-  CPSIT\CpsMyraCloud\ButtonBar\ExternalClearCacheButtonBarItemProvider:
-    public: true
-
-  CPSIT\CpsMyraCloud\Controller\ExternalClearCacheController:
-    public: true
-
-  CPSIT\CpsMyraCloud\FileList\FileListHook:
-    public: true
-
-  CPSIT\CpsMyraCloud\DataHandler\DataHandlerHook:
-    public: true
-
-  CPSIT\CpsMyraCloud\AdapterProvider\AdapterProvider:
-    arguments:
-      $adapters: !tagged_iterator 'cpsit.external.cache.adapter'
-
-  CPSIT\CpsMyraCloud\Adapter\MyraApiAdapter:
-    tags:
-      - { name: 'cpsit.external.cache.adapter' }
-
-  CPSIT\CpsMyraCloud\Command\MyraCloudClearCommand:
+  CPSIT\MyraCloudConnector\Command\MyraCloudClearCommand:
     tags:
       - name: 'console.command'
         command: 'myracloud:clear'
-        description: 'TYPO3-MyraCloud Interface'
+        description: 'TYPO3/Myra Cloud Interface'
         hidden: false
         schedulable: false
+
+  # @todo Migrate to attribute once support for TYPO3 v12 is dropped
+  CPSIT\MyraCloudConnector\EventListener\ExternalClearCacheButtonListener:
+    tags:
+      - name: event.listener
+        identifier: 'cpsit/myra-cloud-connector/external-clear-cache-button'
+
+  # @todo Migrate to attribute once support for TYPO3 v12 is dropped
+  CPSIT\MyraCloudConnector\EventListener\ExternalClearCacheMenuItemListener:
+    tags:
+      - name: event.listener
+        identifier: 'cpsit/myra-cloud-connector/external-clear-cache-menu-item'
+
+  # @todo Migrate to attribute once support for TYPO3 v12 is dropped
+  CPSIT\MyraCloudConnector\EventListener\ExternalClearResourceCacheListener:
+    tags:
+      - name: event.listener
+        identifier: 'cpsit/myra-cloud-connector/external-clear-resource-cache'

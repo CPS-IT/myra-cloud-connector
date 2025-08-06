@@ -15,19 +15,16 @@ declare(strict_types=1);
  * The TYPO3 project - inspiring people to share!
  */
 
-namespace CPSIT\MyraCloudConnector\Domain\Enum;
+use PhpCsFixer\Runner\Parallel\ParallelConfigFactory;
+use TYPO3\CodingStandards\CsFixerConfig;
 
-enum Typo3CacheType: int
-{
-    case INVALID = -1;
-    case UNKNOWN = 0;
-    case PAGE = 1;
-    case RESOURCE = 2;
-    case ALL_PAGE = 30;
-    case ALL_RESOURCES = 60;
+$config = CsFixerConfig::create();
+$config->setParallelConfig(ParallelConfigFactory::detect());
+$config->setHeader('This file is part of the TYPO3 CMS extension "myra_cloud_connector".');
+$config->getFinder()
+    ->in(__DIR__)
+    ->ignoreDotFiles(false)
+    ->ignoreVCSIgnored(true)
+;
 
-    public function isKnown(): bool
-    {
-        return $this->value > self::UNKNOWN->value;
-    }
-}
+return $config;

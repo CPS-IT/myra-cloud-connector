@@ -1,24 +1,34 @@
 <?php
+
 declare(strict_types=1);
 
-namespace CPSIT\CpsMyraCloud\Service;
+/*
+ * This file is part of the TYPO3 CMS extension "myra_cloud_connector".
+ *
+ * It is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, either version 2
+ * of the License, or any later version.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE.txt file that was distributed with this source code.
+ *
+ * The TYPO3 project - inspiring people to share!
+ */
 
-use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\PageIdInterface;
-use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\SiteConfigExternalIdentifierInterface;
-use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\SiteConfigInterface;
-use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\Typo3SiteConfig;
+namespace CPSIT\MyraCloudConnector\Service;
+
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\PageIdInterface;
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\SiteConfigExternalIdentifierInterface;
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\SiteConfigInterface;
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\Typo3SiteConfig;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Site\SiteFinder;
 
-readonly class SiteService implements SingletonInterface
+class SiteService implements SingletonInterface
 {
-    /**
-     * @param SiteFinder $siteFinder
-     */
     public function __construct(
-        private SiteFinder $siteFinder
-    )
-    {}
+        private readonly SiteFinder $siteFinder
+    ) {}
 
     /**
      * @param PageIdInterface|null $pageId
@@ -26,8 +36,9 @@ readonly class SiteService implements SingletonInterface
      */
     public function getSitesForClearance(?PageIdInterface $pageId): array
     {
-        if ($pageId)
+        if ($pageId) {
             return $this->getAllSupportedSitesForPageId($pageId);
+        }
 
         return $this->getAllSupportedSites();
     }
@@ -59,7 +70,7 @@ readonly class SiteService implements SingletonInterface
         try {
             $site = $this->siteFinder->getSiteByPageId($pageId->getPageId());
             $siteConfig = new Typo3SiteConfig($site);
-        } catch (\Exception $_) {
+        } catch (\Exception) {
             return [];
         }
 

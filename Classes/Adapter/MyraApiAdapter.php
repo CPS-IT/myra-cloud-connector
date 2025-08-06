@@ -1,11 +1,25 @@
 <?php
+
 declare(strict_types=1);
 
-namespace CPSIT\CpsMyraCloud\Adapter;
+/*
+ * This file is part of the TYPO3 CMS extension "myra_cloud_connector".
+ *
+ * It is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, either version 2
+ * of the License, or any later version.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE.txt file that was distributed with this source code.
+ *
+ * The TYPO3 project - inspiring people to share!
+ */
 
-use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\PageSlugInterface;
-use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\SiteConfigInterface;
-use Exception;
+namespace CPSIT\MyraCloudConnector\Adapter;
+
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\PageSlugInterface;
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\SiteConfigInterface;
+use CPSIT\MyraCloudConnector\Extension;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
@@ -16,8 +30,9 @@ use Myracloud\WebApi\Endpoint\AbstractEndpoint;
 use Myracloud\WebApi\Endpoint\CacheClear;
 use Myracloud\WebApi\Endpoint\DnsRecord;
 use Myracloud\WebApi\Middleware\Signature;
-use Psr\Http\Message\RequestInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
+#[AutoconfigureTag('myra_cloud.external.cache.adapter')]
 class MyraApiAdapter extends BaseAdapter
 {
     protected array $clients;
@@ -29,22 +44,22 @@ class MyraApiAdapter extends BaseAdapter
 
     public function getCacheId(): string
     {
-        return 'cps_myra_cloud';
+        return Extension::KEY;
     }
 
     public function getCacheIconIdentifier(): string
     {
-        return 'cps-cache-myra';
+        return 'ext-myra-cloud-connector-myra';
     }
 
     public function getCacheTitle(): string
     {
-        return 'LLL:EXT:cps_myra_cloud/Resources/Private/Language/locallang_myra.xlf:title';
+        return 'LLL:EXT:myra_cloud_connector/Resources/Private/Language/locallang_myra.xlf:title';
     }
 
     public function getCacheDescription(): string
     {
-        return 'LLL:EXT:cps_myra_cloud/Resources/Private/Language/locallang_myra.xlf:description';
+        return 'LLL:EXT:myra_cloud_connector/Resources/Private/Language/locallang_myra.xlf:description';
     }
 
     protected function getAdapterConfigPrefix(): string
@@ -85,7 +100,7 @@ class MyraApiAdapter extends BaseAdapter
      */
     protected function getSendHash(string $siteRef, string $fqdn, string $path, bool $recursive = false): string
     {
-        return md5($siteRef .'_'. $fqdn .'_'. $path . '_' . $recursive);
+        return md5($siteRef . '_' . $fqdn . '_' . $path . '_' . $recursive);
     }
 
     /**
@@ -98,31 +113,31 @@ class MyraApiAdapter extends BaseAdapter
     protected function clearCacheDomain(string $domain, string $fqdn, string $path = '/', bool $recursive = false): bool
     {
         $hash = $this->getSendHash($domain, $fqdn, $path, $recursive);
-        if ((self::$multiClearCacheProtection[$hash]??false) === true) {
+        if ((self::$multiClearCacheProtection[$hash] ?? false) === true) {
             return true;
         }
 
         try {
             $r = $this->getCacheClearApi()->clear($domain, $fqdn, $path, $recursive);
-            self::$multiClearCacheProtection[$hash] = $success = (!empty($r) && ($r['error']??true) === false);
-        } catch (GuzzleException $e) {
+            self::$multiClearCacheProtection[$hash] = $success = (!empty($r) && ($r['error'] ?? true) === false);
+        } catch (GuzzleException) {
             return false;
         }
 
-        $this->writeLog('User %s has cleared the MYRA_CLOUD cache for domain %s => %s%s (recursive: %s) (success: %s)',
+        $this->writeLog(
+            'User %s has cleared the MYRA_CLOUD cache for domain %s => %s%s (recursive: %s) (success: %s)',
             [
-                $this->getBEUser()->user['username'] . ' (uid: ' . $this->getBEUser()->user['uid'] . ')',
+                $this->getBackendUser()->user['username'] . ' (uid: ' . $this->getBackendUser()->user['uid'] . ')',
                 $domain,
                 $fqdn,
                 $path,
-                ($recursive?'true':'false'),
-                ($success?'true':'false')
+                ($recursive ? 'true' : 'false'),
+                ($success ? 'true' : 'false'),
             ]
         );
 
         return $success;
     }
-
 
     /**
      * @param string $domainIdentifier
@@ -135,11 +150,11 @@ class MyraApiAdapter extends BaseAdapter
         $fqdn = [];
         if (!empty($r) && $r['error'] === false) {
             foreach ($r['list'] as $recordItem) {
-                $name = $recordItem['name']??'';
-                $active = (bool)($recordItem['active']??false);
-                $enable = (bool)($recordItem['enabled']??false);
+                $name = $recordItem['name'] ?? '';
+                $active = (bool)($recordItem['active'] ?? false);
+                $enable = (bool)($recordItem['enabled'] ?? false);
                 if ($active && $enable && $name !== '') {
-                    $fqdn[crc32($name)] = $name;
+                    $fqdn[crc32((string)$name)] = $name;
                 }
             }
         }
@@ -158,7 +173,7 @@ class MyraApiAdapter extends BaseAdapter
         $r = [];
         try {
             $r = $st->getList($domain);
-        } catch (Exception|GuzzleException) {
+        } catch (\Exception|GuzzleException) {
         }
 
         return $r;
@@ -186,7 +201,7 @@ class MyraApiAdapter extends BaseAdapter
         $client = $this->getMyraClient();
         try {
             return $client !== null ? new $className($client) : null;
-        } catch (Exception) {
+        } catch (\Exception) {
             return null;
         }
     }
@@ -208,10 +223,8 @@ class MyraApiAdapter extends BaseAdapter
         $signature = new Signature($config[self::CONFIG_NAME_SECRET], $config[self::CONFIG_NAME_API_KEY]);
         $stack->push(
             Middleware::mapRequest(
-                function (RequestInterface $request) use ($signature) {
-                    return $signature->signRequest($request);
-                }
-            )
+                $signature->signRequest(...),
+            ),
         );
         return $this->clients[$instanceId] = new Client(
             [

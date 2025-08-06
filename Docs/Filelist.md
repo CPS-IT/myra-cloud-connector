@@ -1,6 +1,6 @@
 # Filelist
 
-There are 4 ways to clear the Files 
+There are 4 ways to clear the Files
 * Backend CacheMenu (clear all)
 * Context Menu in FileTree and in Filelist (left/right-click)
 * ButtonBar in Filelist

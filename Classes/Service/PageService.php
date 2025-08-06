@@ -1,10 +1,24 @@
 <?php
+
 declare(strict_types=1);
 
-namespace CPSIT\CpsMyraCloud\Service;
+/*
+ * This file is part of the TYPO3 CMS extension "myra_cloud_connector".
+ *
+ * It is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, either version 2
+ * of the License, or any later version.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE.txt file that was distributed with this source code.
+ *
+ * The TYPO3 project - inspiring people to share!
+ */
 
-use CPSIT\CpsMyraCloud\Domain\DTO\Typo3\PageInterface;
-use CPSIT\CpsMyraCloud\Domain\Repository\PageRepository;
+namespace CPSIT\MyraCloudConnector\Service;
+
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\PageInterface;
+use CPSIT\MyraCloudConnector\Domain\Repository\PageRepository;
 use Doctrine\DBAL\Exception;
 use TYPO3\CMS\Core\SingletonInterface;
 
@@ -15,8 +29,7 @@ readonly class PageService implements SingletonInterface
      */
     public function __construct(
         private PageRepository $pageRepository
-    )
-    {}
+    ) {}
 
     /**
      * @param int $pageUid
@@ -28,7 +41,8 @@ readonly class PageService implements SingletonInterface
             $pageData = null;
             try {
                 $pageData = $this->pageRepository->getPageWithUid($pageUid);
-            } catch (Exception) {} finally {
+            } catch (Exception) {
+            } finally {
                 return $pageData;
             }
         }

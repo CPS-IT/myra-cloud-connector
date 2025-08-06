@@ -1,22 +1,30 @@
 <?php
+
 declare(strict_types=1);
 
-namespace CPSIT\CpsMyraCloud\Domain\DTO\Provider;
+/*
+ * This file is part of the TYPO3 CMS extension "myra_cloud_connector".
+ *
+ * It is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, either version 2
+ * of the License, or any later version.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE.txt file that was distributed with this source code.
+ *
+ * The TYPO3 project - inspiring people to share!
+ */
 
-use CPSIT\CpsMyraCloud\Adapter\AdapterInterface;
-use CPSIT\CpsMyraCloud\Domain\Enum\Typo3CacheType;
+namespace CPSIT\MyraCloudConnector\Domain\DTO\Provider;
+
+use CPSIT\MyraCloudConnector\Adapter\AdapterInterface;
+use TYPO3\CMS\Core\Page\JavaScriptModuleInstruction;
 
 class ProviderItem implements ProviderItemRegisterInterface
 {
-    private AdapterInterface $adapter;
-
-    /**
-     * @param AdapterInterface $adapter
-     */
-    public function __construct(AdapterInterface $adapter)
-    {
-        $this->adapter = $adapter;
-    }
+    public function __construct(
+        private readonly AdapterInterface $adapter,
+    ) {}
 
     public function getAdapter(): AdapterInterface
     {
@@ -43,24 +51,24 @@ class ProviderItem implements ProviderItemRegisterInterface
         return $this->getAdapter()->getCacheDescription();
     }
 
-    public function getRequireJsNamespace(): string
+    public function getJavaScriptModule(): string
     {
-        return $this->getAdapter()->getRequireJsNamespace();
+        return $this->getAdapter()->getJavaScriptModule();
     }
 
-    public function getRequireJsFunction(): string
+    public function getJavaScriptModuleInstruction(): JavaScriptModuleInstruction
     {
-        return $this->getAdapter()->getRequireJsFunction();
+        return $this->getAdapter()->getJavaScriptModuleInstruction();
     }
 
-    public function getRequireJsCall(string $id, Typo3CacheType $type = Typo3CacheType::UNKNOWN): string
+    public function getJavaScriptMethod(): string
     {
-        return 'require(["'. $this->getRequireJsNamespace() .'"],function(c){c.'. $this->getRequireJsFunction() .'('. $type->value .', \'' . $id . '\');});return false;';
+        return $this->getAdapter()->getJavaScriptMethod();
     }
 
     public function getTypo3CssClass(): string
     {
-        return 't3js-clear-page-cache';
+        return 't3js-clear-myra-cache';
     }
 
     public function canExecute(): bool
