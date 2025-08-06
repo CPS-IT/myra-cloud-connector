@@ -40,6 +40,7 @@ return [
         'php-cs-fixer.php',
         'phpunit.xml',
         'rector.php',
+        'typo3-vendor-bundler.yaml',
         'version-bumper.yaml',
     ],
 ];
