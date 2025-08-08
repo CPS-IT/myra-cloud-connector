@@ -17,6 +17,8 @@ declare(strict_types=1);
 
 namespace CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File;
 
+use TYPO3\CMS\Core\Core\Environment;
+
 class Typo3Temp extends File
 {
     /**
@@ -24,6 +26,6 @@ class Typo3Temp extends File
      */
     protected function getPrefix(): string
     {
-        return '/typo3temp';
+        return Environment::getPublicPath() . '/typo3temp';
     }
 }
