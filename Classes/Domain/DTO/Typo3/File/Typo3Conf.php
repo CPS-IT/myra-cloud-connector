@@ -24,6 +24,7 @@ class Typo3Conf extends File
      */
     protected function getPrefix(): string
     {
+        // @todo Remove with TYPO3 v13, handle _assets folder instead
         return '/typo3conf';
     }
 }

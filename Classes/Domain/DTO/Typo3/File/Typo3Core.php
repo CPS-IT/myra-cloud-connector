@@ -24,6 +24,7 @@ class Typo3Core extends File
      */
     protected function getPrefix(): string
     {
+        // @todo Use \TYPO3\CMS\Core\Routing\BackendEntryPointResolver::getPathFromRequest() with TYPO3 v13
         return '/typo3';
     }
 }

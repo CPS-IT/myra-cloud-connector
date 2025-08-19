@@ -26,6 +26,7 @@ class FileAdmin extends File
      */
     protected function getPrefix(): string
     {
+        // @todo Respect other file storages as well
         return self::PREFIX;
     }
 }
