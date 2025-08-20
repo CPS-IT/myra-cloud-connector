@@ -17,7 +17,7 @@ declare(strict_types=1);
 
 namespace CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File;
 
-class CustomFile extends File
+class CustomFile extends AbstractFile
 {
     public function __construct(
         string $slug,

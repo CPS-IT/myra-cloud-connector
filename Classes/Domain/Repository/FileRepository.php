@@ -17,7 +17,7 @@ declare(strict_types=1);
 
 namespace CPSIT\MyraCloudConnector\Domain\Repository;
 
-use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\FileAdmin;
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\File;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
@@ -30,13 +30,8 @@ readonly class FileRepository implements SingletonInterface
         private ConnectionPool $connectionPool
     ) {}
 
-    private function getQueryBuilder(): QueryBuilder
-    {
-        return $this->connectionPool->getQueryBuilderForTable('sys_file_processedfile');
-    }
-
     /**
-     * @return list<FileAdmin>
+     * @return list<File>
      */
     public function getProcessedFilesFromFile(FileInterface $file): array
     {
@@ -57,10 +52,19 @@ readonly class FileRepository implements SingletonInterface
 
         foreach ($qb->executeQuery()->fetchAllAssociative() as $row) {
             if (!empty($row['identifier'])) {
-                $files[] = new FileAdmin($row['identifier']);
+                $processedFile = $file->getStorage()->getFileByIdentifier($row['identifier']);
+
+                if ($processedFile !== null) {
+                    $files[] = new File($processedFile);
+                }
             }
         }
 
         return $files;
+    }
+
+    private function getQueryBuilder(): QueryBuilder
+    {
+        return $this->connectionPool->getQueryBuilderForTable('sys_file_processedfile');
     }
 }
