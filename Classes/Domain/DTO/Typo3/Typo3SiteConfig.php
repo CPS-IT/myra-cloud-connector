@@ -24,6 +24,9 @@ class Typo3SiteConfig implements SiteConfigInterface
 {
     use DomainListParserTrait;
 
+    /**
+     * @var list<non-empty-string>|null
+     */
     private ?array $myraDomainList = null;
 
     /**
@@ -33,6 +36,9 @@ class Typo3SiteConfig implements SiteConfigInterface
         private readonly SiteInterface $site
     ) {}
 
+    /**
+     * @return list<non-empty-string>
+     */
     private function getDomainList(): array
     {
         if ($this->myraDomainList !== null) {
@@ -48,9 +54,6 @@ class Typo3SiteConfig implements SiteConfigInterface
         return $this->myraDomainList = $domainList;
     }
 
-    /**
-     * @return array
-     */
     public function getExternalIdentifierList(): array
     {
         return $this->getDomainList();

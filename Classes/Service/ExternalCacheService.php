@@ -23,7 +23,7 @@ use CPSIT\MyraCloudConnector\Domain\DTO\Provider\ProviderItemRegisterInterface;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\CustomFile;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\FileAdmin;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\FileInterface;
-use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\Typo3Conf;
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\PublicResources;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\Typo3Core;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\Typo3Temp;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\PageSlugInterface;
@@ -95,7 +95,7 @@ readonly class ExternalCacheService
     private function clearAllFiles(ProviderItemRegisterInterface $provider): bool
     {
         $sites = $this->siteService->getSitesForClearance(null);
-        $fileCaches = [new FileAdmin(), new Typo3Temp(), new Typo3Conf(), new Typo3Core()];
+        $fileCaches = [new FileAdmin(), new Typo3Temp(), new PublicResources(), new Typo3Core()];
         $result = 0;
         foreach ($fileCaches as $file) {
             $result |= $this->clearCacheWithAdapter($provider->getAdapter(), $sites, $file, true);

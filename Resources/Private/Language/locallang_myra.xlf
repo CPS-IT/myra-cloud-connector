@@ -13,7 +13,7 @@
 				<source>Myra Cloud clear Resources Cache</source>
 			</trans-unit>
 			<trans-unit id="description.resource" resname="description">
-				<source>Clear the resources Myra Cloud cache [/fileadmin/*, /typo3temp/*, /typo3conf/*]</source>
+				<source>Clear the resources Myra Cloud cache [/fileadmin/*, /typo3temp/*, /_assets/*]</source>
 			</trans-unit>
 			<trans-unit id="tca.site.cache.identifier" resname="tca.site.cache.identifier">
 				<source>Myra Domain List (comma separated)</source>

@@ -21,12 +21,14 @@ use CPSIT\MyraCloudConnector\AdapterProvider\AdapterProvider;
 use CPSIT\MyraCloudConnector\Domain\Enum\Typo3CacheType;
 use CPSIT\MyraCloudConnector\Service\ExternalCacheService;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
-use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\SingletonInterface;
 
 #[Autoconfigure(public: true)]
 class DataHandlerHook implements SingletonInterface
 {
+    /**
+     * @var array<int, bool>
+     */
     private array $pageAlreadyCleared = [];
 
     public function __construct(
@@ -35,14 +37,14 @@ class DataHandlerHook implements SingletonInterface
     ) {}
 
     /**
-     * @param array $data
-     * @param DataHandler $dataHandler
+     * @param array{table: string, uid: int, uid_page: int}|array{cacheCmd: string, tags: list<string>} $data
      */
-    public function clearCachePostProc(array $data, DataHandler $dataHandler): void
+    public function clearCachePostProc(array $data): void
     {
-        if (isset($data['uid']) && isset($data['table']) && isset($data['uid_page'])) {
+        if (isset($data['uid'], $data['table'], $data['uid_page'])) {
             $pid = (int)$data['uid_page'];
             $provider = $this->provider->getDefaultProviderItem();
+
             if ($provider && !($this->pageAlreadyCleared[$pid] ?? false) && $provider->canAutomated()) {
                 try {
                     $this->pageAlreadyCleared[$pid] = $this->externalCacheService->clear(Typo3CacheType::PAGE, (string)$pid);

@@ -22,7 +22,9 @@ use CPSIT\MyraCloudConnector\Domain\Enum\Typo3CacheType;
 use TYPO3\CMS\Backend\Backend\Event\ModifyClearCacheActionsEvent;
 use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
+use TYPO3\CMS\Core\Attribute\AsEventListener;
 
+#[AsEventListener('cpsit/myra-cloud-connector/external-clear-cache-menu-item')]
 final readonly class ExternalClearCacheMenuItemListener
 {
     public function __construct(
@@ -47,15 +49,18 @@ final readonly class ExternalClearCacheMenuItemListener
         $provider = $this->provider->getDefaultProviderItem();
 
         if ($provider && $provider->canInteract()) {
+            /** @var non-empty-string $targetUrl */
+            $targetUrl = (string)$this->uriBuilder->buildUriFromRoute(
+                'ajax_external_cache_clear',
+                ['type' => Typo3CacheType::ALL_PAGE->value, 'id' => '-1'],
+            );
+
             $event->addCacheActionIdentifier($provider->getCacheId());
             $event->addCacheAction([
                 'id' => $provider->getCacheId(),
                 'title' => $provider->getCacheTitle(),
                 'description' => $provider->getCacheDescription(),
-                'href' => (string)$this->uriBuilder->buildUriFromRoute(
-                    'ajax_external_cache_clear',
-                    ['type' => Typo3CacheType::ALL_PAGE->value, 'id' => '-1'],
-                ),
+                'href' => $targetUrl,
                 'iconIdentifier' => $provider->getCacheIconIdentifier(),
             ]);
         }
@@ -70,16 +75,18 @@ final readonly class ExternalClearCacheMenuItemListener
 
         if ($provider && $provider->canInteract()) {
             $id = $provider->getCacheId() . '_resources';
+            /** @var non-empty-string $targetUrl */
+            $targetUrl = (string)$this->uriBuilder->buildUriFromRoute(
+                'ajax_external_cache_clear',
+                ['type' => Typo3CacheType::ALL_RESOURCES->value, 'id' => '-1'],
+            );
 
             $event->addCacheActionIdentifier($id);
             $event->addCacheAction([
                 'id' => $id,
                 'title' => $provider->getCacheTitle() . '.resource',
                 'description' => $provider->getCacheDescription() . '.resource',
-                'href' => (string)$this->uriBuilder->buildUriFromRoute(
-                    'ajax_external_cache_clear',
-                    ['type' => Typo3CacheType::ALL_RESOURCES->value, 'id' => '-1'],
-                ),
+                'href' => $targetUrl,
                 'iconIdentifier' => $provider->getCacheIconIdentifier(),
             ]);
         }

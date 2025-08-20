@@ -19,7 +19,6 @@ namespace CPSIT\MyraCloudConnector\Service;
 
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\PageInterface;
 use CPSIT\MyraCloudConnector\Domain\Repository\PageRepository;
-use Doctrine\DBAL\Exception;
 use TYPO3\CMS\Core\SingletonInterface;
 
 readonly class PageService implements SingletonInterface
@@ -38,12 +37,9 @@ readonly class PageService implements SingletonInterface
     public function getPage(int $pageUid): ?PageInterface
     {
         if ($pageUid > 0) {
-            $pageData = null;
             try {
-                $pageData = $this->pageRepository->getPageWithUid($pageUid);
-            } catch (Exception) {
-            } finally {
-                return $pageData;
+                return $this->pageRepository->getPageWithUid($pageUid);
+            } catch (\Exception) {
             }
         }
 

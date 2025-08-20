@@ -19,5 +19,8 @@ namespace CPSIT\MyraCloudConnector\Domain\DTO\Typo3;
 
 interface SiteConfigExternalIdentifierInterface
 {
+    /**
+     * @return list<non-empty-string>
+     */
     public function getExternalIdentifierList(): array;
 }

@@ -17,14 +17,10 @@ declare(strict_types=1);
 
 namespace CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File;
 
-class Typo3Conf extends File
+class PublicResources extends File
 {
-    /**
-     * @return string
-     */
     protected function getPrefix(): string
     {
-        // @todo Remove with TYPO3 v13, handle _assets folder instead
-        return '/typo3conf';
+        return '/_assets';
     }
 }

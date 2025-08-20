@@ -17,14 +17,28 @@ declare(strict_types=1);
 
 namespace CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File;
 
+use Psr\Http\Message\ServerRequestInterface;
+use TYPO3\CMS\Core\Http\ServerRequestFactory;
+use TYPO3\CMS\Core\Routing\BackendEntryPointResolver;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 class Typo3Core extends File
 {
-    /**
-     * @return string
-     */
+    private static ?string $resolvedPrefix = null;
+
     protected function getPrefix(): string
     {
-        // @todo Use \TYPO3\CMS\Core\Routing\BackendEntryPointResolver::getPathFromRequest() with TYPO3 v13
-        return '/typo3';
+        if (self::$resolvedPrefix === null) {
+            $backendEntryPointResolver = GeneralUtility::makeInstance(BackendEntryPointResolver::class);
+            $serverRequest = $this->getServerRequest();
+            self::$resolvedPrefix = rtrim($backendEntryPointResolver->getPathFromRequest($serverRequest), '/');
+        }
+
+        return self::$resolvedPrefix;
+    }
+
+    private function getServerRequest(): ServerRequestInterface
+    {
+        return $GLOBALS['TYPO3_REQUEST'] ?? ServerRequestFactory::fromGlobals();
     }
 }
