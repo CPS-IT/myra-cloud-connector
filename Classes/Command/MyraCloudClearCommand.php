@@ -48,7 +48,7 @@ final class MyraCloudClearCommand extends Command
             '-t resource ' . "\t\t" . ' require a uri. example: -t resource -i /fileadmin/user_upload/pdfs' . LF .
             '-t all ' . "\t\t" . ' clear everything in myracloud for this TYPO3 Instance (does not need a identifier)' . LF .
             '-t allresources ' . "\t" . ' clear everything, recursive, under these folders (does not need a identifier): ' . LF .
-            "\t\t\t" . ' /fileadmin/*, /typo3/*, /typo3temp/*, /typo3conf/*' . LF);
+            "\t\t\t" . ' /fileadmin/*, /typo3/*, /typo3temp/*, /_assets/*' . LF);
         $this->addOption('type', 't', InputArgument::OPTIONAL, 'types: ' . implode(', ', Typo3CacheType::names()), '');
         $this->addOption('identifier', 'i', InputArgument::OPTIONAL, 'page id or resource path for (page / resource type)', '');
     }

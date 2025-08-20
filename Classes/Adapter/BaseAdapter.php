@@ -34,7 +34,14 @@ abstract class BaseAdapter implements SingletonInterface, AdapterInterface
 {
     use DomainListParserTrait;
 
+    /**
+     * @var array<string, array<string, mixed>>
+     */
     private static array $configCache = [];
+
+    /**
+     * @var array<string, bool>
+     */
     private static array $checkupCache = [];
 
     public function __construct(
@@ -69,19 +76,20 @@ abstract class BaseAdapter implements SingletonInterface, AdapterInterface
         return null;
     }
 
+    /**
+     * @param array<string, mixed>|array<int, mixed> $arguments
+     */
     protected function writeLog(string $message, array $arguments): void
     {
         $beUser = $this->getBackendUser();
-        if ($beUser) {
-            $beUser->writeLog(
-                SystemLogType::CACHE,
-                SystemLogCacheAction::CLEAR,
-                SystemLogErrorClassification::MESSAGE,
-                0,
-                $message,
-                $arguments,
-            );
-        }
+        $beUser?->writeLog(
+            SystemLogType::CACHE,
+            SystemLogCacheAction::CLEAR,
+            SystemLogErrorClassification::MESSAGE,
+            null,
+            $message,
+            $arguments,
+        );
     }
 
     public function canExecute(): bool
@@ -183,6 +191,9 @@ abstract class BaseAdapter implements SingletonInterface, AdapterInterface
         return self::$checkupCache[__METHOD__] = true;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function getAdapterConfig(bool $ignorePrefix = false): array
     {
         $prefix = $this->getAdapterConfigPrefix();

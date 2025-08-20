@@ -24,12 +24,14 @@ use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Routing\Route;
 use TYPO3\CMS\Backend\Template\Components\ButtonBar;
 use TYPO3\CMS\Backend\Template\Components\ModifyButtonBarEvent;
+use TYPO3\CMS\Core\Attribute\AsEventListener;
 use TYPO3\CMS\Core\Http\ServerRequestFactory;
-use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Imaging\IconSize;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Page\PageRenderer;
 
+#[AsEventListener('cpsit/myra-cloud-connector/external-clear-cache-button')]
 final class ExternalClearCacheButtonListener
 {
     private Typo3CacheType $cacheTypeCache = Typo3CacheType::UNKNOWN;
@@ -57,7 +59,7 @@ final class ExternalClearCacheButtonListener
             );
 
             $clearCacheButton = $event->getButtonBar()->makeLinkButton()
-                ->setIcon($this->iconFactory->getIcon($provider->getCacheIconIdentifier(), Icon::SIZE_SMALL))
+                ->setIcon($this->iconFactory->getIcon($provider->getCacheIconIdentifier(), IconSize::SMALL))
                 ->setTitle($this->getLanguageService()->sL($provider->getCacheTitle()))
                 ->setHref('#')
                 ->setClasses($provider->getTypo3CssClass())

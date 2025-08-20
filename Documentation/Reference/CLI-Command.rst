@@ -70,7 +70,7 @@ This will clear everything from these folders :
 -  :file:`/fileadmin/*`
 -  :file:`/typo3/*`
 -  :file:`/typo3temp/*`
--  :file:`/typo3conf/*`
+-  :file:`/_assets/*`
 
 ..  note::
     The ``allresources`` clear command is recursive by default.

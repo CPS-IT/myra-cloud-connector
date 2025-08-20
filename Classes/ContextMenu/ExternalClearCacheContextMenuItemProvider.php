@@ -95,6 +95,10 @@ class ExternalClearCacheContextMenuItemProvider extends AbstractProvider
         return [];
     }
 
+    /**
+     * @param array<string, array<string, mixed>> $items
+     * @return array<string, array<string, mixed>>
+     */
     public function addItems(array $items): array
     {
         $this->initDisabledItems();

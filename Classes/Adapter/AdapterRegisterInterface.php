@@ -21,17 +21,35 @@ use TYPO3\CMS\Core\Page\JavaScriptModuleInstruction;
 
 interface AdapterRegisterInterface
 {
+    /**
+     * @return non-empty-string
+     */
     public function getCacheId(): string;
 
+    /**
+     * @return non-empty-string
+     */
     public function getCacheIconIdentifier(): string;
 
+    /**
+     * @return non-empty-string
+     */
     public function getCacheTitle(): string;
 
+    /**
+     * @return non-empty-string
+     */
     public function getCacheDescription(): string;
 
+    /**
+     * @return non-empty-string
+     */
     public function getJavaScriptModule(): string;
 
     public function getJavaScriptModuleInstruction(): JavaScriptModuleInstruction;
 
+    /**
+     * @return non-empty-string
+     */
     public function getJavaScriptMethod(): string;
 }

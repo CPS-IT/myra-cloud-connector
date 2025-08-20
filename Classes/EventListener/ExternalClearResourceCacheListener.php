@@ -24,11 +24,14 @@ use CPSIT\MyraCloudConnector\Domain\Enum\Typo3CacheType;
 use CPSIT\MyraCloudConnector\Domain\Repository\FileRepository;
 use CPSIT\MyraCloudConnector\Service\ExternalCacheService;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use TYPO3\CMS\Core\Attribute\AsEventListener;
 use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
-use TYPO3\CMS\Core\Resource\DuplicationBehavior;
+use TYPO3\CMS\Core\Resource\Enum\DuplicationBehavior;
 use TYPO3\CMS\Core\Resource\Event\AfterFileCommandProcessedEvent;
+use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\FileInterface;
 
+#[AsEventListener('cpsit/myra-cloud-connector/external-clear-resource-cache')]
 final readonly class ExternalClearResourceCacheListener
 {
     public function __construct(
@@ -43,21 +46,24 @@ final readonly class ExternalClearResourceCacheListener
     {
         $action = array_key_first($event->getCommand());
 
-        if ($action === 'upload' && $event->getConflictMode() === DuplicationBehavior::REPLACE) {
+        if ($action === 'upload' && $event->getConflictMode() === DuplicationBehavior::REPLACE->value) {
             $provider = $this->provider->getDefaultProviderItem();
+            /** @var File[]|bool $result */
+            $result = $event->getResult();
 
-            if ($provider && $provider->canAutomated()) {
-                $this->clearCacheForFiles($event->getResult());
+            if (\is_array($result) && $provider?->canAutomated()) {
+                $this->clearCacheForFiles($result);
             }
         }
     }
 
+    /**
+     * @param File[] $files
+     */
     private function clearCacheForFiles(array $files): void
     {
         foreach ($files as $file) {
-            if ($file instanceof FileInterface) {
-                $this->clearCacheForFile($file);
-            }
+            $this->clearCacheForFile($file);
         }
     }
 
@@ -72,6 +78,9 @@ final readonly class ExternalClearResourceCacheListener
         }
     }
 
+    /**
+     * @return list<FileAdmin>
+     */
     private function getProcessedFiles(FileInterface $file): array
     {
         try {

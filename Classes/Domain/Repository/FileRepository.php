@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace CPSIT\MyraCloudConnector\Domain\Repository;
 
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\FileAdmin;
-use Doctrine\DBAL\ParameterType;
+use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Resource\FileInterface;
@@ -36,13 +36,12 @@ readonly class FileRepository implements SingletonInterface
     }
 
     /**
-     * @param FileInterface $file
-     * @return array
-     * @throws \Doctrine\DBAL\Exception
+     * @return list<FileAdmin>
      */
     public function getProcessedFilesFromFile(FileInterface $file): array
     {
         $uid = (int)$file->getProperty('uid');
+
         if ($uid <= 0) {
             return [];
         }
@@ -51,10 +50,11 @@ readonly class FileRepository implements SingletonInterface
         $qb->select('identifier');
         $qb->from('sys_file_processedfile');
         $qb->where(
-            $qb->expr()->eq('original', $qb->createNamedParameter($uid, ParameterType::INTEGER))
+            $qb->expr()->eq('original', $qb->createNamedParameter($uid, Connection::PARAM_INT))
         );
 
         $files = [];
+
         foreach ($qb->executeQuery()->fetchAllAssociative() as $row) {
             if (!empty($row['identifier'])) {
                 $files[] = new FileAdmin($row['identifier']);

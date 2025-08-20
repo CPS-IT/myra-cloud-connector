@@ -19,9 +19,7 @@ namespace CPSIT\MyraCloudConnector\Domain\Repository;
 
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\Page;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\PageInterface;
-use Doctrine\DBAL\ArrayParameterType;
-use Doctrine\DBAL\Exception;
-use Doctrine\DBAL\ParameterType;
+use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\SingletonInterface;
@@ -40,7 +38,6 @@ readonly class PageRepository implements SingletonInterface
     /**
      * @param int $pageUid
      * @return PageInterface|null
-     * @throws Exception
      */
     public function getPageWithUid(int $pageUid): ?PageInterface
     {
@@ -49,9 +46,9 @@ readonly class PageRepository implements SingletonInterface
         $qb->select('p.uid', 'p.title', 'p.hidden', 'p.doktype', 'p.slug');
         $qb->from('pages', 'p');
         $qb->where(
-            $qb->expr()->eq('p.uid', $qb->createNamedParameter($pageUid, ParameterType::INTEGER)),
-            $qb->expr()->eq('p.deleted', $qb->createNamedParameter(0, ParameterType::INTEGER)),
-            $qb->expr()->in('p.doktype', $qb->createNamedParameter([1, 4, 5], ArrayParameterType::INTEGER))
+            $qb->expr()->eq('p.uid', $qb->createNamedParameter($pageUid, Connection::PARAM_INT)),
+            $qb->expr()->eq('p.deleted', $qb->createNamedParameter(0, Connection::PARAM_INT)),
+            $qb->expr()->in('p.doktype', $qb->createNamedParameter([1, 4, 5], Connection::PARAM_INT_ARRAY))
         );
 
         $qb->orderBy('uid', 'ASC');

@@ -9,6 +9,7 @@
 /composer-dependency-analyser.php export-ignore
 /ext_emconf.php export-ignore
 /packaging_exclude.php export-ignore
+/phpstan.neon export-ignore
 /phpunit.xml export-ignore
 /rector.php export-ignore
 /typo3-vendor-bundler.yaml export-ignore

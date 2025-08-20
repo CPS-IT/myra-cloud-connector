@@ -24,6 +24,9 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 final class AdapterProvider
 {
+    /**
+     * @var array<class-string<AdapterInterface>, ProviderItem>
+     */
     private static array $providerItemCache = [];
 
     /**
@@ -34,24 +37,20 @@ final class AdapterProvider
         private readonly iterable $adapters,
     ) {}
 
-    public function getAllProviderItems(): iterable
+    /**
+     * @return AdapterInterface[]
+     */
+    public function getAllProviderItems(): array
     {
         return iterator_to_array($this->adapters);
     }
 
-    /**
-     * @return ProviderItemRegisterInterface|null
-     */
     public function getDefaultProviderItem(): ?ProviderItemRegisterInterface
     {
         return $this->getProviderItem($this->getAllProviderItems()[0] ?? null);
     }
 
-    /**
-     * @param AdapterInterface|null $adapter
-     * @return ProviderItemRegisterInterface|null
-     */
-    public function getProviderItem(?AdapterInterface $adapter): ?ProviderItemRegisterInterface
+    public function getProviderItem(?AdapterInterface $adapter): ?ProviderItem
     {
         return $adapter ? self::$providerItemCache[$adapter::class] ??= new ProviderItem($adapter) : null;
     }

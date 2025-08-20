@@ -35,8 +35,15 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 #[AutoconfigureTag('myra_cloud.external.cache.adapter')]
 class MyraApiAdapter extends BaseAdapter
 {
-    protected array $clients;
+    /**
+     * @var array<string, bool>
+     */
     private static array $multiClearCacheProtection = [];
+
+    /**
+     * @var array<string, ClientInterface>
+     */
+    protected array $clients = [];
 
     private const CONFIG_NAME_API_KEY = 'myra_api_key';
     private const CONFIG_NAME_ENDPOINT = 'myra_endpoint';
@@ -118,16 +125,18 @@ class MyraApiAdapter extends BaseAdapter
         }
 
         try {
-            $r = $this->getCacheClearApi()->clear($domain, $fqdn, $path, $recursive);
+            $r = $this->getCacheClearApi()?->clear($domain, $fqdn, $path, $recursive);
             self::$multiClearCacheProtection[$hash] = $success = (!empty($r) && ($r['error'] ?? true) === false);
         } catch (GuzzleException) {
             return false;
         }
 
+        $backendUser = $this->getBackendUser();
+
         $this->writeLog(
             'User %s has cleared the MYRA_CLOUD cache for domain %s => %s%s (recursive: %s) (success: %s)',
             [
-                $this->getBackendUser()->user['username'] . ' (uid: ' . $this->getBackendUser()->user['uid'] . ')',
+                ($backendUser?->user['username'] ?? '') . ' (uid: ' . ($backendUser?->user['uid'] ?? 0) . ')',
                 $domain,
                 $fqdn,
                 $path,
@@ -150,7 +159,7 @@ class MyraApiAdapter extends BaseAdapter
         $fqdn = [];
         if (!empty($r) && $r['error'] === false) {
             foreach ($r['list'] as $recordItem) {
-                $name = $recordItem['name'] ?? '';
+                $name = $recordItem['name'];
                 $active = (bool)($recordItem['active'] ?? false);
                 $enable = (bool)($recordItem['enabled'] ?? false);
                 if ($active && $enable && $name !== '') {
@@ -163,8 +172,40 @@ class MyraApiAdapter extends BaseAdapter
     }
 
     /**
-     * @param string $domain
-     * @return array
+     * @return array{}|array{
+     *     error: bool,
+     *     list: list<array{
+     *         objectType: string,
+     *         id: int,
+     *         modified: string,
+     *         created?: string,
+     *         name: string,
+     *         ttl?: int,
+     *         recordType: string,
+     *         alternativeCname?: string,
+     *         active?: bool,
+     *         value: string,
+     *         priority?: int,
+     *         paused?: bool,
+     *         upstreamOptions?: array{
+     *             weight?: int,
+     *             maxFails?: int,
+     *             failTimeout?: int,
+     *             backup?: bool,
+     *             down?: bool,
+     *         },
+     *         caaTag?: string,
+     *         caaFlags?: int,
+     *         endpoints?: list<string>,
+     *         serviceType?: int,
+     *         enabled?: bool,
+     *         port?: int,
+     *         weight?: int,
+     *     }>,
+     *     page: int,
+     *     count: int,
+     *     pageSize: int
+     * }
      */
     private function getDomainRecordsForDomain(string $domain): array
     {
@@ -188,9 +229,9 @@ class MyraApiAdapter extends BaseAdapter
     }
 
     /**
-     * @template T of object
+     * @template T of AbstractEndpoint
      * @param class-string<T> $className
-     * @return T the created instance
+     * @return T|null the created instance
      */
     private function getEndPointApi(string $className): ?AbstractEndpoint
     {
@@ -200,19 +241,17 @@ class MyraApiAdapter extends BaseAdapter
 
         $client = $this->getMyraClient();
         try {
-            return $client !== null ? new $className($client) : null;
+            return new $className($client);
         } catch (\Exception) {
             return null;
         }
     }
 
-    /**
-     * @return ClientInterface|null
-     */
-    private function getMyraClient(): ?ClientInterface
+    private function getMyraClient(): ClientInterface
     {
         $config = $this->getAdapterConfig();
         $instanceId = md5(serialize($config));
+
         if (isset($this->clients[$instanceId])) {
             return $this->clients[$instanceId];
         }
@@ -226,6 +265,7 @@ class MyraApiAdapter extends BaseAdapter
                 $signature->signRequest(...),
             ),
         );
+
         return $this->clients[$instanceId] = new Client(
             [
                 'base_uri' => 'https://' . $config[self::CONFIG_NAME_ENDPOINT] . '/' . 'en' . '/rapi',

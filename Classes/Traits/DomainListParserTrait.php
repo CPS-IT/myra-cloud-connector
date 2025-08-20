@@ -17,15 +17,17 @@ declare(strict_types=1);
 
 namespace CPSIT\MyraCloudConnector\Traits;
 
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 trait DomainListParserTrait
 {
     /**
-     * @param string $list
-     * @return array
+     * @return list<non-empty-string>
      */
     protected function parseCommaList(string $list): array
     {
-        $rawList = explode(',', str_replace(' ', '', $list));
-        return array_unique(array_filter($rawList ?: []));
+        $rawList = GeneralUtility::trimExplode(',', $list, true);
+
+        return array_values(array_unique($rawList));
     }
 }

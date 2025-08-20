@@ -38,6 +38,7 @@ return [
         'gitignore',
         'packaging_exclude.php',
         'php-cs-fixer.php',
+        'phpstan.neon',
         'phpunit.xml',
         'rector.php',
         'typo3-vendor-bundler.yaml',
