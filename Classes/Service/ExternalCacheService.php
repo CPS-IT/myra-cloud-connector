@@ -21,28 +21,28 @@ use CPSIT\MyraCloudConnector\Adapter\AdapterInterface;
 use CPSIT\MyraCloudConnector\AdapterProvider\AdapterProvider;
 use CPSIT\MyraCloudConnector\Domain\DTO\Provider\ProviderItemRegisterInterface;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\CustomFile;
-use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\FileAdmin;
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\ExtensionAsset;
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\File;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\FileInterface;
-use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\PublicResources;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\Typo3Core;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\Typo3Temp;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\PageSlugInterface;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\SiteConfigInterface;
 use CPSIT\MyraCloudConnector\Domain\Enum\Typo3CacheType;
+use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
+use TYPO3\CMS\Core\Resource\ResourceFactory;
+use TYPO3\CMS\Core\Resource\StorageRepository;
 
 readonly class ExternalCacheService
 {
     public function __construct(
         private PageService $pageService,
         private SiteService $siteService,
-        private AdapterProvider $provider
+        private AdapterProvider $provider,
+        private ResourceFactory $resourceFactory,
+        private StorageRepository $storageRepository,
     ) {}
 
-    /**
-     * @param Typo3CacheType $type
-     * @param string $identifier
-     * @return bool
-     */
     public function clear(Typo3CacheType $type, string $identifier): bool
     {
         $providerItem = $this->provider->getDefaultProviderItem();
@@ -66,11 +66,6 @@ readonly class ExternalCacheService
         return false;
     }
 
-    /**
-     * @param ProviderItemRegisterInterface $provider
-     * @param int $pageUid
-     * @return bool
-     */
     private function clearPage(ProviderItemRegisterInterface $provider, int $pageUid): bool
     {
         $page = $this->pageService->getPage($pageUid);
@@ -78,25 +73,21 @@ readonly class ExternalCacheService
         return $this->clearCacheWithAdapter($provider->getAdapter(), $sites, $page);
     }
 
-    /**
-     * @param ProviderItemRegisterInterface $provider
-     * @return bool
-     */
     private function clearAllPages(ProviderItemRegisterInterface $provider): bool
     {
         $sites = $this->siteService->getSitesForClearance(null);
         return $this->clearCacheWithAdapter($provider->getAdapter(), $sites, null, true);
     }
 
-    /**
-     * @param ProviderItemRegisterInterface $provider
-     * @return bool
-     */
     private function clearAllFiles(ProviderItemRegisterInterface $provider): bool
     {
         $sites = $this->siteService->getSitesForClearance(null);
-        $fileCaches = [new FileAdmin(), new Typo3Temp(), new PublicResources(), new Typo3Core()];
+        $fileCaches = $this->getAllFileStorages();
+        $fileCaches[] = new ExtensionAsset();
+        $fileCaches[] = new Typo3Core();
+        $fileCaches[] = new Typo3Temp();
         $result = 0;
+
         foreach ($fileCaches as $file) {
             $result |= $this->clearCacheWithAdapter($provider->getAdapter(), $sites, $file, true);
         }
@@ -104,11 +95,6 @@ readonly class ExternalCacheService
         return (bool)$result;
     }
 
-    /**
-     * @param ProviderItemRegisterInterface $provider
-     * @param string $relPath
-     * @return bool
-     */
     private function clearFile(ProviderItemRegisterInterface $provider, string $relPath): bool
     {
         $file = $this->getFile($relPath);
@@ -118,24 +104,38 @@ readonly class ExternalCacheService
     }
 
     /**
-     * @param string $identifier
-     * @return FileInterface
+     * @return list<File>
      */
+    private function getAllFileStorages(): array
+    {
+        $storageObjects = $this->storageRepository->findAll();
+        $storages = [];
+
+        foreach ($storageObjects as $storage) {
+            $rootFolder = $storage->getRootLevelFolder();
+            $storages[] = new File($rootFolder);
+        }
+
+        return $storages;
+    }
+
     private function getFile(string $identifier): FileInterface
     {
-        if (str_starts_with($identifier, '1:/')) {
-            return new FileAdmin(substr($identifier, 3));
+        try {
+            $file = $this->resourceFactory->retrieveFileOrFolderObject($identifier);
+        } catch (ResourceDoesNotExistException) {
+            $file = null;
         }
-        // TODO: add other storages here
+
+        if ($file !== null) {
+            return new File($file);
+        }
+
         return new CustomFile($identifier);
     }
 
     /**
-     * @param AdapterInterface $adapter
      * @param SiteConfigInterface[] $sites
-     * @param PageSlugInterface|null $slug
-     * @param bool $recursive
-     * @return bool
      */
     private function clearCacheWithAdapter(AdapterInterface $adapter, array $sites, ?PageSlugInterface $slug = null, bool $recursive = false): bool
     {

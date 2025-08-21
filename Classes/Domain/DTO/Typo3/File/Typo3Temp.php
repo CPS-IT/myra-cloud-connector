@@ -17,7 +17,7 @@ declare(strict_types=1);
 
 namespace CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File;
 
-class Typo3Temp extends File
+class Typo3Temp extends AbstractFile
 {
     /**
      * @return string

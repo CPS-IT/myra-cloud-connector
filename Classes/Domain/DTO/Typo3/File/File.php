@@ -17,29 +17,29 @@ declare(strict_types=1);
 
 namespace CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File;
 
-abstract class File implements FileInterface
+use TYPO3\CMS\Core\Resource\ResourceInterface;
+
+class File extends AbstractFile
 {
-    abstract protected function getPrefix(): string;
-
     public function __construct(
-        private readonly string $slug = '',
-    ) {}
-
-    /**
-     * @return string
-     */
-    public function getRawSlug(): string
-    {
-        return $this->slug;
+        private readonly ResourceInterface $resource,
+    ) {
+        parent::__construct($this->resource->getIdentifier());
     }
 
-    /**
-     * @return string
-     */
-    public function getSlug(): string
+    protected function getPrefix(): string
     {
-        $relPath = $this->getPrefix() . '/' . $this->getRawSlug();
-        $pathSegments = array_filter(explode('/', $relPath));
-        return '/' . implode('/', $pathSegments);
+        $publicFile = (string)$this->resource->getStorage()->getPublicUrl($this->resource);
+
+        return '/' . trim(str_replace($this->getRawSlug(), '', $publicFile), '/');
+    }
+
+    public function getCombinedIdentifier(): string
+    {
+        if ($this->resource instanceof \TYPO3\CMS\Core\Resource\AbstractFile) {
+            return $this->resource->getCombinedIdentifier();
+        }
+
+        return $this->resource->getStorage()->getUid() . ':' . $this->resource->getIdentifier();
     }
 }

@@ -18,8 +18,7 @@ declare(strict_types=1);
 namespace CPSIT\MyraCloudConnector\EventListener;
 
 use CPSIT\MyraCloudConnector\AdapterProvider\AdapterProvider;
-use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\FileAdmin;
-use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\FileInterface as MyraFileInterface;
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\File as MyraFile;
 use CPSIT\MyraCloudConnector\Domain\Enum\Typo3CacheType;
 use CPSIT\MyraCloudConnector\Domain\Repository\FileRepository;
 use CPSIT\MyraCloudConnector\Service\ExternalCacheService;
@@ -69,9 +68,8 @@ final readonly class ExternalClearResourceCacheListener
 
     private function clearCacheForFile(FileInterface $file): void
     {
-        $path = $file->getIdentifier();
         $files = $this->getProcessedFiles($file);
-        $files[] = new FileAdmin($path);
+        $files[] = new MyraFile($file);
 
         foreach ($files as $toClearFile) {
             $this->clearMyraFile($toClearFile);
@@ -79,7 +77,7 @@ final readonly class ExternalClearResourceCacheListener
     }
 
     /**
-     * @return list<FileAdmin>
+     * @return list<MyraFile>
      */
     private function getProcessedFiles(FileInterface $file): array
     {
@@ -92,10 +90,9 @@ final readonly class ExternalClearResourceCacheListener
         return $files;
     }
 
-    private function clearMyraFile(MyraFileInterface $file): void
+    private function clearMyraFile(MyraFile $file): void
     {
-        // TODO: add other storages here not only (1:)
-        $path = '1:/' . ltrim($file->getRawSlug(), '/');
+        $path = $file->getCombinedIdentifier();
         $cacheIdentifier = 'myra-cloud-file-list-' . crc32($path);
 
         if ($this->cache->get($cacheIdentifier) === false) {

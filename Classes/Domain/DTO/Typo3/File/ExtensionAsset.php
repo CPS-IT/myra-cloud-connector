@@ -17,7 +17,7 @@ declare(strict_types=1);
 
 namespace CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File;
 
-class PublicResources extends File
+class ExtensionAsset extends AbstractFile
 {
     protected function getPrefix(): string
     {

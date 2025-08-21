@@ -17,16 +17,26 @@ declare(strict_types=1);
 
 namespace CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File;
 
-class FileAdmin extends File
-{
-    public const PREFIX = '/fileadmin';
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-    /**
-     * @return string
-     */
-    protected function getPrefix(): string
+abstract class AbstractFile implements FileInterface
+{
+    abstract protected function getPrefix(): string;
+
+    public function __construct(
+        private readonly string $slug = '',
+    ) {}
+
+    public function getRawSlug(): string
     {
-        // @todo Respect other file storages as well
-        return self::PREFIX;
+        return $this->slug;
+    }
+
+    public function getSlug(): string
+    {
+        $relPath = $this->getPrefix() . '/' . $this->getRawSlug();
+        $pathSegments = GeneralUtility::trimExplode('/', $relPath, true);
+
+        return '/' . implode('/', $pathSegments);
     }
 }
