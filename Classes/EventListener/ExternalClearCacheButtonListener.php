@@ -25,11 +25,14 @@ use TYPO3\CMS\Backend\Routing\Route;
 use TYPO3\CMS\Backend\Template\Components\ButtonBar;
 use TYPO3\CMS\Backend\Template\Components\ModifyButtonBarEvent;
 use TYPO3\CMS\Core\Attribute\AsEventListener;
+use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Http\ServerRequestFactory;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Imaging\IconSize;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Page\PageRenderer;
+use TYPO3\CMS\Core\Resource\ResourceStorage;
+use TYPO3\CMS\Filelist\Controller\FileListController;
 
 #[AsEventListener('cpsit/myra-cloud-connector/external-clear-cache-button')]
 final class ExternalClearCacheButtonListener
@@ -97,13 +100,27 @@ final class ExternalClearCacheButtonListener
 
         if ($this->getCacheType() === Typo3CacheType::RESOURCE) {
             if ($id === '') {
-                $id = '1:/';
+                $fileStorage = $this->getFirstAvailableFileStorage();
+                $id = $fileStorage?->getRootLevelFolder()->getCombinedIdentifier() ?? '1:/';
             }
 
             return $this->cacheId = $id;
         }
 
         return $this->cacheId = '';
+    }
+
+    /**
+     * @see FileListController::handleRequest
+     */
+    private function getFirstAvailableFileStorage(): ?ResourceStorage
+    {
+        $fileStorages = array_filter(
+            $this->getBackendUser()->getFileStorages(),
+            static fn(ResourceStorage $storage) => $storage->isBrowsable(),
+        );
+
+        return reset($fileStorages) ?: null;
     }
 
     private function isPageTypeSupported(): bool
@@ -154,6 +171,11 @@ final class ExternalClearCacheButtonListener
     private function getLanguageService(): LanguageService
     {
         return $GLOBALS['LANG'];
+    }
+
+    private function getBackendUser(): BackendUserAuthentication
+    {
+        return $GLOBALS['BE_USER'];
     }
 
     private function getRequest(): ServerRequestInterface
