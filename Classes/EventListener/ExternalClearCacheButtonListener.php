@@ -157,7 +157,7 @@ final class ExternalClearCacheButtonListener
         $route = $this->getBackendRoute();
 
         return $this->cacheTypeCache = match ($route?->getPath()) {
-            '/module/file/FilelistList' => Typo3CacheType::RESOURCE,
+            '/module/file/list' => Typo3CacheType::RESOURCE,
             '/module/web/layout', '/module/web/list', '/module/web/ViewpageView' => Typo3CacheType::PAGE,
             default => Typo3CacheType::INVALID,
         };
