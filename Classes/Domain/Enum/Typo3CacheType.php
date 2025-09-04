@@ -61,4 +61,15 @@ enum Typo3CacheType: int
     {
         return \array_keys(self::NAME_MAP);
     }
+
+    public function name(): string
+    {
+        $name = \array_search($this, self::NAME_MAP, true);
+
+        if ($name === false) {
+            throw new \InvalidArgumentException('Unknown cache type: ' . $this->value, 1757497642);
+        }
+
+        return $name;
+    }
 }

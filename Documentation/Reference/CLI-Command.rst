@@ -18,13 +18,15 @@ Usage
 
 .. code:: shell
 
-     myracloud:clear [options]
-     myracloud:clear -t page -i [PAGE_UID like: 123]
-     myracloud:clear -t resource -i [PATH like: /fileadmin/path/To/Directory]
-     myracloud:clear -t resource -i [PATH like: /assets/myCustomAssets/myScript.js]
-     myracloud:clear -t resource -i [PATH like: /fileadmin/path/ToFile.jpg]
-     myracloud:clear -t all
-     myracloud:clear -t allresources
+    myracloud:clear [options]
+    myracloud:clear -t page -i [PAGE_UID like: 123]
+    myracloud:clear -t page -i [PAGE_UID like: 123] -l [LANGUAGE_ID like: 2]
+    myracloud:clear -t resource -i [PATH like: /fileadmin/path/To/Directory]
+    myracloud:clear -t resource -i [PATH like: /assets/myCustomAssets/myScript.js]
+    myracloud:clear -t resource -i [PATH like: /fileadmin/path/ToFile.jpg]
+    myracloud:clear -t all
+    myracloud:clear -t all -l [LANGUAGE_ID like: 2]
+    myracloud:clear -t allresources
 
 .. _cli-type:
 Type Parameter
@@ -42,7 +44,8 @@ Type Parameter
 ~~~~~~~~~~~
 
 ``page`` type requires a page identifier (pid) ``-i 1``. the pid must be
-numeric.
+numeric. An optional language identifier ``-l <language uid>`` can be passed
+to limit cache clear to this specific language.
 
 ..  note::
     ``page`` clear commands are **never** recursive.
@@ -82,7 +85,9 @@ This will clear everything from these folders :
 
 ``all`` type requires no extra option.
 
-This clears everything in Myra Cache for this TYPO3 Instance.
+This clears everything in Myra Cache for this TYPO3 Instance. An optional
+language identifier ``-l <language uid>`` can be passed to limit cache
+clear to this specific language.
 
 ..  note::
     The ``all`` clear command is recursive by default.

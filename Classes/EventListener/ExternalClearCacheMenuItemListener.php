@@ -52,7 +52,11 @@ final readonly class ExternalClearCacheMenuItemListener
             /** @var non-empty-string $targetUrl */
             $targetUrl = (string)$this->uriBuilder->buildUriFromRoute(
                 'ajax_external_cache_clear',
-                ['type' => Typo3CacheType::ALL_PAGE->value, 'id' => '-1'],
+                [
+                    'type' => Typo3CacheType::ALL_PAGE->value,
+                    'id' => '-1',
+                    'language' => '-1',
+                ],
             );
 
             $event->addCacheActionIdentifier($provider->getCacheId());
