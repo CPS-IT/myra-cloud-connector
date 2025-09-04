@@ -19,51 +19,66 @@ namespace CPSIT\MyraCloudConnector\Domain\Repository;
 
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\Page;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\PageInterface;
-use TYPO3\CMS\Core\Database\Connection;
-use TYPO3\CMS\Core\Database\ConnectionPool;
-use TYPO3\CMS\Core\Database\Query\QueryBuilder;
+use TYPO3\CMS\Core\Context\LanguageAspectFactory;
+use TYPO3\CMS\Core\Domain\Repository\PageRepository as CorePageRepository;
+use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Site\SiteFinder;
 
 readonly class PageRepository implements SingletonInterface
 {
     public function __construct(
-        private ConnectionPool $connectionPool
+        private SiteFinder $siteFinder,
+        private CorePageRepository $pageRepository,
     ) {}
 
-    private function getQueryBuilder(): QueryBuilder
+    public function getPageWithUid(int $pageUid, ?int $languageId = null): ?PageInterface
     {
-        return $this->connectionPool->getQueryBuilderForTable('pages');
+        if ($languageId > 0) {
+            $site = $this->siteFinder->getSiteByPageId($pageUid);
+            $siteLanguage = $site->getLanguageById($languageId);
+            $languageAspect = LanguageAspectFactory::createFromSiteLanguage($siteLanguage);
+            $row = $this->pageRepository->getPageOverlay($pageUid, $languageAspect);
+        } else {
+            $row = $this->pageRepository->getPage($pageUid);
+        }
+
+        if ($row === []) {
+            return null;
+        }
+
+        $resolvedPageUid = (int)($row['_LOCALIZED_UID'] ?? $row['uid'] ?? 0);
+
+        if ($resolvedPageUid === 0) {
+            return null;
+        }
+
+        return new Page(
+            uid: $resolvedPageUid,
+            title: $row['title'],
+            hidden: (bool)$row['hidden'],
+            dokType: (int)$row['doktype'],
+            slug: $this->resolvePageSlug($row, $resolvedPageUid),
+            language: (int)$row['sys_language_uid'],
+            translationSource: $row['l10n_parent'] !== null ? (int)$row['l10n_parent'] : null,
+        );
     }
 
     /**
-     * @param int $pageUid
-     * @return PageInterface|null
+     * @param array<string, mixed> $result
      */
-    public function getPageWithUid(int $pageUid): ?PageInterface
+    private function resolvePageSlug(array $result, int $pageUid): string
     {
-        $qb = $this->getQueryBuilder();
-        $qb->getRestrictions()->removeAll();
-        $qb->select('p.uid', 'p.title', 'p.hidden', 'p.doktype', 'p.slug');
-        $qb->from('pages', 'p');
-        $qb->where(
-            $qb->expr()->eq('p.uid', $qb->createNamedParameter($pageUid, Connection::PARAM_INT)),
-            $qb->expr()->eq('p.deleted', $qb->createNamedParameter(0, Connection::PARAM_INT)),
-            $qb->expr()->in('p.doktype', $qb->createNamedParameter([1, 4, 5], Connection::PARAM_INT_ARRAY))
-        );
-
-        $qb->orderBy('uid', 'ASC');
-        $result = $qb->executeQuery()->fetchAssociative();
-
-        if ($result !== false) {
-            return new Page(
-                uid: (int)$result['uid'],
-                title: $result['title'],
-                hidden: (bool)$result['hidden'],
-                dokType: (int)$result['doktype'],
-                slug: $result['slug']
-            );
+        try {
+            $site = $this->siteFinder->getSiteByPageId($result['l10n_parent'] ?: $pageUid);
+            $siteLanguage = $site->getLanguageById($result['sys_language_uid']);
+        } catch (SiteNotFoundException | \InvalidArgumentException) {
+            return $result['slug'];
         }
 
-        return null;
+        return $site->getRouter()
+            ->generateUri($pageUid, ['_language' => $siteLanguage])
+            ->getPath()
+        ;
     }
 }

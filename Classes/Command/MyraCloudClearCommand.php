@@ -20,13 +20,15 @@ namespace CPSIT\MyraCloudConnector\Command;
 use CPSIT\MyraCloudConnector\Domain\Enum\Typo3CacheType;
 use CPSIT\MyraCloudConnector\Service\ExternalCacheService;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 final class MyraCloudClearCommand extends Command
 {
+    private SymfonyStyle $io;
+
     public function __construct(
         private readonly ExternalCacheService $externalCacheService,
     ) {
@@ -36,7 +38,9 @@ final class MyraCloudClearCommand extends Command
     protected function configure(): void
     {
         $this->addUsage('myracloud:clear -t page -i [PAGE_UID like: 123]');
+        $this->addUsage('myracloud:clear -t page -i [PAGE_UID like: 123] -l [LANGUAGE_ID like: 2]');
         $this->addUsage('myracloud:clear -t all');
+        $this->addUsage('myracloud:clear -t all -l [LANGUAGE_ID like: 2]');
         $this->addUsage('myracloud:clear -t resource -i [PATH like: /fileadmin/path/To/Directory]');
         $this->addUsage('myracloud:clear -t resource -i [PATH like: /assets/myCustomAssets/myScript.js]');
         $this->addUsage('myracloud:clear -t resource -i [PATH like: /fileadmin/path/ToFile.jpg]');
@@ -44,36 +48,67 @@ final class MyraCloudClearCommand extends Command
 
         $this->setHelp('resource and allresources are always cleared recursive' . LF .
             'identifier for recursive can be a folder or a file' . LF . LF .
-            '-t page ' . "\t\t" . ' require a page id' . LF .
+            '-t page ' . "\t\t" . ' require a page id and optional language id' . LF .
             '-t resource ' . "\t\t" . ' require a uri. example: -t resource -i /fileadmin/user_upload/pdfs' . LF .
-            '-t all ' . "\t\t" . ' clear everything in myracloud for this TYPO3 Instance (does not need a identifier)' . LF .
-            '-t allresources ' . "\t" . ' clear everything, recursive, under these folders (does not need a identifier): ' . LF .
+            '-t all ' . "\t\t" . ' clear everything in myracloud for this TYPO3 Instance (does not need an identifier)' . LF .
+            '-t allresources ' . "\t" . ' clear everything, recursive, under these folders (does not need an identifier): ' . LF .
             "\t\t\t" . ' /fileadmin/*, /typo3/*, /typo3temp/*, /_assets/*' . LF);
-        $this->addOption('type', 't', InputArgument::OPTIONAL, 'types: ' . implode(', ', Typo3CacheType::names()), '');
-        $this->addOption('identifier', 'i', InputArgument::OPTIONAL, 'page id or resource path for (page / resource type)', '');
+        $this->addOption('type', 't', InputOption::VALUE_REQUIRED, 'types: ' . \implode(', ', Typo3CacheType::names()), '');
+        $this->addOption('identifier', 'i', InputOption::VALUE_REQUIRED, 'page id or resource path for (page / resource type)', '');
+        $this->addOption('language', 'l', InputOption::VALUE_REQUIRED, 'Language id, usable in combination with "page" type');
+    }
+
+    protected function initialize(InputInterface $input, OutputInterface $output): void
+    {
+        $this->io = new SymfonyStyle($input, $output);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
         $type = trim((string)$input->getOption('type'));
         $identifier = trim((string)$input->getOption('identifier'));
         $typeId = Typo3CacheType::tryFromName($type) ?? Typo3CacheType::INVALID;
+        $language = $input->getOption('language');
 
         if (!$typeId->isKnown()) {
-            $io->error('Invalid options provided.');
+            $this->io->error('Invalid options provided.');
 
             return self::INVALID;
         }
 
-        if (!$this->externalCacheService->clear($typeId, $identifier)) {
-            $io->error('Some or all operations failed.');
+        if (\is_numeric($language)) {
+            $this->validateLanguageOption($typeId);
+
+            $languageId = (int)$language;
+        } else {
+            $languageId = null;
+        }
+
+        if (!$this->externalCacheService->clear($typeId, $identifier, $languageId)) {
+            $this->io->error('Some or all operations failed.');
 
             return self::FAILURE;
         }
 
-        $io->success('Cache clear request was successful.');
+        $this->io->success('Cache clear request was successful.');
 
         return self::SUCCESS;
+    }
+
+    private function validateLanguageOption(Typo3CacheType $selectedType): void
+    {
+        $supportedTypes = [Typo3CacheType::PAGE, Typo3CacheType::ALL_PAGE];
+
+        if (!\in_array($selectedType, $supportedTypes, true)) {
+            $this->io->warning(
+                \sprintf(
+                    'The language option can only be used for types "%s". Ignoring.',
+                    \implode(
+                        '", "',
+                        \array_map(static fn(Typo3CacheType $type) => $type->name(), $supportedTypes),
+                    ),
+                ),
+            );
+        }
     }
 }

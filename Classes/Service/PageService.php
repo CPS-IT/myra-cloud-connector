@@ -23,22 +23,15 @@ use TYPO3\CMS\Core\SingletonInterface;
 
 readonly class PageService implements SingletonInterface
 {
-    /**
-     * @param PageRepository $pageRepository
-     */
     public function __construct(
         private PageRepository $pageRepository
     ) {}
 
-    /**
-     * @param int $pageUid
-     * @return PageInterface|null
-     */
-    public function getPage(int $pageUid): ?PageInterface
+    public function getPage(int $pageUid, ?int $languageId = null): ?PageInterface
     {
         if ($pageUid > 0) {
             try {
-                return $this->pageRepository->getPageWithUid($pageUid);
+                return $this->pageRepository->getPageWithUid($pageUid, $languageId);
             } catch (\Exception) {
             }
         }
