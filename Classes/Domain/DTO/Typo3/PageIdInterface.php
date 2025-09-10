@@ -20,4 +20,11 @@ namespace CPSIT\MyraCloudConnector\Domain\DTO\Typo3;
 interface PageIdInterface
 {
     public function getPageId(): int;
+
+    /**
+     * @phpstan-assert-if-true !null $this->getTranslationSource()
+     */
+    public function getLanguageId(): int;
+
+    public function getTranslationSource(): ?int;
 }
