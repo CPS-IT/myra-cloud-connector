@@ -17,6 +17,7 @@ Topbar clear cache menu
 -----------------------
 
 ..  figure:: /img/cacheMenu.png
+    :width: 353 px
     :alt: The TYPO3 cache menu showing additional Myra cache options to delete all files or all pages.
 
     Clear the entire page cache or file cache
@@ -34,6 +35,7 @@ Context menu in file tree
 -------------------------
 
 ..  figure:: /img/context_filetree.png
+    :width: 283 px
     :alt: View of File tree context menu showing Myra clear cache option
 
 This will clear all files from the selected directory and all its subdirectories recursively.
@@ -43,7 +45,8 @@ Options menu in file list
 -------------------------
 
 ..  figure:: /img/context_filelist.png
-    :alt: View of File list context menu showing Myra clear cache option
+    :width: 283 px
+    :alt: Screenshot of the File list context menu showing Myra clear cache option
 
 This will clear the selected file only.
 
