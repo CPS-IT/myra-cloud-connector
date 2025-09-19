@@ -9,4 +9,5 @@ The extension inserts GUI options to clear pages and files from the Myra cache:
     :titlesonly:
 
     Page
+    Translations
     FileList
