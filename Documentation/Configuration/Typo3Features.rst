@@ -5,6 +5,7 @@ TYPO3 Features
 Toggle TYPO3 features.
 
 ..  figure:: /img/TYPO3Features.png
+    :width: 931 px
     :alt: view of TYPO3 feature settings
 
 .. _production-only:

@@ -18,7 +18,8 @@ Topbar clear cache menu
 -----------------------
 
 ..  figure:: /img/cacheMenu.png
-    :alt: View of main cache menu showing Myra Clear cache option
+    :width: 353 px
+    :alt: Screenshot of main cache menu showing Myra Clear cache option
 
     Clear the entire page cache or file cache
 
@@ -35,7 +36,8 @@ Context menu in page tree
 -------------------------
 
 ..  figure:: /img/page_context.png
-    :alt: View of page context menu showing Myra Clear Cache option
+    :width: 278 px
+    :alt: Screenshot of the page context menu showing Myra Clear Cache option
 
 This will clear the selected page only (no child pages). The option will not clear file resources.
 
@@ -44,7 +46,8 @@ Button bar
 ----------
 
 ..  figure:: /img/page_buttonbar.png
-    :alt: View of page buttonbar showing Myra Clear Cache option
+    :width: 234 px
+    :alt: Screenshot of the page buttonbar showing Myra Clear Cache option
 
 This will clear the current page only (no child pages). The option will not clear file resources.
 

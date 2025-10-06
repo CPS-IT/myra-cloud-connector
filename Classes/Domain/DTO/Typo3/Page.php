@@ -25,6 +25,8 @@ class Page implements PageInterface
         private readonly bool $hidden,
         private readonly int $dokType,
         private readonly string $slug,
+        private readonly int $language = 0,
+        private readonly ?int $translationSource = null,
     ) {}
 
     public function getPageId(): int
@@ -50,5 +52,15 @@ class Page implements PageInterface
     public function getTitle(): string
     {
         return $this->title;
+    }
+
+    public function getLanguageId(): int
+    {
+        return $this->language;
+    }
+
+    public function getTranslationSource(): ?int
+    {
+        return $this->translationSource;
     }
 }

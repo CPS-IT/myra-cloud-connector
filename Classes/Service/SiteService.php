@@ -68,7 +68,7 @@ class SiteService implements SingletonInterface
     {
         // todo: caching?
         try {
-            $site = $this->siteFinder->getSiteByPageId($pageId->getPageId());
+            $site = $this->siteFinder->getSiteByPageId($pageId->getTranslationSource() ?? $pageId->getPageId());
             $siteConfig = new Typo3SiteConfig($site);
         } catch (\Exception) {
             return [];

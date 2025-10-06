@@ -43,7 +43,7 @@ readonly class ExternalCacheService
         private StorageRepository $storageRepository,
     ) {}
 
-    public function clear(Typo3CacheType $type, string $identifier): bool
+    public function clear(Typo3CacheType $type, string $identifier, ?int $languageId = null): bool
     {
         $providerItem = $this->provider->getDefaultProviderItem();
         if ($providerItem === null) {
@@ -51,13 +51,13 @@ readonly class ExternalCacheService
         }
 
         if ($type === Typo3CacheType::PAGE) {
-            return $this->clearPage($providerItem, (int)$identifier);
+            return $this->clearPage($providerItem, (int)$identifier, $languageId);
         }
         if ($type === Typo3CacheType::RESOURCE) {
             return $this->clearFile($providerItem, trim($identifier));
         }
         if ($type === Typo3CacheType::ALL_PAGE) {
-            return $this->clearAllPages($providerItem);
+            return $this->clearAllPages($providerItem, $languageId);
         }
         if ($type === Typo3CacheType::ALL_RESOURCES) {
             return $this->clearAllFiles($providerItem);
@@ -66,14 +66,14 @@ readonly class ExternalCacheService
         return false;
     }
 
-    private function clearPage(ProviderItemRegisterInterface $provider, int $pageUid): bool
+    private function clearPage(ProviderItemRegisterInterface $provider, int $pageUid, ?int $languageId = null): bool
     {
-        $page = $this->pageService->getPage($pageUid);
+        $page = $this->pageService->getPage($pageUid, $languageId);
         $sites = $this->siteService->getSitesForClearance($page);
         return $this->clearCacheWithAdapter($provider->getAdapter(), $sites, $page);
     }
 
-    private function clearAllPages(ProviderItemRegisterInterface $provider): bool
+    private function clearAllPages(ProviderItemRegisterInterface $provider, ?int $languageId = null): bool
     {
         $sites = $this->siteService->getSitesForClearance(null);
         return $this->clearCacheWithAdapter($provider->getAdapter(), $sites, null, true);

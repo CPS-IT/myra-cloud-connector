@@ -21,6 +21,7 @@ use CPSIT\MyraCloudConnector\AdapterProvider\AdapterProvider;
 use CPSIT\MyraCloudConnector\Domain\Enum\Typo3CacheType;
 use CPSIT\MyraCloudConnector\Service\PageService;
 use Psr\Http\Message\ServerRequestInterface;
+use TYPO3\CMS\Backend\Module\ModuleData;
 use TYPO3\CMS\Backend\Routing\Route;
 use TYPO3\CMS\Backend\Template\Components\ButtonBar;
 use TYPO3\CMS\Backend\Template\Components\ModifyButtonBarEvent;
@@ -49,7 +50,7 @@ final class ExternalClearCacheButtonListener
 
     public function __invoke(ModifyButtonBarEvent $event): void
     {
-        if (!$this->isModuleSupported() || !$this->isPageTypeSupported()) {
+        if (!$this->isModuleSupported() || !$this->isCacheTypeSupported()) {
             return;
         }
 
@@ -69,6 +70,7 @@ final class ExternalClearCacheButtonListener
                 ->setDataAttributes([
                     'id' => $this->getIdentifier(),
                     'type' => $this->getCacheType()->value,
+                    'language' => $this->getLanguageId(),
                 ])
             ;
 
@@ -95,7 +97,9 @@ final class ExternalClearCacheButtonListener
                 return '';
             }
 
-            return $this->cacheId = $id;
+            $page = $this->pageService->getPage((int)$id, $this->getLanguageId());
+
+            return $this->cacheId = (string)($page?->getPageId() ?? $id);
         }
 
         if ($this->getCacheType() === Typo3CacheType::RESOURCE) {
@@ -108,6 +112,23 @@ final class ExternalClearCacheButtonListener
         }
 
         return $this->cacheId = '';
+    }
+
+    private function getLanguageId(): ?int
+    {
+        $serverRequest = $this->getRequest();
+        $moduleData = $serverRequest->getAttribute('moduleData');
+        $languageId = $serverRequest->getQueryParams()['language'] ?? null;
+
+        if ($languageId === null && $moduleData instanceof ModuleData && $moduleData->has('language')) {
+            $languageId = $moduleData->get('language');
+        }
+
+        if (is_numeric($languageId)) {
+            return (int)$languageId;
+        }
+
+        return null;
     }
 
     /**
@@ -123,20 +144,17 @@ final class ExternalClearCacheButtonListener
         return reset($fileStorages) ?: null;
     }
 
-    private function isPageTypeSupported(): bool
+    private function isCacheTypeSupported(): bool
     {
         if ($this->getCacheType() === Typo3CacheType::PAGE) {
             $pageUid = (int)$this->getIdentifier();
 
-            if ($pageUid <= 0) {
-                return false;
-            }
-
-            return $this->pageService->getPage($pageUid) !== null;
+            return $pageUid > 0;
         }
 
         if ($this->getCacheType() === Typo3CacheType::RESOURCE) {
             $path = $this->getIdentifier();
+
             return !empty($path);
         }
 

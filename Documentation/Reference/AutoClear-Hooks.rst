@@ -25,6 +25,7 @@ File Replace
 --------------
 
 ..  figure:: /img/context_filelist.png
+    :width: 283 px
     :alt: View of File list context menu showing Myra clear cache option
 
 Using the option "Replace" in FileList will trigger this hook. This also

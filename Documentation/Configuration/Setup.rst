@@ -11,6 +11,7 @@ Use of environment variables
 Configuration values can be set as text or parsed from environment values:
 
 ..  figure:: /img/env_inject.png
+    :width: 931 px
    :alt: Extension configuration Settings
 
 Every configuration value that starts with :php:`ENV=` will be parsed and the provided
