@@ -19,7 +19,7 @@ namespace CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File;
 
 use TYPO3\CMS\Core\Resource\ResourceInterface;
 
-class File extends AbstractFile
+final class File extends AbstractFile
 {
     public function __construct(
         private readonly ResourceInterface $resource,

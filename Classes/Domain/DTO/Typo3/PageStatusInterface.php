@@ -21,10 +21,5 @@ interface PageStatusInterface
 {
     public function getDokType(): int;
 
-    /**
-     * is hidden or not
-     *
-     * @return bool
-     */
     public function getVisibility(): bool;
 }

@@ -22,7 +22,7 @@ use TYPO3\CMS\Core\Http\ServerRequestFactory;
 use TYPO3\CMS\Core\Routing\BackendEntryPointResolver;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class Typo3Core extends AbstractFile
+final class Typo3Core extends AbstractFile
 {
     private static ?string $resolvedPrefix = null;
 
