@@ -17,7 +17,7 @@ declare(strict_types=1);
 
 namespace CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File;
 
-class CustomFile extends AbstractFile
+final class CustomFile extends AbstractFile
 {
     public function __construct(
         string $slug,
@@ -26,9 +26,6 @@ class CustomFile extends AbstractFile
         parent::__construct($slug);
     }
 
-    /**
-     * @return string
-     */
     protected function getPrefix(): string
     {
         return '/' . trim($this->prefix, '/');

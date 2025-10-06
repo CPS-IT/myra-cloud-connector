@@ -17,16 +17,16 @@ declare(strict_types=1);
 
 namespace CPSIT\MyraCloudConnector\Domain\DTO\Typo3;
 
-class Page implements PageInterface
+readonly class Page implements PageInterface
 {
     public function __construct(
-        private readonly int $uid,
-        private readonly string $title,
-        private readonly bool $hidden,
-        private readonly int $dokType,
-        private readonly string $slug,
-        private readonly int $language = 0,
-        private readonly ?int $translationSource = null,
+        private int $uid,
+        private string $title,
+        private bool $hidden,
+        private int $dokType,
+        private string $slug,
+        private int $language = 0,
+        private ?int $translationSource = null,
     ) {}
 
     public function getPageId(): int

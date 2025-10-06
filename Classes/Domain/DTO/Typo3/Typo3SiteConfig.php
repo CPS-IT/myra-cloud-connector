@@ -29,9 +29,6 @@ class Typo3SiteConfig implements SiteConfigInterface
      */
     private ?array $myraDomainList = null;
 
-    /**
-     * @param SiteInterface $site
-     */
     public function __construct(
         private readonly SiteInterface $site
     ) {}

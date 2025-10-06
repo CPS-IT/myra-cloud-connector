@@ -20,10 +20,10 @@ namespace CPSIT\MyraCloudConnector\Domain\DTO\Provider;
 use CPSIT\MyraCloudConnector\Adapter\AdapterInterface;
 use TYPO3\CMS\Core\Page\JavaScriptModuleInstruction;
 
-class ProviderItem implements ProviderItemRegisterInterface
+readonly class ProviderItem implements ProviderItemRegisterInterface
 {
     public function __construct(
-        private readonly AdapterInterface $adapter,
+        private AdapterInterface $adapter,
     ) {}
 
     public function getAdapter(): AdapterInterface
