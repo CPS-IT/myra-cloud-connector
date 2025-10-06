@@ -29,8 +29,7 @@ return RectorConfig::configure()
         __DIR__ . '/Classes',
         __DIR__ . '/Configuration',
         __DIR__ . '/Tests',
-        __DIR__ . '/ext_emconf.php',
-        __DIR__ . '/ext_tables.php',
+        __DIR__ . '/*.php',
     ])
     ->withPhpSets(php82: true)
     ->withPhpVersion(PhpVersion::PHP_82)
