@@ -80,7 +80,7 @@ final readonly class DataHandlerHook
             }
         } catch (\Exception $exception) {
             $this->logger->error(
-                'Unable to clear MyraCloud cache for incoming record change {table}:{uid}, resolving to page {pageUid} with language {languageId}: {message}',
+                'Unable to clear Myra Cloud cache for incoming record change {table}:{uid}, resolving to page {pageUid} with language {languageId}: {message}',
                 [
                     'table' => $tableName,
                     'uid' => $recordUid,
