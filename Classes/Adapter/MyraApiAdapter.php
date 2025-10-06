@@ -268,7 +268,7 @@ class MyraApiAdapter extends BaseAdapter
 
         return $this->clients[$instanceId] = new Client(
             [
-                'base_uri' => 'https://' . $config[self::CONFIG_NAME_ENDPOINT] . '/' . 'en' . '/rapi',
+                'base_uri' => 'https://' . $config[self::CONFIG_NAME_ENDPOINT] . '/en/rapi',
                 'handler'  => $stack,
             ],
         );
