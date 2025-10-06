@@ -10,8 +10,8 @@
 </div>
 
 An extension for TYPO3 CMS that connects a TYPO3 installation with a configured
-Myra Cloud instance. It allows to clear page and file caches for the configured
-domains.
+[Myra Cloud](https://www.myrasecurity.com/en/) instance. It allows to clear page
+and file caches for the configured domains.
 
 ## 🚀 Features
 
