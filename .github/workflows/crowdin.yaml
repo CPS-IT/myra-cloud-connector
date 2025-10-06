@@ -2,7 +2,7 @@ name: Crowdin
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   sync:
@@ -19,4 +19,4 @@ jobs:
           config: '.crowdin.yaml'
           project_id: ${{ secrets.CROWDIN_PROJECT_ID }}
           token: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
-          crowdin_branch_name: 'master'
+          crowdin_branch_name: 'main'
