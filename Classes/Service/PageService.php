@@ -19,9 +19,8 @@ namespace CPSIT\MyraCloudConnector\Service;
 
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\PageInterface;
 use CPSIT\MyraCloudConnector\Domain\Repository\PageRepository;
-use TYPO3\CMS\Core\SingletonInterface;
 
-readonly class PageService implements SingletonInterface
+final readonly class PageService
 {
     public function __construct(
         private PageRepository $pageRepository

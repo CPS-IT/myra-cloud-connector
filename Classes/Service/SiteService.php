@@ -21,17 +21,15 @@ use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\PageIdInterface;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\SiteConfigExternalIdentifierInterface;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\SiteConfigInterface;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\Typo3SiteConfig;
-use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Site\SiteFinder;
 
-class SiteService implements SingletonInterface
+final readonly class SiteService
 {
     public function __construct(
-        private readonly SiteFinder $siteFinder
+        private SiteFinder $siteFinder
     ) {}
 
     /**
-     * @param PageIdInterface|null $pageId
      * @return SiteConfigInterface[]
      */
     public function getSitesForClearance(?PageIdInterface $pageId): array
@@ -61,7 +59,6 @@ class SiteService implements SingletonInterface
     }
 
     /**
-     * @param PageIdInterface $pageId
      * @return SiteConfigInterface[]
      */
     private function getAllSupportedSitesForPageId(PageIdInterface $pageId): array
@@ -81,12 +78,8 @@ class SiteService implements SingletonInterface
         return [];
     }
 
-    /**
-     * @param SiteConfigExternalIdentifierInterface $site
-     * @return bool
-     */
     private function isSiteSupported(SiteConfigExternalIdentifierInterface $site): bool
     {
-        return !empty($site->getExternalIdentifierList());
+        return $site->getExternalIdentifierList() !== [];
     }
 }
