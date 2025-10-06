@@ -33,7 +33,7 @@ use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\StorageRepository;
 
-readonly class ExternalCacheService
+final readonly class ExternalCacheService
 {
     public function __construct(
         private PageService $pageService,
@@ -99,7 +99,7 @@ readonly class ExternalCacheService
     {
         $file = $this->getFile($relPath);
         $sites = $this->siteService->getSitesForClearance(null);
-        // files are always recursive deleted
+        // files are always deleted recursively
         return $this->clearCacheWithAdapter($provider->getAdapter(), $sites, $file, true);
     }
 
@@ -137,8 +137,12 @@ readonly class ExternalCacheService
     /**
      * @param SiteConfigInterface[] $sites
      */
-    private function clearCacheWithAdapter(AdapterInterface $adapter, array $sites, ?PageSlugInterface $slug = null, bool $recursive = false): bool
-    {
+    private function clearCacheWithAdapter(
+        AdapterInterface $adapter,
+        array $sites,
+        ?PageSlugInterface $slug = null,
+        bool $recursive = false,
+    ): bool {
         $result = 0;
         foreach ($sites as $site) {
             $result |= $adapter->clearCache($site, $slug, $recursive);
