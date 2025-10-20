@@ -16,5 +16,5 @@ onlyAdmin = 1
 # cat=Typo3; type=boolean; label=Disable AutoClear-hooks for Pages and FileList: default OFF
 disableHooks = 0
 
-# cat=Typo3; type=string; label=Disable extension for these domains (comma separated list, use for special stage/preview/development domains)
+# cat=Typo3; type=string; label=Disable extension for these domains:Comma-separated list, may contain patterns parseable by `fnmatch`, useful for special stage/preview/development domains
 domainBlacklist =

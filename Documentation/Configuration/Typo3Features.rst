@@ -40,3 +40,7 @@ disable all UI elements if TYPO3 is used from a domain in this list.
 
 ..  note::
     This does not affect the CLI command.
+
+..  versionchanged:: 3.0.0
+    Since version 3.0.0, the :php:`domainBlacklist` configuration may contain values which are
+    parseable by PHP's :php:`fnmatch` function. Example: :php:`*.ddev.site`
