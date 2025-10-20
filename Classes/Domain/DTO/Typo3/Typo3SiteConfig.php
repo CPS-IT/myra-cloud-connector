@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace CPSIT\MyraCloudConnector\Domain\DTO\Typo3;
 
 use CPSIT\MyraCloudConnector\Traits\DomainListParserTrait;
-use TYPO3\CMS\Core\Site\Entity\SiteInterface;
+use TYPO3\CMS\Core\Site\Entity\Site;
 
 class Typo3SiteConfig implements SiteConfigInterface
 {
@@ -30,7 +30,7 @@ class Typo3SiteConfig implements SiteConfigInterface
     private ?array $myraDomainList = null;
 
     public function __construct(
-        private readonly SiteInterface $site
+        private readonly Site $site
     ) {}
 
     /**
@@ -42,11 +42,8 @@ class Typo3SiteConfig implements SiteConfigInterface
             return $this->myraDomainList;
         }
 
-        $domainList = [];
-        if (method_exists($this->site, 'getConfiguration')) {
-            $domainListString = $this->site->getConfiguration()['myra_host'] ?? '';
-            $domainList = $this->parseCommaList($domainListString);
-        }
+        $domainListString = $this->site->getConfiguration()['myra_host'] ?? '';
+        $domainList = $this->parseCommaList($domainListString);
 
         return $this->myraDomainList = $domainList;
     }
