@@ -21,12 +21,16 @@ use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\PageIdInterface;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\SiteConfigExternalIdentifierInterface;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\SiteConfigInterface;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\Typo3SiteConfig;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
 use TYPO3\CMS\Core\Site\SiteFinder;
 
 final readonly class SiteService
 {
     public function __construct(
-        private SiteFinder $siteFinder
+        private SiteFinder $siteFinder,
+        #[Autowire('@cache.runtime')]
+        private FrontendInterface $cache,
     ) {}
 
     /**
@@ -46,13 +50,20 @@ final readonly class SiteService
      */
     private function getAllSupportedSites(): array
     {
-        // TODO: caching ?
-        $sites = [];
-        foreach ($this->siteFinder->getAllSites() as $site) {
-            $siteConfig = new Typo3SiteConfig($site);
-            if ($this->isSiteSupported($siteConfig)) {
-                $sites[] = $siteConfig;
+        $cacheIdentifier = 'myra-cloud-supported-sites';
+
+        if (($sites = $this->cache->get($cacheIdentifier)) === false) {
+            $sites = [];
+
+            foreach ($this->siteFinder->getAllSites() as $site) {
+                $siteConfig = new Typo3SiteConfig($site);
+
+                if ($this->isSiteSupported($siteConfig)) {
+                    $sites[] = $siteConfig;
+                }
             }
+
+            $this->cache->set($cacheIdentifier, $sites);
         }
 
         return $sites;
@@ -63,19 +74,26 @@ final readonly class SiteService
      */
     private function getAllSupportedSitesForPageId(PageIdInterface $pageId): array
     {
-        // todo: caching?
-        try {
-            $site = $this->siteFinder->getSiteByPageId($pageId->getTranslationSource() ?? $pageId->getPageId());
-            $siteConfig = new Typo3SiteConfig($site);
-        } catch (\Exception) {
-            return [];
+        $cacheIdentifier = 'myra-cloud-supported-sites-page-' . crc32(serialize($pageId));
+
+        if (($sites = $this->cache->get($cacheIdentifier)) === false) {
+            try {
+                $site = $this->siteFinder->getSiteByPageId($pageId->getTranslationSource() ?? $pageId->getPageId());
+                $siteConfig = new Typo3SiteConfig($site);
+
+                if ($this->isSiteSupported($siteConfig)) {
+                    $sites = [$siteConfig];
+                } else {
+                    $sites = [];
+                }
+            } catch (\Exception) {
+                $sites = [];
+            }
+
+            $this->cache->set($cacheIdentifier, $sites);
         }
 
-        if ($this->isSiteSupported($siteConfig)) {
-            return [$siteConfig];
-        }
-
-        return [];
+        return $sites;
     }
 
     private function isSiteSupported(SiteConfigExternalIdentifierInterface $site): bool
