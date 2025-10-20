@@ -8,12 +8,18 @@ changelog:
       - question
       - wontfix
   categories:
+    - title: ⚡ Breaking
+      labels:
+        - breaking
     - title: 🚀 Improved
       labels:
         - enhancement
     - title: 🚑 Fixed
       labels:
         - bug
+    - title: 👷 Changed
+      labels:
+        - maintenance
     - title: 📖 Documentation
       labels:
         - documentation
