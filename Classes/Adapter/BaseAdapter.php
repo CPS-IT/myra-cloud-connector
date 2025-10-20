@@ -109,94 +109,107 @@ abstract class BaseAdapter implements SingletonInterface, AdapterInterface
 
     private function isAutomatedAllowedCondition(): bool
     {
-        if (isset(self::$checkupCache[__METHOD__])) {
-            return self::$checkupCache[__METHOD__];
-        }
+        return $this->getFromCache(
+            __METHOD__,
+            function () {
+                $allConfigData = $this->getAdapterConfig(true);
+                $hooksDisabled = (int)($allConfigData['disableHooks'] ?? 0) === 1;
 
-        $allConfigData = $this->getAdapterConfig(true);
-        $hooksDisabled = (int)($allConfigData['disableHooks'] ?? 0) === 1;
-
-        return self::$checkupCache[__METHOD__] = !$hooksDisabled;
+                return !$hooksDisabled;
+            },
+        );
     }
 
     private function adminOnlyCondition(): bool
     {
-        if (isset(self::$checkupCache[__METHOD__])) {
-            return self::$checkupCache[__METHOD__];
-        }
+        return $this->getFromCache(
+            __METHOD__,
+            function () {
+                $backendUser = $this->getBackendUser();
 
-        $backendUser = $this->getBackendUser();
+                if ($backendUser === null) {
+                    return false;
+                }
 
-        if (!$backendUser) {
-            return self::$checkupCache[__METHOD__] = false;
-        }
+                $allConfigData = $this->getAdapterConfig(true);
+                $onlyAdmin = (int)($allConfigData['onlyAdmin'] ?? 1) === 1;
 
-        $allConfigData = $this->getAdapterConfig(true);
-        $only = (int)($allConfigData['onlyAdmin'] ?? 1) === 1;
+                if ($onlyAdmin) {
+                    return $backendUser->isAdmin();
+                }
 
-        if ($only) {
-            return self::$checkupCache[__METHOD__] = $backendUser->isAdmin();
-        }
-
-        return self::$checkupCache[__METHOD__] = true;
+                return true;
+            },
+        );
     }
 
     private function liveOnlyCondition(): bool
     {
-        if (isset(self::$checkupCache[__METHOD__])) {
-            return self::$checkupCache[__METHOD__];
-        }
+        return $this->getFromCache(
+            __METHOD__,
+            function () {
+                $allConfigData = $this->getAdapterConfig(true);
+                $only = (int)($allConfigData['onlyLive'] ?? 1) === 1;
 
-        $allConfigData = $this->getAdapterConfig(true);
-        $only = (int)($allConfigData['onlyLive'] ?? 1) === 1;
+                if ($only) {
+                    return Environment::getContext()->isProduction();
+                }
 
-        if ($only) {
-            return self::$checkupCache[__METHOD__] = Environment::getContext()->isProduction();
-        }
-
-        return self::$checkupCache[__METHOD__] = true;
+                return true;
+            },
+        );
     }
 
     private function isDomainBlacklisted(): bool
     {
-        if (isset(self::$checkupCache[__METHOD__])) {
-            return self::$checkupCache[__METHOD__];
-        }
+        return $this->getFromCache(
+            __METHOD__,
+            function () {
+                if (Environment::isCli()) {
+                    return false;
+                }
 
-        if (Environment::isCli()) {
-            return self::$checkupCache[__METHOD__] = false;
-        }
+                $blacklistString = $this->getAdapterConfig(true)['domainBlacklist'] ?? '';
+                $blackList = $this->parseCommaList($blacklistString);
+                $request = $this->getServerRequest();
+                $currentDomainContext = $request->getUri()->getHost();
+                $isBlacklisted = false;
 
-        $blacklistString = $this->getAdapterConfig(true)['domainBlacklist'] ?? '';
-        $blackList = $this->parseCommaList($blacklistString);
-        $request = $this->getServerRequest();
-        $currentDomainContext = $request->getUri()->getHost();
-        $isBlacklisted = false;
+                foreach ($blackList as $pattern) {
+                    if ($pattern === $currentDomainContext || fnmatch($pattern, $currentDomainContext)) {
+                        $isBlacklisted = true;
+                        break;
+                    }
+                }
 
-        foreach ($blackList as $pattern) {
-            if ($pattern === $currentDomainContext || fnmatch($pattern, $currentDomainContext)) {
-                $isBlacklisted = true;
-                break;
-            }
-        }
-
-        return self::$checkupCache[__METHOD__] = $isBlacklisted;
+                return $isBlacklisted;
+            },
+        );
     }
 
     private function setupConfigCondition(): bool
     {
-        if (isset(self::$checkupCache[__METHOD__])) {
-            return self::$checkupCache[__METHOD__];
-        }
+        return $this->getFromCache(
+            __METHOD__,
+            function () {
+                $allConfigData = $this->getAdapterConfig(true);
+                foreach ($allConfigData as $key => $value) {
+                    if (empty($this->getRealAdapterConfigValue($value)) && str_starts_with($key, $this->getAdapterConfigPrefix())) {
+                        return false;
+                    }
+                }
 
-        $allConfigData = $this->getAdapterConfig(true);
-        foreach ($allConfigData as $key => $value) {
-            if (str_starts_with($key, $this->getAdapterConfigPrefix()) && empty($this->getRealAdapterConfigValue($value))) {
-                return self::$checkupCache[__METHOD__] = false;
-            }
-        }
+                return true;
+            },
+        );
+    }
 
-        return self::$checkupCache[__METHOD__] = true;
+    /**
+     * @param \Closure(): bool $buildFunction
+     */
+    private function getFromCache(string $identifier, \Closure $buildFunction): bool
+    {
+        return self::$checkupCache[$identifier] ?? (self::$checkupCache[$identifier] = $buildFunction());
     }
 
     /**
