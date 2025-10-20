@@ -94,7 +94,7 @@ abstract class BaseAdapter implements SingletonInterface, AdapterInterface
 
     public function canExecute(): bool
     {
-        return $this->setupConfigCondition() && $this->liveOnlyCondition() && $this->domainNotBlacklisted();
+        return $this->setupConfigCondition() && $this->liveOnlyCondition() && !$this->isDomainBlacklisted();
     }
 
     public function canInteract(): bool
@@ -157,22 +157,30 @@ abstract class BaseAdapter implements SingletonInterface, AdapterInterface
         return self::$checkupCache[__METHOD__] = true;
     }
 
-    private function domainNotBlacklisted(): bool
+    private function isDomainBlacklisted(): bool
     {
         if (isset(self::$checkupCache[__METHOD__])) {
             return self::$checkupCache[__METHOD__];
         }
 
         if (Environment::isCli()) {
-            return self::$checkupCache[__METHOD__] = true;
+            return self::$checkupCache[__METHOD__] = false;
         }
 
         $blacklistString = $this->getAdapterConfig(true)['domainBlacklist'] ?? '';
         $blackList = $this->parseCommaList($blacklistString);
         $request = $this->getServerRequest();
         $currentDomainContext = $request->getUri()->getHost();
+        $isBlacklisted = false;
 
-        return self::$checkupCache[__METHOD__] = (empty($blackList) || !in_array($currentDomainContext, $blackList, true));
+        foreach ($blackList as $pattern) {
+            if ($pattern === $currentDomainContext || fnmatch($pattern, $currentDomainContext)) {
+                $isBlacklisted = true;
+                break;
+            }
+        }
+
+        return self::$checkupCache[__METHOD__] = $isBlacklisted;
     }
 
     private function setupConfigCondition(): bool
