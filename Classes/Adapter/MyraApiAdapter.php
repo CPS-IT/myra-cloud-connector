@@ -31,6 +31,9 @@ use Myracloud\WebApi\Endpoint\CacheClear;
 use Myracloud\WebApi\Endpoint\DnsRecord;
 use Myracloud\WebApi\Middleware\Signature;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 
 #[AutoconfigureTag('myra_cloud.external.cache.adapter')]
 class MyraApiAdapter extends BaseAdapter
@@ -48,6 +51,14 @@ class MyraApiAdapter extends BaseAdapter
     private const CONFIG_NAME_API_KEY = 'myra_api_key';
     private const CONFIG_NAME_ENDPOINT = 'myra_endpoint';
     private const CONFIG_NAME_SECRET = 'myra_secret';
+
+    public function __construct(
+        ExtensionConfiguration $extensionConfiguration,
+        #[Autowire('@cache.runtime')]
+        private readonly FrontendInterface $cache,
+    ) {
+        parent::__construct($extensionConfiguration);
+    }
 
     public function getCacheId(): string
     {
@@ -149,26 +160,31 @@ class MyraApiAdapter extends BaseAdapter
     }
 
     /**
-     * @param string $domainIdentifier
      * @return string[]
      */
     private function getFqdnForSite(string $domainIdentifier): array
     {
-        // todo: caching?
-        $r = $this->getDomainRecordsForDomain($domainIdentifier);
-        $fqdn = [];
-        if (!empty($r) && $r['error'] === false) {
-            foreach ($r['list'] as $recordItem) {
-                $name = $recordItem['name'];
-                $active = (bool)($recordItem['active'] ?? false);
-                $enable = (bool)($recordItem['enabled'] ?? false);
-                if ($active && $enable && $name !== '') {
-                    $fqdn[crc32((string)$name)] = $name;
+        $cacheIdentifier = 'myra-cloud-api-adapter-fqdn-site-' . crc32($domainIdentifier);
+
+        if (($fqdn = $this->cache->get($cacheIdentifier)) === false) {
+            $r = $this->getDomainRecordsForDomain($domainIdentifier);
+            $fqdn = [];
+
+            if (!empty($r) && $r['error'] === false) {
+                foreach ($r['list'] as $recordItem) {
+                    $name = $recordItem['name'];
+                    $active = (bool)($recordItem['active'] ?? false);
+                    $enable = (bool)($recordItem['enabled'] ?? false);
+                    if ($active && $enable && $name !== '') {
+                        $fqdn[crc32((string)$name)] = $name;
+                    }
                 }
             }
+
+            $this->cache->set($cacheIdentifier, $fqdn);
         }
 
-        return array_values($fqdn);
+        return $fqdn;
     }
 
     /**
