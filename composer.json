@@ -4,7 +4,7 @@
 	"license": "GPL-2.0-or-later",
 	"type": "typo3-cms-extension",
 	"require": {
-		"php": "~8.2.0 || ~8.3.0 || ~8.4.0",
+		"php": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
 		"ext-json": "*",
 		"cpsit/myra-web-api": "^1.0",
 		"guzzlehttp/guzzle": "^7.0",
