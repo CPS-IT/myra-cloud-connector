@@ -34,6 +34,9 @@ jobs:
       - name: Install Composer dependencies
         uses: ramsey/composer-install@v3
 
+      - name: Bundle vendor libraries
+        run: composer bundle -v
+
       - name: Stash bundled files
         run: |
           git add -f Resources/Private/Libs/vendor
@@ -44,9 +47,6 @@ jobs:
 
       - name: Restore bundled files
         run: git stash pop
-
-      - name: Bundle vendor libraries
-        run: composer bundle -v
 
       - name: Create artefact
         run: |
