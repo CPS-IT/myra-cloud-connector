@@ -18,6 +18,7 @@
 	},
 	"require-dev": {
 		"armin/editorconfig-cli": "^2.1",
+		"eliashaeussler/typo3-vendor-bundler": "^2.2",
 		"eliashaeussler/version-bumper": "^3.0",
 		"ergebnis/composer-normalize": "^2.47",
 		"phpstan/extension-installer": "^1.4",
@@ -43,6 +44,7 @@
 	},
 	"config": {
 		"allow-plugins": {
+			"eliashaeussler/typo3-vendor-bundler": true,
 			"eliashaeussler/version-bumper": true,
 			"ergebnis/composer-normalize": true,
 			"phpstan/extension-installer": true,
