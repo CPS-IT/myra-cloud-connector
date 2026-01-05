@@ -18,7 +18,7 @@
 	},
 	"require-dev": {
 		"armin/editorconfig-cli": "^2.1",
-		"eliashaeussler/typo3-vendor-bundler": "^2.2",
+		"eliashaeussler/typo3-vendor-bundler": "^3.0",
 		"eliashaeussler/version-bumper": "^3.0",
 		"ergebnis/composer-normalize": "^2.47",
 		"phpstan/extension-installer": "^1.4",
@@ -77,8 +77,7 @@
 			"@fix:php"
 		],
 		"fix:composer": [
-			"@composer normalize --no-check-lock --no-update-lock",
-			"@composer normalize Resources/Private/Libs/composer.json --no-check-lock --no-update-lock"
+			"@composer normalize"
 		],
 		"fix:editorconfig": "@lint:editorconfig --fix",
 		"fix:php": "php-cs-fixer fix",

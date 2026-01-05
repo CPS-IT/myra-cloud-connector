@@ -2,7 +2,7 @@
 /.idea
 /config
 /public
-/Resources/Private/Libs/vendor
+/Resources/Private/Libs
 /var
 /vendor
 /.php-cs-fixer.cache
