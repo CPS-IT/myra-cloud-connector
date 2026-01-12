@@ -5610,16 +5610,16 @@
         },
         {
             "name": "cyclonedx/cyclonedx-library",
-            "version": "v3.9.0",
+            "version": "v3.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/CycloneDX/cyclonedx-php-library.git",
-                "reference": "0301e2c16ede56d0377626f581e5fab98ec987a3"
+                "reference": "e6bb0fca8d89f1e34755900c361061a6f5253e49"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/CycloneDX/cyclonedx-php-library/zipball/0301e2c16ede56d0377626f581e5fab98ec987a3",
-                "reference": "0301e2c16ede56d0377626f581e5fab98ec987a3",
+                "url": "https://api.github.com/repos/CycloneDX/cyclonedx-php-library/zipball/e6bb0fca8d89f1e34755900c361061a6f5253e49",
+                "reference": "e6bb0fca8d89f1e34755900c361061a6f5253e49",
                 "shasum": ""
             },
             "require": {
@@ -5695,7 +5695,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2025-12-02T10:32:20+00:00"
+            "time": "2026-01-07T13:45:46+00:00"
         },
         {
             "name": "cypresslab/gitelephant",
@@ -5832,16 +5832,16 @@
         },
         {
             "name": "eliashaeussler/task-runner",
-            "version": "1.1.0",
+            "version": "1.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/eliashaeussler/task-runner.git",
-                "reference": "9876f8e9f428225ef56a826fbbc50095490331c4"
+                "reference": "286f3e94b6f94126106a9f2c16c787afc70ddab1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eliashaeussler/task-runner/zipball/9876f8e9f428225ef56a826fbbc50095490331c4",
-                "reference": "9876f8e9f428225ef56a826fbbc50095490331c4",
+                "url": "https://api.github.com/repos/eliashaeussler/task-runner/zipball/286f3e94b6f94126106a9f2c16c787afc70ddab1",
+                "reference": "286f3e94b6f94126106a9f2c16c787afc70ddab1",
                 "shasum": ""
             },
             "require": {
@@ -5850,6 +5850,7 @@
             },
             "require-dev": {
                 "armin/editorconfig-cli": "^2.2",
+                "composer/composer": "^2.2",
                 "eliashaeussler/php-cs-fixer-config": "^3.1",
                 "eliashaeussler/phpstan-config": "^4.0",
                 "eliashaeussler/rector-config": "^4.0",
@@ -5880,9 +5881,9 @@
             "description": "Progress helper for long-running CLI tasks, based on Symfony Console",
             "support": {
                 "issues": "https://github.com/eliashaeussler/task-runner/issues",
-                "source": "https://github.com/eliashaeussler/task-runner/tree/1.1.0"
+                "source": "https://github.com/eliashaeussler/task-runner/tree/1.2.2"
             },
-            "time": "2025-12-29T16:53:28+00:00"
+            "time": "2026-01-06T11:25:33+00:00"
         },
         {
             "name": "eliashaeussler/typo3-vendor-bundler",
@@ -6597,16 +6598,16 @@
         },
         {
             "name": "friendsofphp/php-cs-fixer",
-            "version": "v3.92.4",
+            "version": "v3.92.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer.git",
-                "reference": "9e7488b19403423e02e8403cc1eb596baf4673b0"
+                "reference": "260cc8c4a1d2f6d2f22cd4f9c70aa72e55ebac58"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/9e7488b19403423e02e8403cc1eb596baf4673b0",
-                "reference": "9e7488b19403423e02e8403cc1eb596baf4673b0",
+                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/260cc8c4a1d2f6d2f22cd4f9c70aa72e55ebac58",
+                "reference": "260cc8c4a1d2f6d2f22cd4f9c70aa72e55ebac58",
                 "shasum": ""
             },
             "require": {
@@ -6689,7 +6690,7 @@
             ],
             "support": {
                 "issues": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/issues",
-                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.92.4"
+                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.92.5"
             },
             "funding": [
                 {
@@ -6697,7 +6698,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-01-04T00:38:52+00:00"
+            "time": "2026-01-08T21:57:37+00:00"
         },
         {
             "name": "idiosyncratic/editorconfig",
@@ -8837,16 +8838,16 @@
         },
         {
             "name": "ssch/typo3-rector",
-            "version": "v3.10.1",
+            "version": "v3.10.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sabbelasichon/typo3-rector.git",
-                "reference": "64711200fd40408efa6239329c72d2e5da68453d"
+                "reference": "6e1824b3629590646b56261f576688d229a5bebe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sabbelasichon/typo3-rector/zipball/64711200fd40408efa6239329c72d2e5da68453d",
-                "reference": "64711200fd40408efa6239329c72d2e5da68453d",
+                "url": "https://api.github.com/repos/sabbelasichon/typo3-rector/zipball/6e1824b3629590646b56261f576688d229a5bebe",
+                "reference": "6e1824b3629590646b56261f576688d229a5bebe",
                 "shasum": ""
             },
             "require": {
@@ -8949,7 +8950,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-12-27T11:07:47+00:00"
+            "time": "2026-01-06T19:18:02+00:00"
         },
         {
             "name": "symfony/polyfill-php80",
