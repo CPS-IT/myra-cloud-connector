@@ -42,7 +42,6 @@ return [
         'phpunit.xml',
         'rector.php',
         'renovate.json',
-        'typo3-vendor-bundler.yaml',
         'version-bumper.yaml',
     ],
 ];
