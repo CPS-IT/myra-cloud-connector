@@ -23,6 +23,7 @@
 		"ergebnis/composer-normalize": "^2.47",
 		"phpstan/extension-installer": "^1.4",
 		"phpstan/phpstan": "^2.1",
+		"phpstan/phpstan-deprecation-rules": "^2.0",
 		"saschaegerer/phpstan-typo3": "^2.1",
 		"shipmonk/composer-dependency-analyser": "^1.8",
 		"ssch/typo3-rector": "^3.6",
