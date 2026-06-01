@@ -25,11 +25,14 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\MessageFormatter;
 use GuzzleHttp\Middleware;
 use Myracloud\WebApi\Endpoint\AbstractEndpoint;
 use Myracloud\WebApi\Endpoint\CacheClear;
 use Myracloud\WebApi\Endpoint\DnsRecord;
 use Myracloud\WebApi\Middleware\Signature;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
@@ -56,6 +59,7 @@ class MyraApiAdapter extends BaseAdapter
         ExtensionConfiguration $extensionConfiguration,
         #[Autowire('@cache.runtime')]
         private readonly FrontendInterface $cache,
+        private readonly LoggerInterface $logger,
     ) {
         parent::__construct($extensionConfiguration);
     }
@@ -280,6 +284,9 @@ class MyraApiAdapter extends BaseAdapter
             Middleware::mapRequest(
                 $signature->signRequest(...),
             ),
+        );
+        $stack->push(
+            Middleware::log($this->logger, new MessageFormatter(MessageFormatter::DEBUG), LogLevel::DEBUG),
         );
 
         return $this->clients[$instanceId] = new Client(
