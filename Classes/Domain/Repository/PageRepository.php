@@ -60,7 +60,7 @@ readonly class PageRepository implements SingletonInterface
             dokType: (int)$row['doktype'],
             slug: $this->resolvePageSlug($row, $resolvedPageUid),
             language: (int)$row['sys_language_uid'],
-            translationSource: $row['l10n_parent'] !== null ? (int)$row['l10n_parent'] : null,
+            translationSource: (int)$row['l10n_parent'] > 0 ? (int)$row['l10n_parent'] : null,
         );
     }
 
