@@ -98,7 +98,7 @@ final readonly class DataHandlerHook
     private function resolveParametersForPage(int $recordUid): array
     {
         $page = $this->pageService->getPage($recordUid);
-        $pageUid = $page?->getLanguageId() > 0 ? $page->getTranslationSource() : $page?->getPageId();
+        $pageUid = $page?->getOriginalPageId();
         $languageId = $page?->getLanguageId() ?? 0;
 
         return [$pageUid, $languageId];

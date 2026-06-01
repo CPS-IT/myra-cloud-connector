@@ -99,7 +99,7 @@ final class ExternalClearCacheButtonListener
 
             $page = $this->pageService->getPage((int)$id, $this->getLanguageId());
 
-            return $this->cacheId = (string)($page?->getPageId() ?? $id);
+            return $this->cacheId = (string)($page?->getOriginalPageId() ?? $id);
         }
 
         if ($this->getCacheType() === Typo3CacheType::RESOURCE) {

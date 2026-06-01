@@ -34,6 +34,11 @@ readonly class Page implements PageInterface
         return $this->uid;
     }
 
+    public function getOriginalPageId(): int
+    {
+        return $this->language > 0 && $this->translationSource !== null ? $this->translationSource : $this->uid;
+    }
+
     public function getSlug(): string
     {
         return $this->slug;

@@ -78,7 +78,7 @@ final readonly class SiteService
 
         if (($sites = $this->cache->get($cacheIdentifier)) === false) {
             try {
-                $site = $this->siteFinder->getSiteByPageId($pageId->getTranslationSource() ?? $pageId->getPageId());
+                $site = $this->siteFinder->getSiteByPageId($pageId->getOriginalPageId());
                 $siteConfig = new Typo3SiteConfig($site);
 
                 if ($this->isSiteSupported($siteConfig)) {
