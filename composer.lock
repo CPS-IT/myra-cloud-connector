@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0d800d083aa784849208892ad7dba4a6",
+    "content-hash": "1c1f5270beff204325a736ced29fc671",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -122,16 +122,16 @@
         },
         {
             "name": "cpsit/myra-web-api",
-            "version": "1.0.2",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/CPS-IT/myra-web-api.git",
-                "reference": "cbbf66905a1ce2facee6c282c4a9da67b9f8c59a"
+                "reference": "1d20c4afb4c152d3c09e7a8e669343dcc4593cd1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/CPS-IT/myra-web-api/zipball/cbbf66905a1ce2facee6c282c4a9da67b9f8c59a",
-                "reference": "cbbf66905a1ce2facee6c282c4a9da67b9f8c59a",
+                "url": "https://api.github.com/repos/CPS-IT/myra-web-api/zipball/1d20c4afb4c152d3c09e7a8e669343dcc4593cd1",
+                "reference": "1d20c4afb4c152d3c09e7a8e669343dcc4593cd1",
                 "shasum": ""
             },
             "require": {
@@ -163,9 +163,9 @@
             ],
             "support": {
                 "issues": "https://github.com/CPS-IT/myra-web-api/issues",
-                "source": "https://github.com/CPS-IT/myra-web-api/tree/1.0.2"
+                "source": "https://github.com/CPS-IT/myra-web-api/tree/1.1.0"
             },
-            "time": "2025-08-20T06:10:06+00:00"
+            "time": "2026-06-01T10:00:41+00:00"
         },
         {
             "name": "dasprid/enum",
