@@ -7,6 +7,9 @@ myra_api_key = ENV=MYRA_API_KEY
 # cat=Myra; type=string; label=Myra Cloud User API-Key Secret. It's also possible to use the value from an environment variable: syntax ENV=YOUR_ENV_NAME
 myra_secret = ENV=MYRA_SECRET
 
+# cat=Myra; type=string; label=Myra Cloud API V2 Bearer Token. It's also possible to use the value from an environment variable: syntax ENV=YOUR_ENV_NAME
+myra_token = ENV=MYRA_TOKEN
+
 # cat=Typo3; type=boolean; label=Enable extension only when applicationContext is set to "Production": default ON
 onlyLive = 1
 

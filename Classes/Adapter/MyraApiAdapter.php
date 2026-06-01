@@ -20,21 +20,48 @@ namespace CPSIT\MyraCloudConnector\Adapter;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\PageSlugInterface;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\SiteConfigInterface;
 use CPSIT\MyraCloudConnector\Extension;
-use GuzzleHttp\Client;
-use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Middleware;
-use Myracloud\WebApi\Endpoint\AbstractEndpoint;
 use Myracloud\WebApi\Endpoint\CacheClear;
-use Myracloud\WebApi\Endpoint\DnsRecord;
-use Myracloud\WebApi\Middleware\Signature;
+use Myracloud\WebApi\Endpoint\CacheClearV2;
+use Myracloud\WebApi\WebApi;
+use Myracloud\WebApi\WebApiV2;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 
+/**
+ * @phpstan-type DnsRecordVO array{
+ *     objectType: string,
+ *     id: int,
+ *     modified: string,
+ *     created?: string,
+ *     name: string,
+ *     ttl?: int,
+ *     recordType: string,
+ *     alternativeCname?: string,
+ *     active?: bool,
+ *     value: string,
+ *     priority?: int,
+ *     paused?: bool,
+ *     upstreamOptions?: array{
+ *         weight?: int,
+ *         maxFails?: int,
+ *         failTimeout?: int,
+ *         backup?: bool,
+ *         down?: bool,
+ *     },
+ *     caaTag?: string,
+ *     caaFlags?: int,
+ *     endpoints?: list<string>,
+ *     serviceType?: int,
+ *     enabled?: bool,
+ *     port?: int,
+ *     weight?: int,
+ * }
+ */
 #[AutoconfigureTag('myra_cloud.external.cache.adapter')]
 class MyraApiAdapter extends BaseAdapter
 {
@@ -44,13 +71,14 @@ class MyraApiAdapter extends BaseAdapter
     private static array $multiClearCacheProtection = [];
 
     /**
-     * @var array<string, ClientInterface>
+     * @var array<string, WebApi|WebApiV2>
      */
     protected array $clients = [];
 
     private const CONFIG_NAME_API_KEY = 'myra_api_key';
     private const CONFIG_NAME_ENDPOINT = 'myra_endpoint';
     private const CONFIG_NAME_SECRET = 'myra_secret';
+    private const CONFIG_NAME_TOKEN = 'myra_token';
 
     public function __construct(
         ExtensionConfiguration $extensionConfiguration,
@@ -100,9 +128,9 @@ class MyraApiAdapter extends BaseAdapter
         $r = false;
         // if no slug provided / clear root
         $slug = ($pageSlug !== null) ? $pageSlug->getSlug() : '/';
-        foreach ($site->getExternalIdentifierList() as $domainIdentifier) {
-            foreach ($this->getFqdnForSite($domainIdentifier) as $subDomain) {
-                $r |= $this->clearCacheDomain($domainIdentifier, $subDomain, $slug, $recursive);
+        foreach ($site->getExternalIdentifierList() as $domain) {
+            foreach ($this->getFqdnForSite($domain) as $subDomain) {
+                $r |= $this->clearCacheDomain($domain, $subDomain, $slug, $recursive);
             }
         }
 
@@ -130,13 +158,17 @@ class MyraApiAdapter extends BaseAdapter
      */
     protected function clearCacheDomain(string $domain, string $fqdn, string $path = '/', bool $recursive = false): bool
     {
+        $domainIdentifier = $this->getDomainIdentifier($domain);
+        if ($domainIdentifier === null) {
+            return false;
+        }
         $hash = $this->getSendHash($domain, $fqdn, $path, $recursive);
         if ((self::$multiClearCacheProtection[$hash] ?? false) === true) {
             return true;
         }
 
         try {
-            $r = $this->getCacheClearApi()?->clear($domain, $fqdn, $path, $recursive);
+            $r = $this->getCacheClearApi()->clear($domainIdentifier, $fqdn, $path, $recursive);
             self::$multiClearCacheProtection[$hash] = $success = (!empty($r) && ($r['error'] ?? true) === false);
         } catch (GuzzleException) {
             return false;
@@ -171,7 +203,7 @@ class MyraApiAdapter extends BaseAdapter
             $fqdn = [];
 
             if (!empty($r) && $r['error'] === false) {
-                foreach ($r['list'] as $recordItem) {
+                foreach ($r['data'] ?? $r['list'] ?? [] as $recordItem) {
                     $name = $recordItem['name'];
                     $active = (bool)($recordItem['active'] ?? false);
                     $enable = (bool)($recordItem['enabled'] ?? false);
@@ -190,34 +222,8 @@ class MyraApiAdapter extends BaseAdapter
     /**
      * @return array{}|array{
      *     error: bool,
-     *     list: list<array{
-     *         objectType: string,
-     *         id: int,
-     *         modified: string,
-     *         created?: string,
-     *         name: string,
-     *         ttl?: int,
-     *         recordType: string,
-     *         alternativeCname?: string,
-     *         active?: bool,
-     *         value: string,
-     *         priority?: int,
-     *         paused?: bool,
-     *         upstreamOptions?: array{
-     *             weight?: int,
-     *             maxFails?: int,
-     *             failTimeout?: int,
-     *             backup?: bool,
-     *             down?: bool,
-     *         },
-     *         caaTag?: string,
-     *         caaFlags?: int,
-     *         endpoints?: list<string>,
-     *         serviceType?: int,
-     *         enabled?: bool,
-     *         port?: int,
-     *         weight?: int,
-     *     }>,
+     *     data?: list<DnsRecordVO>,
+     *     list?: list<DnsRecordVO>,
      *     page: int,
      *     count: int,
      *     pageSize: int
@@ -225,45 +231,56 @@ class MyraApiAdapter extends BaseAdapter
      */
     private function getDomainRecordsForDomain(string $domain): array
     {
-        /** @var DnsRecord $st */
-        $st = $this->getEndPointApi(DnsRecord::class);
-        $r = [];
         try {
-            $r = $st->getList($domain);
+            $domainId = $this->getDomainIdentifier($domain);
+
+            if ($domainId === null) {
+                return [];
+            }
+
+            return $this->getMyraClient()->getDnsRecordEndpoint()->getList($domainId);
         } catch (\Exception|GuzzleException) {
         }
 
-        return $r;
+        return [];
     }
 
-    /**
-     * @return CacheClear|null
-     */
-    private function getCacheClearApi(): ?CacheClear
+    private function getCacheClearApi(): CacheClear|CacheClearV2
     {
-        return $this->getEndPointApi(CacheClear::class);
+        return $this->getMyraClient()->getCacheClearEndpoint();
     }
 
-    /**
-     * @template T of AbstractEndpoint
-     * @param class-string<T> $className
-     * @return T|null the created instance
-     */
-    private function getEndPointApi(string $className): ?AbstractEndpoint
+    private function getDomainIdentifier(string $domain): int|string|null
     {
-        if (!class_exists($className)) {
-            return null;
+        $cacheIdentifier = 'myra-cloud-api-domain-identifier-' . crc32($domain);
+
+        if (($domainIdentifier = $this->cache->get($cacheIdentifier)) === false) {
+            $client = $this->getMyraClient();
+            $domainIdentifier = null;
+
+            if ($client instanceof WebApiV2) {
+                try {
+                    $domains = $client->getDomainEndpoint()->getList();
+
+                    foreach ($domains['data'] ?? [] as $domainResult) {
+                        if ($domainResult['name'] === $domain) {
+                            $domainIdentifier = $domainResult['id'];
+                            break;
+                        }
+                    }
+                } catch (GuzzleException) {
+                }
+            } else {
+                $domainIdentifier = $domain;
+            }
+
+            $this->cache->set($cacheIdentifier, $domainIdentifier);
         }
 
-        $client = $this->getMyraClient();
-        try {
-            return new $className($client);
-        } catch (\Exception) {
-            return null;
-        }
+        return $domainIdentifier;
     }
 
-    private function getMyraClient(): ClientInterface
+    private function getMyraClient(): WebApi|WebApiV2
     {
         $config = $this->getAdapterConfig();
         $instanceId = md5(serialize($config));
@@ -275,18 +292,14 @@ class MyraApiAdapter extends BaseAdapter
         $stack = new HandlerStack();
         $stack->setHandler(new CurlHandler());
 
-        $signature = new Signature($config[self::CONFIG_NAME_SECRET], $config[self::CONFIG_NAME_API_KEY]);
-        $stack->push(
-            Middleware::mapRequest(
-                $signature->signRequest(...),
-            ),
-        );
+        $isV2 = WebApiV2::isV2($config[self::CONFIG_NAME_ENDPOINT]) && $config[self::CONFIG_NAME_TOKEN] !== '';
 
-        return $this->clients[$instanceId] = new Client(
-            [
-                'base_uri' => 'https://' . $config[self::CONFIG_NAME_ENDPOINT] . '/en/rapi',
-                'handler'  => $stack,
-            ],
-        );
+        if ($isV2) {
+            $api = new WebApiV2($config[self::CONFIG_NAME_TOKEN], $config[self::CONFIG_NAME_ENDPOINT]);
+        } else {
+            $api = new WebApi($config[self::CONFIG_NAME_API_KEY], $config[self::CONFIG_NAME_SECRET], $config[self::CONFIG_NAME_ENDPOINT]);
+        }
+
+        return $this->clients[$instanceId] = $api;
     }
 }
