@@ -21,6 +21,8 @@ interface PageIdInterface
 {
     public function getPageId(): int;
 
+    public function getOriginalPageId(): int;
+
     /**
      * @phpstan-assert-if-true !null $this->getTranslationSource()
      */
