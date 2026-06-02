@@ -292,7 +292,7 @@ class MyraApiAdapter extends BaseAdapter
         $stack = new HandlerStack();
         $stack->setHandler(new CurlHandler());
 
-        $isV2 = WebApiV2::isV2($config[self::CONFIG_NAME_ENDPOINT]) && $config[self::CONFIG_NAME_TOKEN] !== '';
+        $isV2 = WebApiV2::isV2($config[self::CONFIG_NAME_ENDPOINT]) && (string)$config[self::CONFIG_NAME_TOKEN] !== '';
 
         if ($isV2) {
             $api = new WebApiV2($config[self::CONFIG_NAME_TOKEN], $config[self::CONFIG_NAME_ENDPOINT]);
