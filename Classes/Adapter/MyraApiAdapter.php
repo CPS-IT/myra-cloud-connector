@@ -65,6 +65,11 @@ use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 #[AutoconfigureTag('myra_cloud.external.cache.adapter')]
 class MyraApiAdapter extends BaseAdapter
 {
+    private const CONFIG_NAME_API_KEY = 'myra_api_key';
+    private const CONFIG_NAME_ENDPOINT = 'myra_endpoint';
+    private const CONFIG_NAME_SECRET = 'myra_secret';
+    private const CONFIG_NAME_TOKEN = 'myra_token';
+
     /**
      * @var array<string, bool>
      */
@@ -74,11 +79,6 @@ class MyraApiAdapter extends BaseAdapter
      * @var array<string, WebApi|WebApiV2>
      */
     protected array $clients = [];
-
-    private const CONFIG_NAME_API_KEY = 'myra_api_key';
-    private const CONFIG_NAME_ENDPOINT = 'myra_endpoint';
-    private const CONFIG_NAME_SECRET = 'myra_secret';
-    private const CONFIG_NAME_TOKEN = 'myra_token';
 
     public function __construct(
         ExtensionConfiguration $extensionConfiguration,
