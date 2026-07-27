@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-	<file source-language="en" datatype="plaintext">
-		<header/>
-		<body>
-			<trans-unit id="title" resname="title">
-				<source>Myra Cloud clear cache</source>
-			</trans-unit>
-			<trans-unit id="description" resname="description">
-				<source>Clear the entire Myra Cloud cache</source>
-			</trans-unit>
-			<trans-unit id="title.resource" resname="title">
-				<source>Myra Cloud clear Resources Cache</source>
-			</trans-unit>
-			<trans-unit id="description.resource" resname="description">
-				<source>Clear the resources Myra Cloud cache [/fileadmin/*, /typo3temp/*, /_assets/*]</source>
-			</trans-unit>
-			<trans-unit id="tca.site.cache.identifier" resname="tca.site.cache.identifier">
-				<source>Myra Domain List (comma separated)</source>
-			</trans-unit>
-		</body>
-	</file>
+  <file source-language="en" datatype="plaintext">
+    <header/>
+    <body>
+      <trans-unit id="title" resname="title">
+        <source>Myra Cloud clear cache</source>
+      </trans-unit>
+      <trans-unit id="description" resname="description">
+        <source>Clear the entire Myra Cloud cache</source>
+      </trans-unit>
+      <trans-unit id="title.resource" resname="title">
+        <source>Myra Cloud clear Resources Cache</source>
+      </trans-unit>
+      <trans-unit id="description.resource" resname="description">
+        <source>Clear the resources Myra Cloud cache [/fileadmin/*, /typo3temp/*, /_assets/*]</source>
+      </trans-unit>
+      <trans-unit id="tca.site.cache.identifier" resname="tca.site.cache.identifier">
+        <source>Myra Domain List (comma separated)</source>
+      </trans-unit>
+    </body>
+  </file>
 </xliff>

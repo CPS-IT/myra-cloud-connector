@@ -45,7 +45,7 @@ readonly class ExternalClearCacheController
         $languageId = $request->getQueryParams()['language'] ?? null;
         $languages = [null];
 
-        if (is_numeric($languageId) && \in_array($type, [Typo3CacheType::PAGE, Typo3CacheType::ALL_PAGE], true)) {
+        if (is_numeric($languageId) && in_array($type, [Typo3CacheType::PAGE, Typo3CacheType::ALL_PAGE], true)) {
             if ($languageId >= 0) {
                 $languages = [(int)$languageId];
             } elseif ((int)$languageId === -1) {
@@ -86,7 +86,7 @@ readonly class ExternalClearCacheController
             return [null];
         }
 
-        return \array_map(
+        return array_map(
             static fn(SiteLanguage $siteLanguage) => $siteLanguage->getLanguageId(),
             $site->getAvailableLanguages($this->getBackendUser()),
         );

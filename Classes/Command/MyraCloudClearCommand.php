@@ -46,14 +46,14 @@ final class MyraCloudClearCommand extends Command
         $this->addUsage('myracloud:clear -t resource -i [PATH like: /fileadmin/path/ToFile.jpg]');
         $this->addUsage('myracloud:clear -t allresources');
 
-        $this->setHelp('resource and allresources are always cleared recursive' . LF .
-            'identifier for recursive can be a folder or a file' . LF . LF .
-            '-t page ' . "\t\t" . ' require a page id and optional language id' . LF .
-            '-t resource ' . "\t\t" . ' require a uri. example: -t resource -i /fileadmin/user_upload/pdfs' . LF .
-            '-t all ' . "\t\t" . ' clear everything in myracloud for this TYPO3 Instance (does not need an identifier)' . LF .
-            '-t allresources ' . "\t" . ' clear everything, recursive, under these folders (does not need an identifier): ' . LF .
-            "\t\t\t" . ' /fileadmin/*, /typo3/*, /typo3temp/*, /_assets/*' . LF);
-        $this->addOption('type', 't', InputOption::VALUE_REQUIRED, 'types: ' . \implode(', ', Typo3CacheType::names()), '');
+        $this->setHelp('resource and allresources are always cleared recursive' . LF
+            . 'identifier for recursive can be a folder or a file' . LF . LF
+            . '-t page ' . "\t\t" . ' require a page id and optional language id' . LF
+            . '-t resource ' . "\t\t" . ' require a uri. example: -t resource -i /fileadmin/user_upload/pdfs' . LF
+            . '-t all ' . "\t\t" . ' clear everything in myracloud for this TYPO3 Instance (does not need an identifier)' . LF
+            . '-t allresources ' . "\t" . ' clear everything, recursive, under these folders (does not need an identifier): ' . LF
+            . "\t\t\t" . ' /fileadmin/*, /typo3/*, /typo3temp/*, /_assets/*' . LF);
+        $this->addOption('type', 't', InputOption::VALUE_REQUIRED, 'types: ' . implode(', ', Typo3CacheType::names()), '');
         $this->addOption('identifier', 'i', InputOption::VALUE_REQUIRED, 'page id or resource path for (page / resource type)', '');
         $this->addOption('language', 'l', InputOption::VALUE_REQUIRED, 'Language id, usable in combination with "page" type');
     }
@@ -76,7 +76,7 @@ final class MyraCloudClearCommand extends Command
             return self::INVALID;
         }
 
-        if (\is_numeric($language)) {
+        if (is_numeric($language)) {
             $this->validateLanguageOption($typeId);
 
             $languageId = (int)$language;
@@ -99,13 +99,13 @@ final class MyraCloudClearCommand extends Command
     {
         $supportedTypes = [Typo3CacheType::PAGE, Typo3CacheType::ALL_PAGE];
 
-        if (!\in_array($selectedType, $supportedTypes, true)) {
+        if (!in_array($selectedType, $supportedTypes, true)) {
             $this->io->warning(
-                \sprintf(
+                sprintf(
                     'The language option can only be used for types "%s". Ignoring.',
-                    \implode(
+                    implode(
                         '", "',
-                        \array_map(static fn(Typo3CacheType $type) => $type->name(), $supportedTypes),
+                        array_map(static fn(Typo3CacheType $type) => $type->name(), $supportedTypes),
                     ),
                 ),
             );

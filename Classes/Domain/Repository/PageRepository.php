@@ -72,7 +72,7 @@ readonly class PageRepository implements SingletonInterface
         try {
             $site = $this->siteFinder->getSiteByPageId($result['l10n_parent'] ?: $pageUid);
             $siteLanguage = $site->getLanguageById($result['sys_language_uid']);
-        } catch (SiteNotFoundException | \InvalidArgumentException) {
+        } catch (SiteNotFoundException|\InvalidArgumentException) {
             return $result['slug'];
         }
 

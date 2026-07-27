@@ -50,7 +50,7 @@ final readonly class ExternalClearResourceCacheListener
             /** @var File[]|bool $result */
             $result = $event->getResult();
 
-            if (\is_array($result) && $provider?->canAutomated()) {
+            if (is_array($result) && $provider?->canAutomated()) {
                 $this->clearCacheForFiles($result);
             }
         }
