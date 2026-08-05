@@ -14,7 +14,7 @@
  */
 
 $GLOBALS['SiteConfiguration']['site']['columns']['myra_host'] = [
-    'label' => 'LLL:EXT:myra_cloud_connector/Resources/Private/Language/locallang_myra.xlf:tca.site.cache.identifier',
+    'label' => 'myra_cloud_connector.myra:tca.site.cache.identifier',
     'config' => [
         'type' => 'input',
         'default' => '',

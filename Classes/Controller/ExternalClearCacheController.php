@@ -42,14 +42,14 @@ readonly class ExternalClearCacheController
         $identifier = $request->getQueryParams()['id'] ?? '0';
         $type = Typo3CacheType::from((int)($request->getQueryParams()['type'] ?? Typo3CacheType::UNKNOWN->value));
 
-        $languageId = $request->getQueryParams()['language'] ?? null;
+        $languageIds = $request->getQueryParams()['languages'] ?? null;
         $languages = [null];
 
-        if (is_numeric($languageId) && in_array($type, [Typo3CacheType::PAGE, Typo3CacheType::ALL_PAGE], true)) {
-            if ($languageId >= 0) {
-                $languages = [(int)$languageId];
-            } elseif ((int)$languageId === -1) {
+        if (is_array($languageIds) && $languageIds !== [] && in_array($type, [Typo3CacheType::PAGE, Typo3CacheType::ALL_PAGE], true)) {
+            if ((int)$languageIds[0] === -1) {
                 $languages = $this->getAllPageLanguages((int)$identifier);
+            } else {
+                $languages = array_map(intval(...), $languageIds);
             }
         }
 

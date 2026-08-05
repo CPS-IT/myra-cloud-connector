@@ -21,7 +21,8 @@ use CPSIT\MyraCloudConnector\AdapterProvider\AdapterProvider;
 use CPSIT\MyraCloudConnector\Domain\Enum\Typo3CacheType;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Routing\Route;
-use TYPO3\CMS\Backend\Template\Components\Buttons\LinkButton;
+use TYPO3\CMS\Backend\Template\Components\ActionGroup;
+use TYPO3\CMS\Backend\Template\Components\ComponentFactory;
 use TYPO3\CMS\Core\Attribute\AsEventListener;
 use TYPO3\CMS\Core\Http\ServerRequestFactory;
 use TYPO3\CMS\Core\Imaging\IconFactory;
@@ -29,7 +30,6 @@ use TYPO3\CMS\Core\Imaging\IconSize;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Resource\AbstractFile;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Filelist\Event\ProcessFileListActionsEvent;
 
 #[AsEventListener('cpsit/myra-cloud-connector/external-clear-cache-file-list')]
@@ -41,6 +41,7 @@ final class ExternalClearCacheFileListListener
         private readonly IconFactory $iconFactory,
         private readonly PageRenderer $pageRenderer,
         private readonly AdapterProvider $provider,
+        private readonly ComponentFactory $componentFactory,
     ) {}
 
     public function __invoke(ProcessFileListActionsEvent $event): void
@@ -60,35 +61,25 @@ final class ExternalClearCacheFileListListener
                     $provider->getJavaScriptModuleInstruction(),
                 );
 
-                $clearCacheButton = GeneralUtility::makeInstance(LinkButton::class)
+                // @todo This does not work yet, needs https://review.typo3.org/c/Packages/TYPO3.CMS/+/95109
+                //       to be approved and released first.
+                $clearCacheButton = $this->componentFactory->createLinkButton()
                     ->setIcon($this->iconFactory->getIcon($provider->getCacheIconIdentifier(), IconSize::SMALL))
                     ->setTitle($this->getLanguageService()->sL($provider->getCacheTitle()))
                     ->setHref('#')
-                    ->setClasses($provider->getTypo3CssClass() . ' dropdown-item')
+                    ->setClasses($provider->getTypo3CssClass())
                     ->setDataAttributes([
                         'id' => $fileOrFolderObject->getCombinedIdentifier(),
                         'type' => Typo3CacheType::RESOURCE->value,
                     ])
                 ;
 
-                $actionItems = [];
-                $itemAdded = false;
-                $itemIdentifier = 'myraCloudConnectorClearFileCache';
-
-                foreach ($event->getActionItems() as $identifier => $actionItem) {
-                    if ($identifier === 'replace') {
-                        $actionItems[$itemIdentifier] = $clearCacheButton;
-                        $itemAdded = true;
-                    }
-
-                    $actionItems[$identifier] = $actionItem;
-                }
-
-                if (!$itemAdded) {
-                    $actionItems[$itemIdentifier] = $clearCacheButton;
-                }
-
-                $event->setActionItems($actionItems);
+                $event->setAction(
+                    $clearCacheButton,
+                    'myraCloudConnectorClearFileCache',
+                    ActionGroup::secondary,
+                    'replace',
+                );
             }
         }
     }

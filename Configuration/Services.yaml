@@ -7,11 +7,3 @@ services:
   CPSIT\MyraCloudConnector\:
     resource: '../Classes/*'
     exclude: ['../Classes/Domain/{DTO,Enum}']
-
-  CPSIT\MyraCloudConnector\Command\MyraCloudClearCommand:
-    tags:
-      - name: 'console.command'
-        command: 'myracloud:clear'
-        description: 'TYPO3/Myra Cloud Interface'
-        hidden: false
-        schedulable: false

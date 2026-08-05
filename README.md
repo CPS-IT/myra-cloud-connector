@@ -18,7 +18,7 @@ and file caches for the configured domains.
 * Clear cache of pages and resources (files/folders)
 * Various integrations in TYPO3 backend
 * Console command
-* Compatible with TYPO3 13.4 LTS
+* Compatible with TYPO3 14.3 LTS
 
 ## 🔥 Installation
 
