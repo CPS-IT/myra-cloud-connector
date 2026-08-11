@@ -24,6 +24,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Module\ModuleData;
 use TYPO3\CMS\Backend\Routing\Route;
 use TYPO3\CMS\Backend\Template\Components\ButtonBar;
+use TYPO3\CMS\Backend\Template\Components\ComponentFactory;
 use TYPO3\CMS\Backend\Template\Components\ModifyButtonBarEvent;
 use TYPO3\CMS\Core\Attribute\AsEventListener;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
@@ -46,6 +47,7 @@ final class ExternalClearCacheButtonListener
         private readonly IconFactory $iconFactory,
         private readonly AdapterProvider $provider,
         private readonly PageRenderer $pageRenderer,
+        private readonly ComponentFactory $componentFactory,
     ) {}
 
     public function __invoke(ModifyButtonBarEvent $event): void
@@ -62,7 +64,7 @@ final class ExternalClearCacheButtonListener
                 $provider->getJavaScriptModuleInstruction(),
             );
 
-            $clearCacheButton = $event->getButtonBar()->makeLinkButton()
+            $clearCacheButton = $this->componentFactory->createLinkButton()
                 ->setIcon($this->iconFactory->getIcon($provider->getCacheIconIdentifier(), IconSize::SMALL))
                 ->setTitle($this->getLanguageService()->sL($provider->getCacheTitle()))
                 ->setHref('#')
@@ -70,7 +72,7 @@ final class ExternalClearCacheButtonListener
                 ->setDataAttributes([
                     'id' => $this->getIdentifier(),
                     'type' => $this->getCacheType()->value,
-                    'language' => $this->getLanguageId(),
+                    'languages' => implode(',', $this->getLanguageIds()),
                 ])
             ;
 
@@ -97,7 +99,7 @@ final class ExternalClearCacheButtonListener
                 return '';
             }
 
-            $page = $this->pageService->getPage((int)$id, $this->getLanguageId());
+            $page = $this->pageService->getPage((int)$id, $this->getLanguageIds()[0] ?? null);
 
             return $this->cacheId = (string)($page?->getOriginalPageId() ?? $id);
         }
@@ -114,21 +116,24 @@ final class ExternalClearCacheButtonListener
         return $this->cacheId = '';
     }
 
-    private function getLanguageId(): ?int
+    /**
+     * @return list<int>
+     */
+    private function getLanguageIds(): array
     {
         $serverRequest = $this->getRequest();
         $moduleData = $serverRequest->getAttribute('moduleData');
-        $languageId = $serverRequest->getQueryParams()['language'] ?? null;
+        $languageIds = $serverRequest->getQueryParams()['languages'] ?? null;
 
-        if ($languageId === null && $moduleData instanceof ModuleData && $moduleData->has('language')) {
-            $languageId = $moduleData->get('language');
+        if ($languageIds === null && $moduleData instanceof ModuleData && $moduleData->has('languages')) {
+            $languageIds = $moduleData->get('languages');
         }
 
-        if (is_numeric($languageId)) {
-            return (int)$languageId;
+        if (!is_array($languageIds)) {
+            return [];
         }
 
-        return null;
+        return array_values(array_map(intval(...), $languageIds));
     }
 
     /**
@@ -176,7 +181,7 @@ final class ExternalClearCacheButtonListener
 
         return $this->cacheTypeCache = match ($route?->getPath()) {
             '/module/file/list' => Typo3CacheType::RESOURCE,
-            '/module/web/layout', '/module/web/list', '/module/web/ViewpageView' => Typo3CacheType::PAGE,
+            '/module/web/layout', '/module/content/records', '/module/page-preview' => Typo3CacheType::PAGE,
             default => Typo3CacheType::INVALID,
         };
     }

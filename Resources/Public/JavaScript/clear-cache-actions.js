@@ -26,7 +26,7 @@ class ClearCacheActions {
 
       buttons.forEach((button) => {
         new RegularEvent('click', (event) => {
-          ClearCacheActions.clearExternalCache(event.currentTarget.dataset.type, event.currentTarget.dataset.id, event.currentTarget.dataset.language);
+          ClearCacheActions.clearExternalCache(event.currentTarget.dataset.type, event.currentTarget.dataset.id, event.currentTarget.dataset.languages);
         }).bindTo(button);
       });
     });
@@ -44,14 +44,14 @@ class ClearCacheActions {
     ClearCacheActions.clearExternalCache(type, id, -1);
   };
 
-  static clearExternalCache(type, pageId, languageId) {
+  static clearExternalCache(type, pageId, languageIds) {
     if (type > 0) {
       let errMsg = 'An error occurred while clearing the cache. It is likely not all caches were cleared as expected.';
       let errTitle = 'An error occurred';
 
       try {
         new AjaxRequest(TYPO3.settings.ajaxUrls.external_cache_clear)
-          .withQueryArguments({id: pageId, type: type, language: languageId})
+          .withQueryArguments({id: pageId, type: type, languages: languageIds?.toString().split(',')})
           .get()
           .then(
             async function (response) {

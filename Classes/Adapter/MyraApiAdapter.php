@@ -100,12 +100,12 @@ class MyraApiAdapter extends BaseAdapter
 
     public function getCacheTitle(): string
     {
-        return 'LLL:EXT:myra_cloud_connector/Resources/Private/Language/locallang_myra.xlf:title';
+        return 'myra_cloud_connector.myra:title';
     }
 
     public function getCacheDescription(): string
     {
-        return 'LLL:EXT:myra_cloud_connector/Resources/Private/Language/locallang_myra.xlf:description';
+        return 'myra_cloud_connector.myra:description';
     }
 
     protected function getAdapterConfigPrefix(): string

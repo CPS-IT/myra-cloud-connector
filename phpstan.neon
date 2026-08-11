@@ -2,6 +2,7 @@ parameters:
 	paths:
 		- Classes
 		- Configuration
+		- Tests
 	level: 8
 	typo3:
 		requestGetAttributeMapping:

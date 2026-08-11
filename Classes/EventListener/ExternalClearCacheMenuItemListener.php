@@ -55,7 +55,7 @@ final readonly class ExternalClearCacheMenuItemListener
                 [
                     'type' => Typo3CacheType::ALL_PAGE->value,
                     'id' => '-1',
-                    'language' => '-1',
+                    'languages' => ['-1'],
                 ],
             );
 
@@ -64,7 +64,7 @@ final readonly class ExternalClearCacheMenuItemListener
                 'id' => $provider->getCacheId(),
                 'title' => $provider->getCacheTitle(),
                 'description' => $provider->getCacheDescription(),
-                'href' => $targetUrl,
+                'endpoint' => $targetUrl,
                 'iconIdentifier' => $provider->getCacheIconIdentifier(),
             ]);
         }
@@ -90,7 +90,7 @@ final readonly class ExternalClearCacheMenuItemListener
                 'id' => $id,
                 'title' => $provider->getCacheTitle() . '.resource',
                 'description' => $provider->getCacheDescription() . '.resource',
-                'href' => $targetUrl,
+                'endpoint' => $targetUrl,
                 'iconIdentifier' => $provider->getCacheIconIdentifier(),
             ]);
         }
