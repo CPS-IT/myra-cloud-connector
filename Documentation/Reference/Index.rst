@@ -1,3 +1,5 @@
+..  _reference:
+
 =========
 Reference
 =========
@@ -10,8 +12,10 @@ Hooks and CLI command.
 
     AutoClear-Hooks
     CLI-Command
+    Events
     Logging
 
+..  _myra-api-reference:
 
 ----------------------
 Myra Security Platform API Reference

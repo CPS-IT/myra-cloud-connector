@@ -43,7 +43,7 @@ final readonly class ExternalCacheService
         private StorageRepository $storageRepository,
     ) {}
 
-    public function clear(Typo3CacheType $type, string $identifier, ?int $languageId = null): bool
+    public function clear(Typo3CacheType $type, ?string $identifier = null, ?int $languageId = null): bool
     {
         $providerItem = $this->provider->getDefaultProviderItem();
         if ($providerItem === null) {
@@ -54,7 +54,7 @@ final readonly class ExternalCacheService
             return $this->clearPage($providerItem, (int)$identifier, $languageId);
         }
         if ($type === Typo3CacheType::RESOURCE) {
-            return $this->clearFile($providerItem, trim($identifier));
+            return $this->clearFile($providerItem, trim((string)$identifier));
         }
         if ($type === Typo3CacheType::ALL_PAGE) {
             return $this->clearAllPages($providerItem, $languageId);

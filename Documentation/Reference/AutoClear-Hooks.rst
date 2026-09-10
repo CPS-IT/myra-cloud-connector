@@ -1,3 +1,5 @@
+..  _auto-clear-hooks:
+
 =================
 AutoClear - Hooks
 =================
@@ -10,8 +12,12 @@ Two AutoClear hooks are implemented:
 .. note::
     - Hooks are not affected by the :ref:`Admin Only<_admin-only>` setting
     - Hooks can be disabled via :ref:`Disable Hooks<_disable-hooks>` setting
+    - Both hooks clear the cache by dispatching a
+      :ref:`ClearMyraCloudCacheEvent <clear-myra-cloud-cache-event>`, see
+      :ref:`events`
 
-.. _page-update-hook:
+..  _page-update-hook:
+
 Page Update
 -----------
 
@@ -20,7 +26,8 @@ This hook listens on the :php:`DataHandler->clearCachePostProc` interface.
 It will only clear the page itself, when the page or its elements are edited (created/updated/deleted).
 It will **not** clear subpages and file resources (non-recursive).
 
-.. _file-replace-hook:
+..  _file-replace-hook:
+
 File Replace
 --------------
 

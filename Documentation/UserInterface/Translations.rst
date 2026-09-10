@@ -1,9 +1,13 @@
+..  _page-translations:
+
 ===========
 Page translations
 ===========
 
+..  _page-module:
+
 Module :guilabel:`Web > Page`
-#################
+#############################
 
 
 While working with translated pages, the clear cache button will respect the setting of the :guilabel:`Language` dropdown:
@@ -21,10 +25,10 @@ Use the "Myra Cloud clear cache" option from the context menu by clicking on the
     :width: 338 px
     :alt: Screenshot of the language specific context menu on the pagetype icon in the Page module
 
-
+..  _info-module:
 
 Module :guilabel:`Web > Info` module
-#################
+####################################
 
 Choose the :guilabel:`Localization Overview` function.
 

@@ -19,13 +19,12 @@ namespace CPSIT\MyraCloudConnector\DataHandler;
 
 use CPSIT\MyraCloudConnector\AdapterProvider\AdapterProvider;
 use CPSIT\MyraCloudConnector\Domain\Enum\Typo3CacheType;
-use CPSIT\MyraCloudConnector\Service\ExternalCacheService;
+use CPSIT\MyraCloudConnector\Event\ClearMyraCloudCacheEvent;
 use CPSIT\MyraCloudConnector\Service\PageService;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
-use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
 use TYPO3\CMS\Core\Schema\Capability\TcaSchemaCapability;
 use TYPO3\CMS\Core\Schema\TcaSchemaFactory;
 
@@ -36,12 +35,10 @@ use TYPO3\CMS\Core\Schema\TcaSchemaFactory;
 final readonly class DataHandlerHook
 {
     public function __construct(
-        private ExternalCacheService $externalCacheService,
+        private EventDispatcherInterface $eventDispatcher,
         private AdapterProvider $provider,
         private PageService $pageService,
         private TcaSchemaFactory $tcaSchemaFactory,
-        #[Autowire('@cache.runtime')]
-        private FrontendInterface $runtimeCache,
         private LoggerInterface $logger,
     ) {}
 
@@ -71,12 +68,8 @@ final readonly class DataHandlerHook
         };
 
         try {
-            $cacheIdentifier = 'MyraCloudConnector_DataHandlerHook_' . $pageUid . '_' . $languageId;
-
-            if ($pageUid !== null && $this->runtimeCache->get($cacheIdentifier) === false) {
-                $result = $this->externalCacheService->clear(Typo3CacheType::PAGE, (string)$pageUid, $languageId);
-
-                $this->runtimeCache->set($cacheIdentifier, $result);
+            if ($pageUid !== null) {
+                $this->eventDispatcher->dispatch(new ClearMyraCloudCacheEvent(Typo3CacheType::PAGE, (string)$pageUid, $languageId));
             }
         } catch (\Exception $exception) {
             $this->logger->error(

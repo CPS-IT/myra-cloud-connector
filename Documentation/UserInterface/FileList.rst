@@ -1,3 +1,5 @@
+..  _clear-files:
+
 ===========
 Clear files
 ===========
@@ -12,7 +14,8 @@ There are 4 ways to clear files from the cache:
 ..  note::
     The file tree clear cache commands on folders are recursive.
 
-.. _topbar-files:
+..  _topbar-files:
+
 Topbar clear cache menu
 -----------------------
 
@@ -30,7 +33,8 @@ If the menu option does not appear, check for missing Myra credentials and the s
 -  :ref:`Production only<_production-only>`
 -  :ref:`Domain blacklist<_domain-blacklist>`
 
-.. _contextmenu-filetree:
+..  _contextmenu-filetree:
+
 Context menu in file tree
 -------------------------
 
@@ -40,7 +44,8 @@ Context menu in file tree
 
 This will clear all files from the selected directory and all its subdirectories recursively.
 
-.. _optionsmenu-filelist:
+..  _optionsmenu-filelist:
+
 Options menu in file list
 -------------------------
 

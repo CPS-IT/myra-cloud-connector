@@ -1,3 +1,5 @@
+..  _typo3-features:
+
 ==============
 TYPO3 Features
 ==============
@@ -8,7 +10,8 @@ Toggle TYPO3 features.
     :width: 931 px
     :alt: view of TYPO3 feature settings
 
-.. _production-only:
+..  _production-only:
+
 Production only
 ~~~~~~~~~~~~~~~
 
@@ -16,7 +19,8 @@ If checked, this prevents any Myra Cloud cache clear request and disables all UI
 application context is not :php:`Production*`. This is useful to prevent clear requests from stage
 or development instances.
 
-.. _admin-only:
+..  _admin-only:
+
 Admin Only UI Elements
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -25,13 +29,15 @@ If checked, all UI Elements are disabled for non-admin users.
 ..  note::
     Auto-clear hooks (page update / file list replace) are not affected by this.
 
-.. _disable-hooks:
+..  _disable-hooks:
+
 Disable Hooks
 ~~~~~~~~~~~~~
 
 If checked, both auto-clear hooks (page update and file list replace) are disabled.
 
-.. _domain-blacklist:
+..  _domain-blacklist:
+
 Domain Blacklist
 ~~~~~~~~~~~~~~~~
 
