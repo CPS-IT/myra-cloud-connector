@@ -15,3 +15,8 @@ services:
         description: 'TYPO3/Myra Cloud Interface'
         hidden: false
         schedulable: false
+
+  cache.myracloud:
+    class: CPSIT\MyraCloudConnector\Cache\MyraCacheFrontend
+    factory: ['@TYPO3\CMS\Core\Cache\CacheManager', 'getCache']
+    arguments: ['myracloud']

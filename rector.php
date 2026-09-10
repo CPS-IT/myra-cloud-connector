@@ -19,6 +19,7 @@ use Rector\Config\RectorConfig;
 use Rector\PostRector\Rector\NameImportingPostRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddVoidReturnTypeWhereNoReturnRector;
 use Rector\ValueObject\PhpVersion;
+use Ssch\TYPO3Rector\CodeQuality\General\AddErrorCodeToExceptionRector;
 use Ssch\TYPO3Rector\CodeQuality\General\ExtEmConfRector;
 use Ssch\TYPO3Rector\Configuration\Typo3Option;
 use Ssch\TYPO3Rector\Set\Typo3LevelSetList;
@@ -52,6 +53,7 @@ return RectorConfig::configure()
     ->withSkip([
         // @see https://github.com/sabbelasichon/typo3-rector/issues/2536
         __DIR__ . '/**/Configuration/ExtensionBuilder/*',
+        AddErrorCodeToExceptionRector::class,
         NameImportingPostRector::class => [
             'ClassAliasMap.php',
         ],
