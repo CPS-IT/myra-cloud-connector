@@ -9,6 +9,9 @@ Events
 ClearMyraCloudCacheEvent
 ------------------------
 
+..  versionadded:: 3.3.0 / 4.1.0
+    `Feature #155 - Introduce and use ClearMyraCloudCacheEvent for cache flush <https://github.com/CPS-IT/myra-cloud-connector/pull/155>`__
+
 :php:`CPSIT\MyraCloudConnector\Event\ClearMyraCloudCacheEvent` is a PSR-14
 event dispatched by every built-in trigger of a Myra Cloud cache clear
 request:
