@@ -18,12 +18,14 @@ declare(strict_types=1);
 namespace CPSIT\MyraCloudConnector\DataHandler;
 
 use CPSIT\MyraCloudConnector\AdapterProvider\AdapterProvider;
+use CPSIT\MyraCloudConnector\Cache\MyraCacheFrontend;
 use CPSIT\MyraCloudConnector\Domain\Enum\Typo3CacheType;
 use CPSIT\MyraCloudConnector\Event\ClearMyraCloudCacheEvent;
 use CPSIT\MyraCloudConnector\Service\PageService;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Schema\Capability\TcaSchemaCapability;
 use TYPO3\CMS\Core\Schema\TcaSchemaFactory;
@@ -39,19 +41,16 @@ final readonly class DataHandlerHook
         private AdapterProvider $provider,
         private PageService $pageService,
         private TcaSchemaFactory $tcaSchemaFactory,
+        #[Autowire('@cache.myracloud')]
+        private MyraCacheFrontend $myraCache,
         private LoggerInterface $logger,
     ) {}
 
     /**
-     * @param array{table: string, uid: int, uid_page: int}|array{cacheCmd: string, tags: list<string>} $data
+     * @param array{table: string, uid: int, uid_page: int}|array{cacheCmd: string, tags: array<string, true>} $data
      */
     public function clearCachePostProc(array $data): void
     {
-        // Early return on unsupported hook call
-        if (!isset($data['uid'], $data['table'], $data['uid_page'])) {
-            return;
-        }
-
         $provider = $this->provider->getDefaultProviderItem();
 
         // Early return if provider is not automated
@@ -59,17 +58,43 @@ final readonly class DataHandlerHook
             return;
         }
 
-        $tableName = $data['table'];
-        $recordUid = (int)$data['uid'];
+        if (isset($data['tags'])) {
+            $this->flushByTags(array_keys($data['tags']));
+        } else {
+            $this->flushByRecord((int)$data['uid'], $data['table'], $data['uid_page']);
+        }
+    }
 
+    /**
+     * @param list<string> $tags
+     */
+    private function flushByTags(array $tags): void
+    {
+        try {
+            $this->myraCache->flushByTags($tags);
+        } catch (\Exception $exception) {
+            $this->logger->error(
+                'Unable to clear Myra Cloud cache for cache tags {tags}: {message}',
+                [
+                    'tags' => implode(', ', $tags),
+                    'message' => $exception->getMessage(),
+                ],
+            );
+        }
+    }
+
+    private function flushByRecord(int $recordUid, string $tableName, int $pageUid): void
+    {
         [$pageUid, $languageId] = match ($tableName) {
             'pages' => $this->resolveParametersForPage($recordUid),
-            default => $this->resolveParametersForRecord($tableName, $recordUid, $data['uid_page']),
+            default => $this->resolveParametersForRecord($tableName, $recordUid, $pageUid),
         };
 
         try {
             if ($pageUid !== null) {
-                $this->eventDispatcher->dispatch($event = new ClearMyraCloudCacheEvent(Typo3CacheType::PAGE, (string)$pageUid, $languageId));
+                $this->eventDispatcher->dispatch(
+                    new ClearMyraCloudCacheEvent(Typo3CacheType::PAGE, (string)$pageUid, $languageId),
+                );
             }
         } catch (\Exception $exception) {
             $this->logger->error(

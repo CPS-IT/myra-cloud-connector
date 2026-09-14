@@ -15,7 +15,8 @@
 		"symfony/console": "^7.0",
 		"symfony/dependency-injection": "^7.0",
 		"typo3/cms-backend": "^13.4",
-		"typo3/cms-core": "^13.4"
+		"typo3/cms-core": "^13.4",
+		"typo3/cms-frontend": "^13.4"
 	},
 	"require-dev": {
 		"armin/editorconfig-cli": "^2.1",
