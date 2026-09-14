@@ -27,14 +27,20 @@ Admin Only UI Elements
 If checked, all UI Elements are disabled for non-admin users.
 
 ..  note::
-    Auto-clear hooks (page update / file list replace) are not affected by this.
+    Auto-clear hooks (page update / file list replace / cache tag flush) are not affected by this.
 
 ..  _disable-hooks:
 
 Disable Hooks
 ~~~~~~~~~~~~~
 
-If checked, both auto-clear hooks (page update and file list replace) are disabled.
+If checked, all AutoClear mechanisms (page update, file list replace and cache tag flush) are disabled.
+
+..  note::
+    This is only respected by this extension's own hooks / event listeners. It has no
+    effect on :php:`clearCachePostProc` hooks (or other TYPO3 hooks/listeners) registered
+    by third-party extensions (e.g. EXT:news' data handler hook) - those run independently
+    and are not aware of this setting.
 
 ..  _domain-blacklist:
 
