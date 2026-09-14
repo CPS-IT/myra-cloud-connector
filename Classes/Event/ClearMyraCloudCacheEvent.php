@@ -1,0 +1,41 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * This file is part of the TYPO3 CMS extension "myra_cloud_connector".
+ *
+ * It is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, either version 2
+ * of the License, or any later version.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE.txt file that was distributed with this source code.
+ *
+ * The TYPO3 project - inspiring people to share!
+ */
+
+namespace CPSIT\MyraCloudConnector\Event;
+
+use CPSIT\MyraCloudConnector\Domain\Enum\Typo3CacheType;
+
+final class ClearMyraCloudCacheEvent
+{
+    private ?bool $cacheResult = null;
+
+    public function __construct(
+        public readonly Typo3CacheType $type,
+        public readonly ?string $identifier = null,
+        public readonly ?int $languageId = null,
+    ) {}
+
+    public function getCacheResult(): ?bool
+    {
+        return $this->cacheResult;
+    }
+
+    public function setCacheResult(bool $result): void
+    {
+        $this->cacheResult = $result;
+    }
+}

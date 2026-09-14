@@ -1,3 +1,5 @@
+..  _clear-pages:
+
 ===========
 Clear pages
 ===========
@@ -13,7 +15,8 @@ There are 4 ways to clear a page from the cache:
     Apart from the topbar clear cache menu, the page clear cache options clear a single page only
     and are non-recursive.
 
-.. _topbar-page:
+..  _topbar-page:
+
 Topbar clear cache menu
 -----------------------
 
@@ -31,7 +34,8 @@ If the menu option does not appear, check for missing Myra credentials and the s
 -  :ref:`Production only<_production-only>`
 -  :ref:`Domain blacklist<_domain-blacklist>`
 
-.. _contextmenu-page:
+..  _contextmenu-page:
+
 Context menu in page tree
 -------------------------
 
@@ -41,7 +45,8 @@ Context menu in page tree
 
 This will clear the selected page only (no child pages). The option will not clear file resources.
 
-.. _buttonbar-page:
+..  _buttonbar-page:
+
 Button bar
 ----------
 

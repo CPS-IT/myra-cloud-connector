@@ -1,10 +1,18 @@
+..  _cli:
+
 ===========
 CLI command
 ===========
 
 The command is based on a Symfony command and is only accessible via CLI (not via scheduler)
 
-.. _cli-command:
+..  note::
+    The command clears the cache by dispatching a
+    :ref:`ClearMyraCloudCacheEvent<clear-myra-cloud-cache-event>`, see
+    :ref:`events`
+
+..  _cli-command:
+
 Command
 -------
 
@@ -12,7 +20,8 @@ Command
 
    vendor/bin/typo3 myracloud:clear
 
-.. _cli-usage:
+..  _cli-usage:
+
 Usage
 -----
 
@@ -28,7 +37,8 @@ Usage
     myracloud:clear -t all -l [LANGUAGE_ID like: 2]
     myracloud:clear -t allresources
 
-.. _cli-type:
+..  _cli-type:
+
 Type Parameter
 -----
 
@@ -39,7 +49,8 @@ Type Parameter
 -  :php:`all`
 -  :php:`allresources`
 
-.. _cli-type-page:
+..  _cli-type-page:
+
 --type=page
 ~~~~~~~~~~~
 
@@ -50,7 +61,8 @@ to limit cache clear to this specific language.
 ..  note::
     ``page`` clear commands are **never** recursive.
 
-.. _cli-type-resource:
+..  _cli-type-resource:
+
 --type=resource
 ~~~~~~~~~~~~~~~
 
@@ -62,7 +74,8 @@ to limit cache clear to this specific language.
 ..  note::
     The ``resource`` type can also be used to clear pages. Simply provide the site URI (this will be recursive!).
 
-.. _cli-type-allresources:
+..  _cli-type-allresources:
+
 --type=allresources
 ~~~~~~~~~~~~~~~~~~~
 
@@ -79,7 +92,8 @@ This will clear everything from these folders :
     The ``allresources`` clear command is recursive by default.
 
 
-.. _cli-type-all:
+..  _cli-type-all:
+
 --type=all
 ~~~~~~~~~~
 

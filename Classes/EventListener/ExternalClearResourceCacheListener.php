@@ -21,7 +21,8 @@ use CPSIT\MyraCloudConnector\AdapterProvider\AdapterProvider;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\File as MyraFile;
 use CPSIT\MyraCloudConnector\Domain\Enum\Typo3CacheType;
 use CPSIT\MyraCloudConnector\Domain\Repository\FileRepository;
-use CPSIT\MyraCloudConnector\Service\ExternalCacheService;
+use CPSIT\MyraCloudConnector\Event\ClearMyraCloudCacheEvent;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use TYPO3\CMS\Core\Attribute\AsEventListener;
 use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
@@ -34,7 +35,7 @@ use TYPO3\CMS\Core\Resource\FileInterface;
 final readonly class ExternalClearResourceCacheListener
 {
     public function __construct(
-        private ExternalCacheService $externalCacheService,
+        private EventDispatcherInterface $eventDispatcher,
         private FileRepository $fileRepository,
         private AdapterProvider $provider,
         #[Autowire('@cache.runtime')]
@@ -97,9 +98,11 @@ final readonly class ExternalClearResourceCacheListener
 
         if ($this->cache->get($cacheIdentifier) === false) {
             try {
+                $this->eventDispatcher->dispatch($event = new ClearMyraCloudCacheEvent(Typo3CacheType::RESOURCE, $path));
+
                 $this->cache->set(
                     $cacheIdentifier,
-                    $this->externalCacheService->clear(Typo3CacheType::RESOURCE, $path),
+                    $event->getCacheResult(),
                 );
             } catch (\Exception) {
             }

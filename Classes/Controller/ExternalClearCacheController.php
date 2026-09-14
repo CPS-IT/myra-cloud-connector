@@ -18,7 +18,8 @@ declare(strict_types=1);
 namespace CPSIT\MyraCloudConnector\Controller;
 
 use CPSIT\MyraCloudConnector\Domain\Enum\Typo3CacheType;
-use CPSIT\MyraCloudConnector\Service\ExternalCacheService;
+use CPSIT\MyraCloudConnector\Event\ClearMyraCloudCacheEvent;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -33,7 +34,7 @@ readonly class ExternalClearCacheController
 {
     public function __construct(
         private ResponseFactoryInterface $responseFactory,
-        private ExternalCacheService $externalCacheService,
+        private EventDispatcherInterface $eventDispatcher,
         private SiteFinder $siteFinder,
     ) {}
 
@@ -56,7 +57,9 @@ readonly class ExternalClearCacheController
         $result = 0;
 
         foreach ($languages as $language) {
-            $result |= $this->externalCacheService->clear($type, $identifier, $language);
+            $this->eventDispatcher->dispatch($event = new ClearMyraCloudCacheEvent($type, $identifier, $language));
+
+            $result |= $event->getCacheResult();
         }
 
         return $this->getJsonResponse(['status' => (bool)$result], $result ? 200 : 500);

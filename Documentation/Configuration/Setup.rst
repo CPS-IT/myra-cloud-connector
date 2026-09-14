@@ -1,9 +1,13 @@
+..  _extension-setup:
+
 ===============
 Extension Setup
 ===============
 
 Most settings are made in
 :guilabel:`Admin Tools > Settings > Extension Configuration > myra_cloud_connector`.
+
+..  _env-variables:
 
 Use of environment variables
 ----------------------------
@@ -22,26 +26,35 @@ Example syntax:
 -   Configuration: :php:`ENV=MYRA_API_KEY`
 -   Result: :php:`getenv('MYRA_API_KEY')`
 
+..  _myra-settings:
 
 Myra Settings
 -------------
 
 Myra API setup
 
+..  _myra-api-endpoint:
+
 Myra API Endpoint
 ~~~~~~~~~~~~~~~~~
 
 The Myra Cloud API endpoint for every request.
+
+..  _myra-api-key:
 
 Myra API Key
 ~~~~~~~~~~~~
 
 A Myra Cloud User API key (the user needs permissions to clear the domain cache).
 
+..  _myra-api-secret:
+
 Myra API Secret
 ~~~~~~~~~~~~~~~
 
 The matching secret for the API key.
+
+..  _typo3-site-settings:
 
 TYPO3 Site Settings
 ~~~~~~~~~~~~~~~~~~~

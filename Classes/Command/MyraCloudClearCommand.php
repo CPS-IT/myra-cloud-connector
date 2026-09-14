@@ -18,7 +18,8 @@ declare(strict_types=1);
 namespace CPSIT\MyraCloudConnector\Command;
 
 use CPSIT\MyraCloudConnector\Domain\Enum\Typo3CacheType;
-use CPSIT\MyraCloudConnector\Service\ExternalCacheService;
+use CPSIT\MyraCloudConnector\Event\ClearMyraCloudCacheEvent;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -34,7 +35,7 @@ final class MyraCloudClearCommand extends Command
     private SymfonyStyle $io;
 
     public function __construct(
-        private readonly ExternalCacheService $externalCacheService,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
         parent::__construct();
     }
@@ -88,7 +89,9 @@ final class MyraCloudClearCommand extends Command
             $languageId = null;
         }
 
-        if (!$this->externalCacheService->clear($typeId, $identifier, $languageId)) {
+        $this->eventDispatcher->dispatch($event = new ClearMyraCloudCacheEvent($typeId, $identifier, $languageId));
+
+        if (!$event->getCacheResult()) {
             $this->io->error('Some or all operations failed.');
 
             return self::FAILURE;
