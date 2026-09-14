@@ -42,7 +42,7 @@ Usage
 Type Parameter
 -----
 
-``-t, --type=TYPE``
+`-t, --type=TYPE`
 
 -  :php:`page`
 -  :php:`resource`
@@ -54,32 +54,32 @@ Type Parameter
 --type=page
 ~~~~~~~~~~~
 
-``page`` type requires a page identifier (pid) ``-i 1``. the pid must be
-numeric. An optional language identifier ``-l <language uid>`` can be passed
+`page` type requires a page identifier (pid) `-i 1`. the pid must be
+numeric. An optional language identifier `-l <language uid>` can be passed
 to limit cache clear to this specific language.
 
 ..  note::
-    ``page`` clear commands are **never** recursive.
+    `page` clear commands are **never** recursive.
 
 ..  _cli-type-resource:
 
 --type=resource
 ~~~~~~~~~~~~~~~
 
-``resource`` type requires a combined identifier ``-i 1:/path/to/something``.
+`resource` type requires a combined identifier `-i 1:/path/to/something`.
 
 ..  note::
-    ``resource`` clear commands are **always** recursive.
+    `resource` clear commands are **always** recursive.
 
 ..  note::
-    The ``resource`` type can also be used to clear pages. Simply provide the site URI (this will be recursive!).
+    The `resource` type can also be used to clear pages. Simply provide the site URI (this will be recursive!).
 
 ..  _cli-type-allresources:
 
 --type=allresources
 ~~~~~~~~~~~~~~~~~~~
 
-``allresources`` type requires NO extra option.
+`allresources` type requires NO extra option.
 
 This will clear everything from these folders :
 
@@ -89,7 +89,7 @@ This will clear everything from these folders :
 -  :file:`/_assets/*`
 
 ..  note::
-    The ``allresources`` clear command is recursive by default.
+    The `allresources` clear command is recursive by default.
 
 
 ..  _cli-type-all:
@@ -97,11 +97,11 @@ This will clear everything from these folders :
 --type=all
 ~~~~~~~~~~
 
-``all`` type requires no extra option.
+`all` type requires no extra option.
 
 This clears everything in Myra Cache for this TYPO3 Instance. An optional
-language identifier ``-l <language uid>`` can be passed to limit cache
+language identifier `-l <language uid>` can be passed to limit cache
 clear to this specific language.
 
 ..  note::
-    The ``all`` clear command is recursive by default.
+    The `all` clear command is recursive by default.
