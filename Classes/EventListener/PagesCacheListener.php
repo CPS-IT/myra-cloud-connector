@@ -34,28 +34,10 @@ final readonly class PagesCacheListener
     public function __invoke(AfterCachedPageIsPersistedEvent $event): void
     {
         $cacheTags = $event->getCacheData()['cacheTags'];
-        $pageId = $this->determinePageIdFromCacheTags($cacheTags);
+        $pageId = $event->getCacheData()['page_id'];
 
-        if ($pageId !== null) {
-            $this->myraCache->set($event->getCacheIdentifier(), $pageId, $cacheTags);
+        if (MathUtility::canBeInterpretedAsInteger($pageId)) {
+            $this->myraCache->set($event->getCacheIdentifier(), (int)$pageId, $cacheTags);
         }
-    }
-
-    /**
-     * @param list<string> $cacheTags
-     */
-    private function determinePageIdFromCacheTags(array $cacheTags): ?int
-    {
-        foreach ($cacheTags as $cacheTag) {
-            if (MathUtility::canBeInterpretedAsInteger($cacheTag)) {
-                return (int)$cacheTag;
-            }
-
-            if (str_starts_with($cacheTag, 'pageId_')) {
-                return (int)substr($cacheTag, strlen('pageId_'));
-            }
-        }
-
-        return null;
     }
 }
