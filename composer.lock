@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1d4e1707f40552d5c8682b087f4096e5",
+    "content-hash": "c5722863a5c0e8e9ebf86bde97f24819",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -5964,16 +5964,16 @@
         },
         {
             "name": "eliashaeussler/version-bumper",
-            "version": "4.0.2",
+            "version": "4.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/eliashaeussler/version-bumper.git",
-                "reference": "f9a809acf0a8e12916edde330f7fb97eb1800489"
+                "reference": "2ac05950d24cc05abe24e0110bb6aba7967617e9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eliashaeussler/version-bumper/zipball/f9a809acf0a8e12916edde330f7fb97eb1800489",
-                "reference": "f9a809acf0a8e12916edde330f7fb97eb1800489",
+                "url": "https://api.github.com/repos/eliashaeussler/version-bumper/zipball/2ac05950d24cc05abe24e0110bb6aba7967617e9",
+                "reference": "2ac05950d24cc05abe24e0110bb6aba7967617e9",
                 "shasum": ""
             },
             "require": {
@@ -5993,7 +5993,7 @@
             },
             "require-dev": {
                 "armin/editorconfig-cli": "^2.0",
-                "composer/composer": "~2.2.28 || ~2.9.8",
+                "composer/composer": "~2.2.28 || ~2.10.0",
                 "eliashaeussler/php-cs-fixer-config": "^3.0",
                 "eliashaeussler/phpstan-config": "^4.0",
                 "eliashaeussler/rector-config": "^4.0",
@@ -6029,9 +6029,9 @@
             "description": "Composer plugin to bump project versions during release preparations",
             "support": {
                 "issues": "https://github.com/eliashaeussler/version-bumper/issues",
-                "source": "https://github.com/eliashaeussler/version-bumper/tree/4.0.2"
+                "source": "https://github.com/eliashaeussler/version-bumper/tree/4.1.1"
             },
-            "time": "2026-05-28T14:54:12+00:00"
+            "time": "2026-09-16T13:51:30+00:00"
         },
         {
             "name": "ergebnis/agent-detector",
