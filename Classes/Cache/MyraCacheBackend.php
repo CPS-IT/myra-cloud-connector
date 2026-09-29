@@ -60,7 +60,7 @@ final class MyraCacheBackend extends Typo3DatabaseBackend
 
     public function flushByTag($tag): void
     {
-        $this->clearExternalCacheByTag($tag);
+        $this->clearExternalCacheByTag((string)$tag);
 
         parent::flushByTag($tag);
     }
@@ -68,7 +68,7 @@ final class MyraCacheBackend extends Typo3DatabaseBackend
     public function flushByTags(array $tags): void
     {
         foreach ($tags as $tag) {
-            $this->clearExternalCacheByTag($tag);
+            $this->clearExternalCacheByTag((string)$tag);
         }
 
         parent::flushByTags($tags);
