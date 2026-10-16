@@ -17,6 +17,7 @@ declare(strict_types=1);
 
 namespace CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File;
 
+use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Resource\ResourceInterface;
 
 final class File extends AbstractFile
@@ -32,6 +33,11 @@ final class File extends AbstractFile
         $publicFile = (string)$this->resource->getStorage()->getPublicUrl($this->resource);
 
         return '/' . trim(str_replace($this->getRawSlug(), '', $publicFile), '/');
+    }
+
+    public function isFolder(): bool
+    {
+        return $this->resource instanceof Folder;
     }
 
     public function getCombinedIdentifier(): string
