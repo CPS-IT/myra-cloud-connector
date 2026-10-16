@@ -21,8 +21,6 @@ use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\PageSlugInterface;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\SiteConfigInterface;
 use CPSIT\MyraCloudConnector\Extension;
 use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Handler\CurlHandler;
-use GuzzleHttp\HandlerStack;
 use Myracloud\WebApi\Endpoint\CacheClear;
 use Myracloud\WebApi\Endpoint\CacheClearV2;
 use Myracloud\WebApi\WebApi;
@@ -289,8 +287,6 @@ class MyraApiAdapter extends BaseAdapter
             return $this->clients[$instanceId];
         }
 
-        $stack = new HandlerStack();
-        $stack->setHandler(new CurlHandler());
 
         $isV2 = WebApiV2::isV2($config[self::CONFIG_NAME_ENDPOINT]) && (string)$config[self::CONFIG_NAME_TOKEN] !== '';
 
