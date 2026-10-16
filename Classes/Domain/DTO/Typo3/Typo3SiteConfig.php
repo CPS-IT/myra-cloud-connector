@@ -20,7 +20,7 @@ namespace CPSIT\MyraCloudConnector\Domain\DTO\Typo3;
 use CPSIT\MyraCloudConnector\Traits\DomainListParserTrait;
 use TYPO3\CMS\Core\Site\Entity\Site;
 
-class Typo3SiteConfig implements SiteConfigInterface
+class Typo3SiteConfig implements SiteConfigInterface, SiteConfigHostListInterface
 {
     use DomainListParserTrait;
 
@@ -51,5 +51,19 @@ class Typo3SiteConfig implements SiteConfigInterface
     public function getExternalIdentifierList(): array
     {
         return $this->getDomainList();
+    }
+
+    /**
+     * The site's base (with the base variant of the current context already applied)
+     * and every language base; relative language bases resolve to the site's host.
+     */
+    public function getHostList(): array
+    {
+        $hosts = [$this->site->getBase()->getHost()];
+        foreach ($this->site->getAllLanguages() as $language) {
+            $hosts[] = $language->getBase()->getHost();
+        }
+
+        return array_values(array_unique(array_filter(array_map(strtolower(...), $hosts))));
     }
 }

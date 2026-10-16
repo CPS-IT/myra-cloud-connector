@@ -187,14 +187,28 @@ abstract class BaseAdapter implements SingletonInterface, AdapterInterface
         );
     }
 
+    /**
+     * Settings that must not be empty for the adapter to run. Default: every setting
+     * with the adapter's prefix.
+     *
+     * @param array<string, mixed> $config
+     * @return list<string>
+     */
+    protected function getRequiredConfigKeys(array $config): array
+    {
+        $prefix = $this->getAdapterConfigPrefix();
+
+        return array_values(array_filter(array_map(strval(...), array_keys($config)), static fn(string $key): bool => str_starts_with($key, $prefix)));
+    }
+
     private function setupConfigCondition(): bool
     {
         return $this->getFromCache(
             __METHOD__,
             function () {
                 $allConfigData = $this->getAdapterConfig(true);
-                foreach ($allConfigData as $key => $value) {
-                    if (empty($this->getRealAdapterConfigValue($value)) && str_starts_with($key, $this->getAdapterConfigPrefix())) {
+                foreach ($this->getRequiredConfigKeys($allConfigData) as $key) {
+                    if (empty($this->getRealAdapterConfigValue($allConfigData[$key] ?? ''))) {
                         return false;
                     }
                 }
