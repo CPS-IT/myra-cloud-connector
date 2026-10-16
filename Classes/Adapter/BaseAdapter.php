@@ -257,8 +257,16 @@ abstract class BaseAdapter implements SingletonInterface, AdapterInterface
         return $GLOBALS['TYPO3_REQUEST'] ?? ServerRequestFactory::fromGlobals();
     }
 
-    protected function getRealAdapterConfigValue(string $value): string
+    protected function getRealAdapterConfigValue(mixed $value): string
     {
+        // The extension settings form stores strings, but configuration from files
+        // (settings.php, YAML loaders) arrives typed: `onlyLive: 0` is an int.
+        $value = match (true) {
+            is_bool($value) => $value ? '1' : '0',
+            is_scalar($value) => (string)$value,
+            default => '',
+        };
+
         if (stripos($value, 'ENV=') === 0) {
             return (string)getenv(substr($value, 4));
         }
