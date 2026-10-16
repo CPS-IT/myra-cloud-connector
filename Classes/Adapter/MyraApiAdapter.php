@@ -17,6 +17,8 @@ declare(strict_types=1);
 
 namespace CPSIT\MyraCloudConnector\Adapter;
 
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\File;
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\FileInterface;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\PageSlugInterface;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\SiteConfigHostListInterface;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\SiteConfigInterface;
@@ -138,6 +140,9 @@ class MyraApiAdapter extends BaseAdapter
         $r = false;
         // if no slug provided / clear root
         $slug = ($pageSlug !== null) ? $pageSlug->getSlug() : '/';
+        if ($recursive && !$this->isSingleFile($pageSlug)) {
+            $slug = rtrim($slug, '/') . '/*';
+        }
         foreach ($site->getExternalIdentifierList() as $domain) {
             $fqdnList = $this->getFqdnForSite($domain);
 
@@ -162,6 +167,25 @@ class MyraApiAdapter extends BaseAdapter
         }
 
         return (bool)$r;
+    }
+
+    /**
+     * Myra matches `resource` as a pattern, `recursive` only extends the match to
+     * subdirectories (API docs, PUT /domain/{domainId}/cache-clear): "/fileadmin"
+     * matches paths ending in "/fileadmin", "/fileadmin/*" everything below it. So a
+     * recursive clear of a folder or the root needs the wildcard, a single file not:
+     * "/fileadmin/a.pdf/*" would no longer match the file itself.
+     */
+    private function isSingleFile(?PageSlugInterface $slug): bool
+    {
+        if ($slug instanceof File) {
+            return !$slug->isFolder();
+        }
+
+        // Paths FAL does not know (CLI `resource` type): a dot in the last segment means a file.
+        return $slug instanceof FileInterface
+            && $slug->getRawSlug() !== ''
+            && str_contains(basename(rtrim($slug->getSlug(), '/')), '.');
     }
 
     /**

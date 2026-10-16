@@ -60,7 +60,9 @@ final readonly class ExternalClearCacheListener
 
     private function clearExternalCache(Typo3CacheType $type, ?string $identifier, ?int $languageId): bool
     {
-        $cacheIdentifier = 'MyraCloudConnector_ExternalClearCache_' . $identifier . '_' . $languageId;
+        // Resource identifiers ("1:/user_upload/") contain characters a cache entry
+        // identifier must not, so the identifier is hashed.
+        $cacheIdentifier = 'MyraCloudConnector_ExternalClearCache_' . $type->value . '_' . md5((string)$identifier) . '_' . $languageId;
         $result = $this->runtimeCache->get($cacheIdentifier);
 
         if (!$result) {
