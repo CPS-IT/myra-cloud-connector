@@ -342,7 +342,6 @@ class MyraApiAdapter extends BaseAdapter
             return $this->clients[$instanceId];
         }
 
-
         $isV2 = WebApiV2::isV2($config[self::CONFIG_NAME_ENDPOINT]) && (string)$config[self::CONFIG_NAME_TOKEN] !== '';
 
         if ($isV2) {
