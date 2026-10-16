@@ -18,6 +18,7 @@ declare(strict_types=1);
 namespace CPSIT\MyraCloudConnector\Adapter;
 
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\PageSlugInterface;
+use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\SiteConfigHostListInterface;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\SiteConfigInterface;
 use CPSIT\MyraCloudConnector\Extension;
 use GuzzleHttp\Exception\GuzzleException;
@@ -112,6 +113,17 @@ class MyraApiAdapter extends BaseAdapter
     }
 
     /**
+     * The credentials of the API version in use: v2 (apiv2.myracloud.com) needs the
+     * token, v1 the key and the secret; the other version's settings may stay empty.
+     */
+    protected function getRequiredConfigKeys(array $config): array
+    {
+        return WebApiV2::isV2((string)($config[self::CONFIG_NAME_ENDPOINT] ?? ''))
+            ? [self::CONFIG_NAME_ENDPOINT, self::CONFIG_NAME_TOKEN]
+            : [self::CONFIG_NAME_ENDPOINT, self::CONFIG_NAME_API_KEY, self::CONFIG_NAME_SECRET];
+    }
+
+    /**
      * @param SiteConfigInterface $site
      * @param PageSlugInterface|null $pageSlug
      * @param bool $recursive
@@ -127,7 +139,24 @@ class MyraApiAdapter extends BaseAdapter
         // if no slug provided / clear root
         $slug = ($pageSlug !== null) ? $pageSlug->getSlug() : '/';
         foreach ($site->getExternalIdentifierList() as $domain) {
-            foreach ($this->getFqdnForSite($domain) as $subDomain) {
+            $fqdnList = $this->getFqdnForSite($domain);
+
+            if ($site instanceof SiteConfigHostListInterface) {
+                // Only the hosts this site is served from: the Myra domain also carries
+                // other sites and environments, which a purge here must not reach.
+                $hosts = $site->getHostList();
+                $fqdnList = array_filter($fqdnList, static fn(string $fqdn): bool => in_array(strtolower($fqdn), $hosts, true));
+
+                if ($fqdnList === []) {
+                    $this->writeLog(
+                        'MYRA_CLOUD: no active record of domain %s matches the hosts of this site (%s), nothing was cleared',
+                        [$domain, implode(', ', $hosts)]
+                    );
+                    continue;
+                }
+            }
+
+            foreach ($fqdnList as $subDomain) {
                 $r |= $this->clearCacheDomain($domain, $subDomain, $slug, $recursive);
             }
         }
@@ -209,9 +238,11 @@ class MyraApiAdapter extends BaseAdapter
                         $fqdn[crc32((string)$name)] = $name;
                     }
                 }
-            }
 
-            $this->cache->set($cacheIdentifier, $fqdn);
+                // Only a successful lookup is cached: an empty list after a failed
+                // request would block every purge until the cache entry expires.
+                $this->cache->set($cacheIdentifier, $fqdn);
+            }
         }
 
         return $fqdn;
