@@ -14,6 +14,7 @@ declare(strict_types=1);
  *
  * The TYPO3 project - inspiring people to share!
  */
+
 namespace CPSIT\MyraCloudConnector\Domain\DTO\Typo3;
 
 /**
