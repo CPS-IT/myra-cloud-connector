@@ -22,6 +22,7 @@ use CPSIT\MyraCloudConnector\Traits\DomainListParserTrait;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
+use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Http\ServerRequestFactory;
 use TYPO3\CMS\Core\Page\JavaScriptModuleInstruction;
@@ -29,24 +30,33 @@ use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\SysLog\Action\Cache as SystemLogCacheAction;
 use TYPO3\CMS\Core\SysLog\Error as SystemLogErrorClassification;
 use TYPO3\CMS\Core\SysLog\Type as SystemLogType;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 abstract class BaseAdapter implements SingletonInterface, AdapterInterface
 {
     use DomainListParserTrait;
 
     /**
-     * @var array<string, array<string, mixed>>
+     * All settings, environment references resolved; null until read.
+     *
+     * @var array<string, string>|null
      */
-    private static array $configCache = [];
+    private ?array $config = null;
 
     /**
      * @var array<string, bool>
      */
-    private static array $checkupCache = [];
+    private array $checkupCache = [];
+
+    private readonly Context $context;
 
     public function __construct(
         private readonly ExtensionConfiguration $extensionConfiguration,
-    ) {}
+        ?Context $context = null,
+    ) {
+        // Optional: adapters extending this class pass only the extension configuration.
+        $this->context = $context ?? GeneralUtility::makeInstance(Context::class);
+    }
 
     public function getJavaScriptModule(): string
     {
@@ -125,20 +135,16 @@ abstract class BaseAdapter implements SingletonInterface, AdapterInterface
         return $this->getFromCache(
             __METHOD__,
             function () {
-                $backendUser = $this->getBackendUser();
+                $backendUser = $this->context->getAspect('backend.user');
 
-                if ($backendUser === null) {
+                if (!$backendUser->isLoggedIn()) {
                     return false;
                 }
 
                 $allConfigData = $this->getAdapterConfig(true);
                 $onlyAdmin = (int)($allConfigData['onlyAdmin'] ?? 1) === 1;
 
-                if ($onlyAdmin) {
-                    return $backendUser->isAdmin();
-                }
-
-                return true;
+                return !$onlyAdmin || $backendUser->isAdmin();
             },
         );
     }
@@ -223,7 +229,7 @@ abstract class BaseAdapter implements SingletonInterface, AdapterInterface
      */
     private function getFromCache(string $identifier, \Closure $buildFunction): bool
     {
-        return self::$checkupCache[$identifier] ?? (self::$checkupCache[$identifier] = $buildFunction());
+        return $this->checkupCache[$identifier] ??= $buildFunction();
     }
 
     /**
@@ -231,39 +237,26 @@ abstract class BaseAdapter implements SingletonInterface, AdapterInterface
      */
     protected function getAdapterConfig(bool $ignorePrefix = false): array
     {
-        $prefix = $this->getAdapterConfigPrefix();
-
-        if (!empty(self::$configCache)) {
-            if ($ignorePrefix) {
-                return self::$configCache['all'];
+        if ($this->config === null) {
+            try {
+                $data = $this->extensionConfiguration->get(Extension::KEY);
+            } catch (\Exception) {
+                $data = [];
             }
 
-            if (!empty(self::$configCache[$prefix])) {
-                return self::$configCache[$prefix];
-            }
-        }
-
-        try {
-            $data = $this->extensionConfiguration->get(Extension::KEY);
-        } catch (\Exception) {
-            $data = [];
-        }
-
-        foreach ($data as $key => $value) {
-            $value = $this->getRealAdapterConfigValue($value);
-
-            self::$configCache['all'][$key] = $value;
-
-            if (str_starts_with((string)$key, $prefix)) {
-                self::$configCache[$prefix][$key] = $value;
+            $this->config = [];
+            foreach (is_array($data) ? $data : [] as $key => $value) {
+                $this->config[(string)$key] = $this->getRealAdapterConfigValue($value);
             }
         }
 
         if ($ignorePrefix) {
-            return self::$configCache['all'];
+            return $this->config;
         }
 
-        return self::$configCache[$prefix];
+        $prefix = $this->getAdapterConfigPrefix();
+
+        return array_filter($this->config, static fn(string $key): bool => str_starts_with($key, $prefix), ARRAY_FILTER_USE_KEY);
     }
 
     protected function getServerRequest(): ServerRequestInterface

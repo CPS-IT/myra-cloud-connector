@@ -17,76 +17,68 @@ declare(strict_types=1);
 
 namespace CPSIT\MyraCloudConnector\Adapter;
 
+use CPSIT\MyraCloudConnector\Domain\DTO\Myra\ClientConfiguration;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\File;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\FileInterface;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\PageSlugInterface;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\SiteConfigHostListInterface;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\SiteConfigInterface;
 use CPSIT\MyraCloudConnector\Extension;
-use GuzzleHttp\Exception\GuzzleException;
-use Myracloud\WebApi\Endpoint\CacheClear;
-use Myracloud\WebApi\Endpoint\CacheClearV2;
-use Myracloud\WebApi\WebApi;
-use Myracloud\WebApi\WebApiV2;
+use Myracloud\WebApi\Exception\MyraException;
+use Myracloud\WebApi\V2;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
+use TYPO3\CMS\Core\Context\Context;
 
 /**
- * @phpstan-type DnsRecordVO array{
- *     objectType: string,
- *     id: int,
- *     modified: string,
- *     created?: string,
- *     name: string,
- *     ttl?: int,
- *     recordType: string,
- *     alternativeCname?: string,
- *     active?: bool,
- *     value: string,
- *     priority?: int,
- *     paused?: bool,
- *     upstreamOptions?: array{
- *         weight?: int,
- *         maxFails?: int,
- *         failTimeout?: int,
- *         backup?: bool,
- *         down?: bool,
- *     },
- *     caaTag?: string,
- *     caaFlags?: int,
- *     endpoints?: list<string>,
- *     serviceType?: int,
- *     enabled?: bool,
- *     port?: int,
- *     weight?: int,
- * }
+ * Clears the Myra Cloud cache of TYPO3 sites through API v2 (cpsit/myra-web-api).
+ *
+ * The site setting "myra_host" names the Myra domains (zones); within them only the hosts
+ * the site is served from are cleared.
  */
 #[AutoconfigureTag('myra_cloud.external.cache.adapter')]
-class MyraApiAdapter extends BaseAdapter
+class MyraApiAdapter extends BaseAdapter implements BatchingAdapterInterface
 {
-    /**
-     * @var array<string, bool>
-     */
-    private static array $multiClearCacheProtection = [];
-
-    /**
-     * @var array<string, WebApi|WebApiV2>
-     */
-    protected array $clients = [];
-
     private const CONFIG_NAME_API_KEY = 'myra_api_key';
     private const CONFIG_NAME_ENDPOINT = 'myra_endpoint';
     private const CONFIG_NAME_SECRET = 'myra_secret';
     private const CONFIG_NAME_TOKEN = 'myra_token';
 
+    /**
+     * Clears already sent in this request: one save often clears the same page several times.
+     *
+     * @var array<string, true>
+     */
+    private array $sentClears = [];
+
+    /**
+     * Resources per request: Myra documents no limit; this keeps request bodies bounded,
+     * and a rejected entry fails only its own chunk.
+     */
+    private const MAX_RESOURCES_PER_REQUEST = 100;
+
+    private ?V2\Client $client = null;
+
+    private int $batchDepth = 0;
+
+    /**
+     * Clears waiting for the end of the outermost batch: domain → host → recursive → resources.
+     *
+     * @var array<string, array<string, array<int, array<string, true>>>>
+     */
+    private array $queue = [];
+
     public function __construct(
         ExtensionConfiguration $extensionConfiguration,
         #[Autowire('@cache.runtime')]
         private readonly FrontendInterface $cache,
+        private readonly LoggerInterface $logger,
+        ?Context $context = null,
     ) {
-        parent::__construct($extensionConfiguration);
+        parent::__construct($extensionConfiguration, $context);
     }
 
     public function getCacheId(): string
@@ -115,58 +107,35 @@ class MyraApiAdapter extends BaseAdapter
     }
 
     /**
-     * The credentials of the API version in use: v2 (apiv2.myracloud.com) needs the
-     * token, v1 the key and the secret; the other version's settings may stay empty.
+     * The endpoint and the credentials in use: the token, or the API key and the secret
+     * ({@see ClientConfiguration::fromSettings()}). An empty endpoint keeps the extension
+     * inactive as it always did — setups use it as off switch, e.g. an unset ENV variable.
      */
     protected function getRequiredConfigKeys(array $config): array
     {
-        return WebApiV2::isV2((string)($config[self::CONFIG_NAME_ENDPOINT] ?? ''))
-            ? [self::CONFIG_NAME_ENDPOINT, self::CONFIG_NAME_TOKEN]
-            : [self::CONFIG_NAME_ENDPOINT, self::CONFIG_NAME_API_KEY, self::CONFIG_NAME_SECRET];
+        $credentials = $this->getClientConfiguration($config)?->usesToken === true
+            ? [self::CONFIG_NAME_TOKEN]
+            : [self::CONFIG_NAME_API_KEY, self::CONFIG_NAME_SECRET];
+
+        return [self::CONFIG_NAME_ENDPOINT, ...$credentials];
     }
 
-    /**
-     * @param SiteConfigInterface $site
-     * @param PageSlugInterface|null $pageSlug
-     * @param bool $recursive
-     * @return bool
-     */
     public function clearCache(SiteConfigInterface $site, ?PageSlugInterface $pageSlug = null, bool $recursive = false): bool
     {
         if (!$this->canExecute()) {
             return false;
         }
 
-        $r = false;
-        // if no slug provided / clear root
-        $slug = ($pageSlug !== null) ? $pageSlug->getSlug() : '/';
-        if ($recursive && !$this->isSingleFile($pageSlug)) {
-            $slug = rtrim($slug, '/') . '/*';
-        }
+        $resource = $this->getResource($pageSlug, $recursive);
+        $cleared = false;
+
         foreach ($site->getExternalIdentifierList() as $domain) {
-            $fqdnList = $this->getFqdnForSite($domain);
-
-            if ($site instanceof SiteConfigHostListInterface) {
-                // Only the hosts this site is served from: the Myra domain also carries
-                // other sites and environments, which a purge here must not reach.
-                $hosts = $site->getHostList();
-                $fqdnList = array_filter($fqdnList, static fn(string $fqdn): bool => in_array(strtolower($fqdn), $hosts, true));
-
-                if ($fqdnList === []) {
-                    $this->writeLog(
-                        'MYRA_CLOUD: no active record of domain %s matches the hosts of this site (%s), nothing was cleared',
-                        [$domain, implode(', ', $hosts)]
-                    );
-                    continue;
-                }
-            }
-
-            foreach ($fqdnList as $subDomain) {
-                $r |= $this->clearCacheDomain($domain, $subDomain, $slug, $recursive);
+            foreach ($this->getHostsToClear($site, $domain) as $fqdn) {
+                $cleared = $this->clearCacheDomain($domain, $fqdn, $resource, $recursive) || $cleared;
             }
         }
 
-        return (bool)$r;
+        return $cleared;
     }
 
     /**
@@ -176,6 +145,18 @@ class MyraApiAdapter extends BaseAdapter
      * recursive clear of a folder or the root needs the wildcard, a single file not:
      * "/fileadmin/a.pdf/*" would no longer match the file itself.
      */
+    private function getResource(?PageSlugInterface $pageSlug, bool $recursive): string
+    {
+        // A site base without trailing slash gives its root page an empty path.
+        $resource = '/' . ltrim($pageSlug?->getSlug() ?? '', '/');
+
+        if ($recursive && !$this->isSingleFile($pageSlug)) {
+            $resource = rtrim($resource, '/') . '/*';
+        }
+
+        return $resource;
+    }
+
     private function isSingleFile(?PageSlugInterface $slug): bool
     {
         if ($slug instanceof File) {
@@ -189,167 +170,209 @@ class MyraApiAdapter extends BaseAdapter
     }
 
     /**
-     * @param string $siteRef
-     * @param string $fqdn
-     * @param string $path
-     * @param bool $recursive
-     * @return string
+     * @return list<string>
      */
-    protected function getSendHash(string $siteRef, string $fqdn, string $path, bool $recursive = false): string
+    private function getHostsToClear(SiteConfigInterface $site, string $domain): array
     {
-        return md5($siteRef . '_' . $fqdn . '_' . $path . '_' . $recursive);
+        $hosts = $this->getActiveHosts($domain);
+
+        if (!$site instanceof SiteConfigHostListInterface) {
+            return $hosts;
+        }
+
+        // Only the hosts this site is served from: the Myra domain also carries
+        // other sites and environments, which a purge here must not reach.
+        $siteHosts = $site->getHostList();
+        $hosts = array_values(array_filter($hosts, static fn(string $fqdn): bool => in_array($fqdn, $siteHosts, true)));
+
+        if ($hosts === []) {
+            $this->writeLog(
+                'MYRA_CLOUD: no active record of domain %s matches the hosts of this site (%s), nothing was cleared',
+                [$domain, implode(', ', $siteHosts)]
+            );
+        }
+
+        return $hosts;
+    }
+
+    public function batch(\Closure $operation): bool
+    {
+        $this->batchDepth++;
+
+        try {
+            $operation();
+        } finally {
+            if (--$this->batchDepth === 0) {
+                $sent = $this->sendQueue();
+            }
+        }
+
+        return $sent ?? true;
     }
 
     /**
-     * @param string $domain
-     * @param string $fqdn
-     * @param string $path
-     * @param bool $recursive
-     * @return bool
+     * Sends the clear, or queues it inside a {@see batch()}.
      */
     protected function clearCacheDomain(string $domain, string $fqdn, string $path = '/', bool $recursive = false): bool
     {
-        $domainIdentifier = $this->getDomainIdentifier($domain);
-        if ($domainIdentifier === null) {
-            return false;
-        }
-        $hash = $this->getSendHash($domain, $fqdn, $path, $recursive);
-        if ((self::$multiClearCacheProtection[$hash] ?? false) === true) {
+        if (isset($this->sentClears[$this->getClearKey($domain, $fqdn, $path, $recursive)])) {
             return true;
         }
 
-        try {
-            $r = $this->getCacheClearApi()->clear($domainIdentifier, $fqdn, $path, $recursive);
-            self::$multiClearCacheProtection[$hash] = $success = (!empty($r) && ($r['error'] ?? true) === false);
-        } catch (GuzzleException) {
-            return false;
+        if ($this->batchDepth > 0) {
+            $this->queue[$domain][$fqdn][(int)$recursive][$path] = true;
+
+            return true;
         }
 
-        $backendUser = $this->getBackendUser();
+        return $this->send($domain, $fqdn, [$path], $recursive);
+    }
 
-        $this->writeLog(
-            'User %s has cleared the MYRA_CLOUD cache for domain %s => %s%s (recursive: %s) (success: %s)',
-            [
-                ($backendUser?->user['username'] ?? '') . ' (uid: ' . ($backendUser?->user['uid'] ?? 0) . ')',
-                $domain,
-                $fqdn,
-                $path,
-                ($recursive ? 'true' : 'false'),
-                ($success ? 'true' : 'false'),
-            ]
-        );
+    private function sendQueue(): bool
+    {
+        $queue = $this->queue;
+        $this->queue = [];
+        $success = true;
+
+        foreach ($queue as $domain => $hosts) {
+            foreach ($hosts as $fqdn => $byRecursive) {
+                foreach ($byRecursive as $recursive => $resources) {
+                    foreach (array_chunk(array_keys($resources), self::MAX_RESOURCES_PER_REQUEST) as $chunk) {
+                        $success = $this->send((string)$domain, (string)$fqdn, $chunk, $recursive === 1) && $success;
+                    }
+                }
+            }
+        }
 
         return $success;
     }
 
     /**
-     * @return string[]
+     * One request for the resources of one host: a single clear, or a bulk clear.
+     *
+     * @param non-empty-list<string> $resources
      */
-    private function getFqdnForSite(string $domainIdentifier): array
+    private function send(string $domain, string $fqdn, array $resources, bool $recursive): bool
     {
-        $cacheIdentifier = 'myra-cloud-api-adapter-fqdn-site-' . crc32($domainIdentifier);
-
-        if (($fqdn = $this->cache->get($cacheIdentifier)) === false) {
-            $r = $this->getDomainRecordsForDomain($domainIdentifier);
-            $fqdn = [];
-
-            if (!empty($r) && $r['error'] === false) {
-                foreach ($r['data'] ?? $r['list'] ?? [] as $recordItem) {
-                    $name = $recordItem['name'];
-                    $active = (bool)($recordItem['active'] ?? false);
-                    $enable = (bool)($recordItem['enabled'] ?? false);
-                    if ($active && $enable && $name !== '') {
-                        $fqdn[crc32((string)$name)] = $name;
-                    }
-                }
-
-                // Only a successful lookup is cached: an empty list after a failed
-                // request would block every purge until the cache entry expires.
-                $this->cache->set($cacheIdentifier, $fqdn);
-            }
+        $client = $this->getClient();
+        if ($client === null) {
+            return false;
         }
 
-        return $fqdn;
+        try {
+            if (count($resources) === 1) {
+                $client->cacheClear()->clear($domain, $fqdn, $resources[0], $recursive);
+            } else {
+                $client->cacheClear()->clearBulk($domain, $fqdn, $resources, $recursive);
+            }
+            $success = true;
+        } catch (MyraException $exception) {
+            $success = false;
+            $this->logger->error(
+                'Myra Cloud cache clear of {fqdn} {resources} (domain {domain}, recursive: {recursive}) failed: {message}',
+                [
+                    'domain' => $domain,
+                    'fqdn' => $fqdn,
+                    'resources' => implode(', ', $resources),
+                    'recursive' => $recursive ? 'true' : 'false',
+                    'message' => $exception->getMessage(),
+                    'exception' => $exception,
+                ],
+            );
+        }
+
+        $backendUser = $this->getBackendUser();
+
+        foreach ($resources as $path) {
+            if ($success) {
+                $this->sentClears[$this->getClearKey($domain, $fqdn, $path, $recursive)] = true;
+            }
+
+            // One entry per resource, as before bulk clears.
+            $this->writeLog(
+                'User %s has cleared the MYRA_CLOUD cache for domain %s => %s%s (recursive: %s) (success: %s)',
+                [
+                    ($backendUser?->user['username'] ?? '') . ' (uid: ' . ($backendUser?->user['uid'] ?? 0) . ')',
+                    $domain,
+                    $fqdn,
+                    $path,
+                    ($recursive ? 'true' : 'false'),
+                    ($success ? 'true' : 'false'),
+                ]
+            );
+        }
+
+        return $success;
+    }
+
+    private function getClearKey(string $domain, string $fqdn, string $path, bool $recursive): string
+    {
+        return implode("\0", [$domain, $fqdn, $path, $recursive ? '1' : '0']);
     }
 
     /**
-     * @return array{}|array{
-     *     error: bool,
-     *     data?: list<DnsRecordVO>,
-     *     list?: list<DnsRecordVO>,
-     *     page: int,
-     *     count: int,
-     *     pageSize: int
-     * }
+     * The hosts Myra serves for a domain: the names of its active and enabled DNS records.
+     *
+     * @return list<string>
      */
-    private function getDomainRecordsForDomain(string $domain): array
+    private function getActiveHosts(string $domain): array
     {
+        $cacheIdentifier = 'myra-cloud-api-adapter-hosts-' . md5($domain);
+        $hosts = $this->cache->get($cacheIdentifier);
+
+        if (is_array($hosts)) {
+            return array_values(array_filter($hosts, is_string(...)));
+        }
+
+        $client = $this->getClient();
+        if ($client === null) {
+            return [];
+        }
+
         try {
-            $domainId = $this->getDomainIdentifier($domain);
+            $records = $client->dnsRecords()->list($domain);
+        } catch (MyraException $exception) {
+            // Not cached: an empty list after a failed request would block every
+            // purge of this domain for the rest of the request.
+            $this->logger->error(
+                'Myra Cloud DNS records of domain {domain} could not be read: {message}',
+                ['domain' => $domain, 'message' => $exception->getMessage(), 'exception' => $exception],
+            );
 
-            if ($domainId === null) {
-                return [];
+            return [];
+        }
+
+        $hosts = [];
+        foreach ($records as $record) {
+            $name = rtrim(strtolower($record->name()), '.');
+            if ($record->isActive() && $record->isEnabled() && $name !== '') {
+                $hosts[$name] = $name;
             }
-
-            return $this->getMyraClient()->getDnsRecordEndpoint()->getList($domainId);
-        } catch (\Exception|GuzzleException) {
         }
+        $hosts = array_values($hosts);
 
-        return [];
+        $this->cache->set($cacheIdentifier, $hosts);
+
+        return $hosts;
     }
 
-    private function getCacheClearApi(): CacheClear|CacheClearV2
+    private function getClient(): ?V2\Client
     {
-        return $this->getMyraClient()->getCacheClearEndpoint();
+        return $this->client ??= $this->getClientConfiguration($this->getAdapterConfig())?->createClient();
     }
 
-    private function getDomainIdentifier(string $domain): int|string|null
+    /**
+     * @param array<string, mixed> $config settings as {@see getAdapterConfig()} returns them, already resolved
+     */
+    private function getClientConfiguration(array $config): ?ClientConfiguration
     {
-        $cacheIdentifier = 'myra-cloud-api-domain-identifier-' . crc32($domain);
+        $setting = static fn(string $name): string => is_scalar($config[$name] ?? null) ? (string)$config[$name] : '';
 
-        if (($domainIdentifier = $this->cache->get($cacheIdentifier)) === false) {
-            $client = $this->getMyraClient();
-            $domainIdentifier = null;
-
-            if ($client instanceof WebApiV2) {
-                try {
-                    $domains = $client->getDomainEndpoint()->getList();
-
-                    foreach ($domains['data'] ?? [] as $domainResult) {
-                        if ($domainResult['name'] === $domain) {
-                            $domainIdentifier = $domainResult['id'];
-                            break;
-                        }
-                    }
-                } catch (GuzzleException) {
-                }
-            } else {
-                $domainIdentifier = $domain;
-            }
-
-            $this->cache->set($cacheIdentifier, $domainIdentifier);
-        }
-
-        return $domainIdentifier;
-    }
-
-    private function getMyraClient(): WebApi|WebApiV2
-    {
-        $config = $this->getAdapterConfig();
-        $instanceId = md5(serialize($config));
-
-        if (isset($this->clients[$instanceId])) {
-            return $this->clients[$instanceId];
-        }
-
-        $isV2 = WebApiV2::isV2($config[self::CONFIG_NAME_ENDPOINT]) && (string)$config[self::CONFIG_NAME_TOKEN] !== '';
-
-        if ($isV2) {
-            $api = new WebApiV2($config[self::CONFIG_NAME_TOKEN], $config[self::CONFIG_NAME_ENDPOINT]);
-        } else {
-            $api = new WebApi($config[self::CONFIG_NAME_API_KEY], $config[self::CONFIG_NAME_SECRET], $config[self::CONFIG_NAME_ENDPOINT]);
-        }
-
-        return $this->clients[$instanceId] = $api;
+        return ClientConfiguration::fromSettings(
+            $setting(self::CONFIG_NAME_ENDPOINT),
+            $setting(self::CONFIG_NAME_API_KEY),
+            $setting(self::CONFIG_NAME_SECRET),
+            $setting(self::CONFIG_NAME_TOKEN),
+        );
     }
 }

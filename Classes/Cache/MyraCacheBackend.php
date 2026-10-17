@@ -17,6 +17,7 @@ declare(strict_types=1);
 
 namespace CPSIT\MyraCloudConnector\Cache;
 
+use CPSIT\MyraCloudConnector\AdapterProvider\AdapterProvider;
 use CPSIT\MyraCloudConnector\Domain\Enum\Typo3CacheType;
 use CPSIT\MyraCloudConnector\Event\ClearMyraCloudCacheEvent;
 use CPSIT\MyraCloudConnector\Exception\InvalidCacheEntry;
@@ -36,6 +37,7 @@ final class MyraCacheBackend extends Typo3DatabaseBackend
 {
     private ?Connection $connection = null;
     private ?EventDispatcherInterface $eventDispatcher = null;
+    private ?AdapterProvider $adapterProvider = null;
 
     /**
      * @param list<string> $tags
@@ -60,45 +62,75 @@ final class MyraCacheBackend extends Typo3DatabaseBackend
 
     public function flushByTag($tag): void
     {
-        $this->clearExternalCacheByTag((string)$tag);
+        $this->clearExternalCacheByTags([(string)$tag]);
 
         parent::flushByTag($tag);
     }
 
     public function flushByTags(array $tags): void
     {
-        foreach ($tags as $tag) {
-            $this->clearExternalCacheByTag((string)$tag);
-        }
+        $this->clearExternalCacheByTags(array_values(array_map(strval(...), $tags)));
 
         parent::flushByTags($tags);
     }
 
-    private function clearExternalCacheByTag(string $tag): void
+    /**
+     * One batch for all pages of all tags: one request per host, not per page.
+     *
+     * @param list<string> $tags
+     */
+    private function clearExternalCacheByTags(array $tags): void
     {
-        $pageId = $this->getByTag($tag);
-
-        if ($pageId > 0) {
-            $this->getEventDispatcher()->dispatch(
-                new ClearMyraCloudCacheEvent(Typo3CacheType::PAGE, (string)$pageId),
-            );
+        $pageIds = [];
+        foreach ($tags as $tag) {
+            foreach ($this->getPageIdsByTag($tag) as $pageId) {
+                $pageIds[$pageId] = $pageId;
+            }
         }
+
+        if ($pageIds === []) {
+            return;
+        }
+
+        $this->getAdapterProvider()->batch(function () use ($pageIds): void {
+            foreach ($pageIds as $pageId) {
+                $this->getEventDispatcher()->dispatch(
+                    new ClearMyraCloudCacheEvent(Typo3CacheType::PAGE, (string)$pageId),
+                );
+            }
+        });
     }
 
-    private function getByTag(string $tag): ?int
+    /**
+     * Every page cached with the tag: a record tag such as "tt_content_5" is shared by
+     * all pages showing the record, not only the first one.
+     *
+     * @return list<int>
+     */
+    private function getPageIdsByTag(string $tag): array
     {
-        $cacheIdentifier = $this->getConnection()->select(['identifier'], $this->tagsTable, ['tag' => $tag])->fetchOne();
+        $cacheIdentifiers = $this->getConnection()->select(['identifier'], $this->tagsTable, ['tag' => $tag])->fetchFirstColumn();
+        $pageIds = [];
 
-        if (!is_string($cacheIdentifier)) {
-            return null;
+        foreach ($cacheIdentifiers as $cacheIdentifier) {
+            $pageId = is_string($cacheIdentifier) ? (int)$this->get($cacheIdentifier) : 0;
+
+            if ($pageId > 0) {
+                $pageIds[$pageId] = $pageId;
+            }
         }
 
-        return (int)$this->get($cacheIdentifier);
+        return array_values($pageIds);
     }
 
     private function getConnection(): Connection
     {
         return $this->connection ??= GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable($this->cacheTable);
+    }
+
+    private function getAdapterProvider(): AdapterProvider
+    {
+        return $this->adapterProvider ??= GeneralUtility::makeInstance(AdapterProvider::class);
     }
 
     private function getEventDispatcher(): EventDispatcherInterface

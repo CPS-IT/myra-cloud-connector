@@ -43,7 +43,20 @@ final readonly class ExternalCacheService
         private StorageRepository $storageRepository,
     ) {}
 
+    /**
+     * One batch: "all resources" clears several folders per host, sent in one request.
+     */
     public function clear(Typo3CacheType $type, ?string $identifier = null, ?int $languageId = null): bool
+    {
+        $queued = false;
+        $sent = $this->provider->batch(function () use ($type, $identifier, $languageId, &$queued): void {
+            $queued = $this->clearByType($type, $identifier, $languageId);
+        });
+
+        return $queued && $sent;
+    }
+
+    private function clearByType(Typo3CacheType $type, ?string $identifier, ?int $languageId): bool
     {
         $providerItem = $this->provider->getDefaultProviderItem();
         if ($providerItem === null) {

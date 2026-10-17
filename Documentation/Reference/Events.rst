@@ -53,6 +53,28 @@ Myra adapter, de-duplicates repeated requests for the same
 identifier/language within a request via the TYPO3 runtime cache, and
 reports the result back on the event.
 
+..  _clear-myra-cloud-cache-event-bulk:
+
+Bulk clears
+-----------
+
+..  versionadded:: 3.4.0
+
+Some triggers clear many pages or folders at once: a record whose cache tag
+is on many pages, all languages of a page, all resources, a replaced file with
+its processed variants. The events are still dispatched one per page or
+folder, but the Myra adapter collects the resulting clears and sends them
+afterwards, one request per host (up to 100 resources each) instead of one per
+page and host.
+
+Within such a batch, :php:`getCacheResult()` reports whether the clear could
+be queued. Whether Myra accepted it is known only after the batch; the CLI
+command and the backend AJAX endpoint report that combined result.
+
+Custom adapters can take part by implementing
+:php:`CPSIT\MyraCloudConnector\Adapter\BatchingAdapterInterface`; adapters
+without it keep clearing one by one.
+
 ..  _clear-myra-cloud-cache-event-usage:
 
 Custom listeners
