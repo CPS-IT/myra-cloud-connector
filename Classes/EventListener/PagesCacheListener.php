@@ -18,8 +18,10 @@ declare(strict_types=1);
 namespace CPSIT\MyraCloudConnector\EventListener;
 
 use CPSIT\MyraCloudConnector\Cache\MyraCacheFrontend;
+use CPSIT\MyraCloudConnector\Cache\PageCacheEntry;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use TYPO3\CMS\Core\Attribute\AsEventListener;
+use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Utility\MathUtility;
 use TYPO3\CMS\Frontend\Event\AfterCachedPageIsPersistedEvent;
 
@@ -29,6 +31,7 @@ final readonly class PagesCacheListener
     public function __construct(
         #[Autowire('@cache.myracloud')]
         private MyraCacheFrontend $myraCache,
+        private Context $context,
     ) {}
 
     public function __invoke(AfterCachedPageIsPersistedEvent $event): void
@@ -37,7 +40,11 @@ final readonly class PagesCacheListener
         $pageId = $event->getCacheData()['page_id'];
 
         if (MathUtility::canBeInterpretedAsInteger($pageId)) {
-            $this->myraCache->set($event->getCacheIdentifier(), (int)$pageId, $cacheTags);
+            // Not the event's request: core persists the page cache from the CacheTimeout
+            // middleware with its own, earlier request, which has no "site" or "language".
+            $languageId = $this->context->getAspect('language')->getId();
+
+            $this->myraCache->set($event->getCacheIdentifier(), new PageCacheEntry((int)$pageId, $languageId), $cacheTags);
         }
     }
 }

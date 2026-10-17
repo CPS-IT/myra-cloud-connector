@@ -21,7 +21,6 @@ use CPSIT\MyraCloudConnector\Exception\InvalidCacheEntry;
 use CPSIT\MyraCloudConnector\Exception\InvalidCacheIdentifier;
 use CPSIT\MyraCloudConnector\Exception\InvalidCacheTag;
 use TYPO3\CMS\Core\Cache\Frontend\AbstractFrontend;
-use TYPO3\CMS\Core\Utility\MathUtility;
 
 /**
  * @internal
@@ -29,6 +28,7 @@ use TYPO3\CMS\Core\Utility\MathUtility;
 final class MyraCacheFrontend extends AbstractFrontend
 {
     /**
+     * @param PageCacheEntry|int $data a page id alone is a page without a known language
      * @param string[] $tags
      * @throws InvalidCacheEntry
      * @throws InvalidCacheIdentifier
@@ -46,19 +46,23 @@ final class MyraCacheFrontend extends AbstractFrontend
             }
         }
 
-        if (!MathUtility::canBeInterpretedAsInteger($data)) {
+        $entry = $data instanceof PageCacheEntry ? $data : (PageCacheEntry::isValid($data) ? PageCacheEntry::fromString((string)$data) : null);
+
+        if ($entry === null) {
             throw new InvalidCacheEntry($data);
         }
 
-        $this->backend->set($entryIdentifier, (string)(int)$data, $tags, $lifetime);
+        $this->backend->set($entryIdentifier, $entry->toString(), $tags, $lifetime);
     }
 
-    public function get(string $entryIdentifier): int
+    public function get(string $entryIdentifier): ?PageCacheEntry
     {
         if (!$this->isValidEntryIdentifier($entryIdentifier)) {
             throw new InvalidCacheIdentifier($entryIdentifier);
         }
 
-        return (int)$this->backend->get($entryIdentifier);
+        $value = $this->backend->get($entryIdentifier);
+
+        return is_string($value) ? PageCacheEntry::fromString($value) : null;
     }
 }

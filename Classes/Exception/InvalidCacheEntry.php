@@ -22,7 +22,7 @@ final class InvalidCacheEntry extends Exception
     public function __construct(mixed $data)
     {
         parent::__construct(
-            sprintf('"%s" is not a valid cache entry, it should be an integer.', get_debug_type($data)),
+            sprintf('"%s" is not a valid cache entry, it should be a page id or a page cache entry.', get_debug_type($data)),
             1788950897,
         );
     }
