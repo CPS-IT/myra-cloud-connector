@@ -14,6 +14,11 @@ rejected resources) are additionally written to the TYPO3 logging framework
 :php:`CPSIT.MyraCloudConnector.Adapter.MyraApiAdapter`), with the reason given
 by Myra.
 
+After a network error (timeout, no connection, server error) the remaining
+Myra requests of the same request are skipped instead of waiting for the
+timeout again, for example when a save clears many pages. They are logged
+in sys_log as not successful.
+
 
 ..  figure:: /img/log-example.jpg
     :alt: View of TYPO3 system log, showing a Myra Clear Cache log entry

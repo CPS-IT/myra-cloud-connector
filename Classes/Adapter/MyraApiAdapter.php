@@ -25,6 +25,7 @@ use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\SiteConfigHostListInterface;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\SiteConfigInterface;
 use CPSIT\MyraCloudConnector\Extension;
 use Myracloud\WebApi\Exception\MyraException;
+use Myracloud\WebApi\Exception\TransportException;
 use Myracloud\WebApi\V2;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
@@ -61,6 +62,12 @@ class MyraApiAdapter extends BaseAdapter implements BatchingAdapterInterface
     private const MAX_RESOURCES_PER_REQUEST = 100;
 
     private ?V2\Client $client = null;
+
+    /**
+     * Set by the first network error (timeout, connection, 5xx): the requests after it are
+     * skipped. A save clearing many pages would otherwise wait for the timeout once per page.
+     */
+    private bool $unreachable = false;
 
     private int $batchDepth = 0;
 
@@ -254,22 +261,23 @@ class MyraApiAdapter extends BaseAdapter implements BatchingAdapterInterface
      */
     private function send(string $domain, string $fqdn, array $resources, bool $recursive): bool
     {
+        // Without a client (Myra unreachable earlier in this request) the request is
+        // skipped, but still written to sys_log as not cleared.
         $client = $this->getClient();
-        if ($client === null) {
-            return false;
-        }
+        $success = false;
 
         try {
-            if (count($resources) === 1) {
-                $client->cacheClear()->clear($domain, $fqdn, $resources[0], $recursive);
-            } else {
-                $client->cacheClear()->clearBulk($domain, $fqdn, $resources, $recursive);
+            if ($client !== null) {
+                if (count($resources) === 1) {
+                    $client->cacheClear()->clear($domain, $fqdn, $resources[0], $recursive);
+                } else {
+                    $client->cacheClear()->clearBulk($domain, $fqdn, $resources, $recursive);
+                }
+                $success = true;
             }
-            $success = true;
         } catch (MyraException $exception) {
-            $success = false;
             $this->logger->error(
-                'Myra Cloud cache clear of {fqdn} {resources} (domain {domain}, recursive: {recursive}) failed: {message}',
+                'Myra Cloud cache clear of {fqdn} {resources} (domain {domain}, recursive: {recursive}) failed: {message}' . $this->noteIfUnreachable($exception),
                 [
                     'domain' => $domain,
                     'fqdn' => $fqdn,
@@ -335,7 +343,7 @@ class MyraApiAdapter extends BaseAdapter implements BatchingAdapterInterface
             // Not cached: an empty list after a failed request would block every
             // purge of this domain for the rest of the request.
             $this->logger->error(
-                'Myra Cloud DNS records of domain {domain} could not be read: {message}',
+                'Myra Cloud DNS records of domain {domain} could not be read: {message}' . $this->noteIfUnreachable($exception),
                 ['domain' => $domain, 'message' => $exception->getMessage(), 'exception' => $exception],
             );
 
@@ -358,7 +366,25 @@ class MyraApiAdapter extends BaseAdapter implements BatchingAdapterInterface
 
     private function getClient(): ?V2\Client
     {
+        if ($this->unreachable) {
+            return null;
+        }
+
         return $this->client ??= $this->getClientConfiguration($this->getAdapterConfig())?->createClient();
+    }
+
+    /**
+     * Marks Myra unreachable after a network error; the note goes into the log message.
+     */
+    private function noteIfUnreachable(MyraException $exception): string
+    {
+        if (!$exception instanceof TransportException) {
+            return '';
+        }
+
+        $this->unreachable = true;
+
+        return ' — Myra is not reachable, the following Myra requests of this request are skipped';
     }
 
     /**
