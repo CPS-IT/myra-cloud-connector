@@ -58,7 +58,7 @@ reports the result back on the event.
 Bulk clears
 -----------
 
-..  versionadded:: 3.4.0
+..  versionadded:: 3.4.0 / 4.2.0
 
 Some triggers clear many pages or folders at once: a record whose cache tag
 is on many pages, all languages of a page, all resources, a replaced file with

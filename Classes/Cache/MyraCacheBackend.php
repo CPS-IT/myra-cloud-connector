@@ -93,7 +93,8 @@ final class MyraCacheBackend extends Typo3DatabaseBackend
 
         $this->getAdapterProvider()->batch(function () use ($entries): void {
             foreach ($entries as $entry) {
-                // Without a language (entries up to 3.3), the page's default language is cleared.
+                // Without a language (entries up to 3.3 / 4.1), the page's default language
+                // is cleared.
                 $this->getEventDispatcher()->dispatch(
                     new ClearMyraCloudCacheEvent(Typo3CacheType::PAGE, (string)$entry->pageId, $entry->languageId),
                 );

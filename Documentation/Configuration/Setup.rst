@@ -91,7 +91,7 @@ If those are incomplete, the other credentials are used.
     Before, every Myra setting had to be set, including the token, so a v1
     setup without a token left the extension inactive.
 
-..  versionchanged:: 3.4.0
+..  versionchanged:: 3.4.0 / 4.2.0
     Only the API v2 is used, with either kind of credentials. Before, the endpoint
     chose the API version: the token only worked with :php:`apiv2.myracloud.com`,
     key and secret only with the API v1. Existing settings keep working unchanged.
