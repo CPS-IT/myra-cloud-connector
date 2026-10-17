@@ -18,7 +18,9 @@ declare(strict_types=1);
 namespace CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File;
 
 use Psr\Http\Message\ServerRequestInterface;
-use TYPO3\CMS\Core\Http\ServerRequestFactory;
+use TYPO3\CMS\Core\Core\Environment;
+use TYPO3\CMS\Core\Http\NormalizedParams;
+use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Core\Routing\BackendEntryPointResolver;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -39,6 +41,24 @@ final class Typo3Core extends AbstractFile
 
     private function getServerRequest(): ServerRequestInterface
     {
-        return $GLOBALS['TYPO3_REQUEST'] ?? ServerRequestFactory::fromGlobals();
+        $request = $GLOBALS['TYPO3_REQUEST'] ?? null;
+
+        return $request instanceof ServerRequestInterface ? $request : $this->createCliRequest();
+    }
+
+    /**
+     * CLI has no request, and ServerRequestFactory::fromGlobals() throws there. The URL path
+     * TYPO3 is installed under cannot be known without a request (a site base such as
+     * "https://example.com/de/" is a site prefix, not the installation path), so the
+     * installation is taken to be the web root, the Composer default: the backend is
+     * "/typo3", or the path of an entry point configured as URL.
+     */
+    private function createCliRequest(): ServerRequestInterface
+    {
+        $publicPath = Environment::getPublicPath();
+        $serverParams = ['HTTP_HOST' => 'localhost', 'SCRIPT_NAME' => '/index.php'];
+
+        return (new ServerRequest('http://localhost/index.php', 'GET', null, [], $serverParams))
+            ->withAttribute('normalizedParams', new NormalizedParams($serverParams, [], $publicPath . '/index.php', $publicPath . '/'));
     }
 }
