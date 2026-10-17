@@ -68,7 +68,7 @@ readonly class PageRepository implements SingletonInterface
         // A language is cleared under its own URL ("/en/…"), also without a translation: with a
         // fallback chain (e.g. "fallbacks: 0") the frontend serves the page there. If it answers
         // that URL with 404 instead (no fallback chain, l18n_cfg), clearing it is harmless. Up
-        // to 3.3 an untranslated page was cleared as the site root "/" instead.
+        // to 3.3 / 4.1 an untranslated page was cleared as the site root "/" instead.
         $slug = $foundInLanguage
             ? $this->resolvePageSlug($row, $pageUid, (int)$languageId)
             : $this->resolvePageSlug($row, $resolvedPageUid, (int)$row['sys_language_uid']);

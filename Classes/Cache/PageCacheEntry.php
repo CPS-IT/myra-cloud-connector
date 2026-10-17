@@ -21,9 +21,9 @@ namespace CPSIT\MyraCloudConnector\Cache;
  * A cached page as stored in the Myra cache: the page and the language it was rendered in,
  * so a tag flush clears "/en/…" as well, not only the default language.
  *
- * Stored as "<pageId>:<languageId>". Entries written by versions up to 3.3 hold the page id
- * only; they stay valid, without a language. Versions up to 3.3 read the new format as the
- * page id ((int)"5:1" is 5), so a downgrade keeps working.
+ * Stored as "<pageId>:<languageId>". Entries written by versions up to 3.3 / 4.1 hold the
+ * page id only; they stay valid, without a language. Versions up to 3.3 / 4.1 read the new
+ * format as the page id ((int)"5:1" is 5), so a downgrade keeps working.
  *
  * @internal
  */

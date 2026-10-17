@@ -28,7 +28,7 @@ use Myracloud\WebApi\V2;
  * Only API v2 is used. Both credential types work with it, so the settings of an API v1
  * setup (endpoint "api.myracloud.com", key and secret) keep working unchanged.
  *
- * Which credentials: the ones extension versions up to 3.3 used — the token with the
+ * Which credentials: the ones extension versions up to 3.3 / 4.1 used — the token with the
  * endpoint "apiv2.myracloud.com", key and secret with any other endpoint. Only if those are
  * incomplete, the other ones. That way a stale MYRA_TOKEN in the environment of an
  * existing v1 setup does not replace its working key and secret.
@@ -102,7 +102,7 @@ final readonly class ClientConfiguration
     }
 
     /**
-     * Up to 3.3 the setting was a bare host name, "https://" was added to it.
+     * Up to 3.3 / 4.1 the setting was a bare host name, "https://" was added to it.
      */
     private static function withScheme(string $endpoint): string
     {
