@@ -46,7 +46,12 @@ final readonly class ExternalClearResourceCacheListener
     {
         $action = array_key_first($event->getCommand());
 
-        if ($action === 'upload' && $event->getConflictMode() === DuplicationBehavior::REPLACE->value) {
+        // A file changes its content in place: an upload over an existing file, or the file
+        // list's "Replace" action (command "replace"); both return the files as a list.
+        $replaced = $action === 'replace'
+            || ($action === 'upload' && $event->getConflictMode() === DuplicationBehavior::REPLACE->value);
+
+        if ($replaced) {
             $provider = $this->provider->getDefaultProviderItem();
             /** @var File[]|bool $result */
             $result = $event->getResult();
