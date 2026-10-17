@@ -28,7 +28,6 @@ use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\MathUtility;
 
 /**
  * @internal
@@ -45,7 +44,7 @@ final class MyraCacheBackend extends Typo3DatabaseBackend
      */
     public function set($entryIdentifier, $data, array $tags = [], $lifetime = null): void
     {
-        if (!MathUtility::canBeInterpretedAsInteger($data)) {
+        if (!PageCacheEntry::isValid($data)) {
             throw new InvalidCacheEntry($data);
         }
 
@@ -81,46 +80,48 @@ final class MyraCacheBackend extends Typo3DatabaseBackend
      */
     private function clearExternalCacheByTags(array $tags): void
     {
-        $pageIds = [];
+        $entries = [];
         foreach ($tags as $tag) {
-            foreach ($this->getPageIdsByTag($tag) as $pageId) {
-                $pageIds[$pageId] = $pageId;
+            foreach ($this->getPageCacheEntriesByTag($tag) as $entry) {
+                $entries[$entry->toString()] = $entry;
             }
         }
 
-        if ($pageIds === []) {
+        if ($entries === []) {
             return;
         }
 
-        $this->getAdapterProvider()->batch(function () use ($pageIds): void {
-            foreach ($pageIds as $pageId) {
+        $this->getAdapterProvider()->batch(function () use ($entries): void {
+            foreach ($entries as $entry) {
+                // Without a language (entries up to 3.3), the page's default language is cleared.
                 $this->getEventDispatcher()->dispatch(
-                    new ClearMyraCloudCacheEvent(Typo3CacheType::PAGE, (string)$pageId),
+                    new ClearMyraCloudCacheEvent(Typo3CacheType::PAGE, (string)$entry->pageId, $entry->languageId),
                 );
             }
         });
     }
 
     /**
-     * Every page cached with the tag: a record tag such as "tt_content_5" is shared by
-     * all pages showing the record, not only the first one.
+     * Every page cached with the tag, in every language it was cached in: a record tag such
+     * as "tt_content_5" is shared by all pages showing the record, not only the first one.
      *
-     * @return list<int>
+     * @return list<PageCacheEntry>
      */
-    private function getPageIdsByTag(string $tag): array
+    private function getPageCacheEntriesByTag(string $tag): array
     {
         $cacheIdentifiers = $this->getConnection()->select(['identifier'], $this->tagsTable, ['tag' => $tag])->fetchFirstColumn();
-        $pageIds = [];
+        $entries = [];
 
         foreach ($cacheIdentifiers as $cacheIdentifier) {
-            $pageId = is_string($cacheIdentifier) ? (int)$this->get($cacheIdentifier) : 0;
+            $value = is_string($cacheIdentifier) ? $this->get($cacheIdentifier) : false;
+            $entry = is_string($value) ? PageCacheEntry::fromString($value) : null;
 
-            if ($pageId > 0) {
-                $pageIds[$pageId] = $pageId;
+            if ($entry !== null) {
+                $entries[$entry->toString()] = $entry;
             }
         }
 
-        return array_values($pageIds);
+        return array_values($entries);
     }
 
     private function getConnection(): Connection
