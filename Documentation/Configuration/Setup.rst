@@ -35,14 +35,22 @@ loader. Typed values are accepted there: integers and booleans (for example
 Myra Settings
 -------------
 
-Myra API setup
+The extension talks to Myra Cloud through the API v2 only, using the library
+`cpsit/myra-web-api <https://github.com/CPS-IT/myra-web-api>`__. Both kinds of
+credentials work with it: a token, or an API key with its secret.
 
 ..  _myra-api-endpoint:
 
 Myra API Endpoint
 ~~~~~~~~~~~~~~~~~
 
-The Myra Cloud API endpoint for every request.
+:php:`apiv2.myracloud.com` or :php:`api.myracloud.com` (the former API v1
+default): Myra's API v2 at :php:`https://apiv2.myracloud.com`. Empty: the extension
+stays inactive.
+
+Any other value is used as base URI of the API v2 instead, for example a proxy or a
+local emulator (:php:`http://127.0.0.1:8080`). Without a scheme, :php:`https://` is
+added.
 
 ..  _myra-api-key:
 
@@ -63,23 +71,30 @@ The matching secret for the API key.
 Myra API Token
 ~~~~~~~~~~~~~~
 
-Bearer token for the Myra Cloud API v2. Only used when the endpoint is
-:php:`apiv2.myracloud.com`.
+A Myra Cloud API token, as alternative to API key and secret.
 
 ..  _myra-required-credentials:
 
 Required credentials
 ~~~~~~~~~~~~~~~~~~~~
 
-The extension stays inactive until the credentials of the API version in use
-are set. The settings of the other version may stay empty:
+The extension stays inactive until the endpoint and a token, or an API key and its
+secret, are set.
+If both are set, the endpoint decides, as it did before:
 
--   API v2 (endpoint :php:`apiv2.myracloud.com`): endpoint and token
--   API v1 (any other endpoint): endpoint, API key and API secret
+-   endpoint :php:`apiv2.myracloud.com`: the token
+-   any other endpoint: API key and secret
+
+If those are incomplete, the other credentials are used.
 
 ..  versionchanged:: 3.3.3 / 4.1.4
     Before, every Myra setting had to be set, including the token, so a v1
     setup without a token left the extension inactive.
+
+..  versionchanged:: 3.4.0
+    Only the API v2 is used, with either kind of credentials. Before, the endpoint
+    chose the API version: the token only worked with :php:`apiv2.myracloud.com`,
+    key and secret only with the API v1. Existing settings keep working unchanged.
 
 ..  _typo3-site-settings:
 

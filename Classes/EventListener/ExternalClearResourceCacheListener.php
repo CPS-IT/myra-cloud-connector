@@ -62,9 +62,12 @@ final readonly class ExternalClearResourceCacheListener
      */
     private function clearCacheForFiles(array $files): void
     {
-        foreach ($files as $file) {
-            $this->clearCacheForFile($file);
-        }
+        // One batch for the files and their processed variants: one request per host.
+        $this->provider->batch(function () use ($files): void {
+            foreach ($files as $file) {
+                $this->clearCacheForFile($file);
+            }
+        });
     }
 
     private function clearCacheForFile(FileInterface $file): void
