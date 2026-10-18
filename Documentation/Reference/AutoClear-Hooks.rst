@@ -27,13 +27,19 @@ Page Update
 This hook listens on the :php:`DataHandler->clearCachePostProc` interface.
 
 It will only clear the page itself, when the page or its elements are edited (created/updated/deleted).
-It will **not** clear subpages and file resources (non-recursive).
+It will **not** clear subpages and file resources (non-recursive). Pages with
+:typoscript:`TCEMAIN.clearCache_disable` and workspace versions are not cleared,
+as TYPO3 does not clear them either.
 
-..  note::
-    When TYPO3 requests a cache tag based clear instead of a single-record
-    clear (e.g. because the changed record is referenced by several pages),
-    this hook forwards the request to the
-    :ref:`Cache Tag Flush <cache-tag-flush-hook>` mechanism below.
+Other pages showing the changed record are cleared by the
+:ref:`Cache Tag Flush <cache-tag-flush-hook>` mechanism below. So are cache
+clears TYPO3 requests by command, for example "Clear cache for this page" or
+:typoscript:`TCEMAIN.clearCacheCmd`.
+
+..  versionchanged:: 3.4.0 / 4.2.0
+    Since 3.3.0 / 4.1.0, record changes only reached Myra Cloud through the
+    cache tag flush, which clears a page only while TYPO3 holds a cache entry
+    for it.
 
 ..  _file-replace-hook:
 
