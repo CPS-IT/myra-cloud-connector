@@ -47,7 +47,7 @@ final readonly class DataHandlerHook
     ) {}
 
     /**
-     * @param array{table: string, uid: int, uid_page: int}|array{cacheCmd: string, tags: array<string, true>} $data
+     * @param array{table: string, uid: int, uid_page: int, tags?: array<string, true>}|array{cacheCmd: string, tags: list<string>} $data
      */
     public function clearCachePostProc(array $data): void
     {
@@ -59,7 +59,11 @@ final readonly class DataHandlerHook
         }
 
         if (isset($data['tags'])) {
-            $this->flushByTags(array_keys($data['tags']));
+            // clear_cacheCmd() ("Clear cache for this page", TCEMAIN.clearCacheCmd) passes the tags
+            // as a list, record changes as keys (tag => true). The keys of a list are ints (as are
+            // numeric tags): that flushed tag "0", and fails the typed cache frontend of TYPO3 14.
+            $tags = isset($data['cacheCmd']) ? $data['tags'] : array_keys($data['tags']);
+            $this->flushByTags(array_values(array_map(strval(...), $tags)));
         } else {
             $this->flushByRecord((int)$data['uid'], $data['table'], $data['uid_page']);
         }
