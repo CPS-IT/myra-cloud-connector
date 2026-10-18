@@ -21,8 +21,11 @@ use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\PageIdInterface;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\SiteConfigExternalIdentifierInterface;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\SiteConfigInterface;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\Typo3SiteConfig;
+use CPSIT\MyraCloudConnector\Domain\Repository\PageRepository;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
+use TYPO3\CMS\Core\Exception\SiteNotFoundException;
+use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\SiteFinder;
 
 final readonly class SiteService
@@ -31,6 +34,7 @@ final readonly class SiteService
         private SiteFinder $siteFinder,
         #[Autowire('@cache.runtime')]
         private FrontendInterface $cache,
+        private PageRepository $pageRepository,
     ) {}
 
     /**
@@ -78,7 +82,7 @@ final readonly class SiteService
 
         if (($sites = $this->cache->get($cacheIdentifier)) === false) {
             try {
-                $site = $this->siteFinder->getSiteByPageId($pageId->getOriginalPageId());
+                $site = $this->getSiteByPageId($pageId->getOriginalPageId());
                 $siteConfig = new Typo3SiteConfig($site);
 
                 if ($this->isSiteSupported($siteConfig)) {
@@ -94,6 +98,16 @@ final readonly class SiteService
         }
 
         return $sites;
+    }
+
+    private function getSiteByPageId(int $pageUid): Site
+    {
+        try {
+            return $this->siteFinder->getSiteByPageId($pageUid);
+        } catch (SiteNotFoundException) {
+            // A deleted page: TYPO3's root line ends at it.
+            return $this->siteFinder->getSiteByPageId($pageUid, $this->pageRepository->getRootLineIncludingDeleted($pageUid));
+        }
     }
 
     private function isSiteSupported(SiteConfigExternalIdentifierInterface $site): bool

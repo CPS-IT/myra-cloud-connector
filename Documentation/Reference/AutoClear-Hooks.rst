@@ -31,6 +31,11 @@ It will **not** clear subpages and file resources (non-recursive). Pages with
 :typoscript:`TCEMAIN.clearCache_disable` and workspace versions are not cleared,
 as TYPO3 does not clear them either.
 
+Deleting a page clears the URL it had, in the language of the deleted record;
+deleting a page tree clears every page of it. A page that was not public when
+it was deleted (hidden, or outside its start and end time, also when only its
+default language page was) is not cleared: it was not served.
+
 Other pages showing the changed record are cleared by the
 :ref:`Cache Tag Flush <cache-tag-flush-hook>` mechanism below. So are cache
 clears TYPO3 requests by command, for example "Clear cache for this page" or
@@ -39,7 +44,8 @@ clears TYPO3 requests by command, for example "Clear cache for this page" or
 ..  versionchanged:: 3.4.0 / 4.2.0
     Since 3.3.0 / 4.1.0, record changes only reached Myra Cloud through the
     cache tag flush, which clears a page only while TYPO3 holds a cache entry
-    for it.
+    for it. A deleted page was never cleared; through the cache tag flush, the
+    start page of every site was cleared instead.
 
 ..  _file-replace-hook:
 
