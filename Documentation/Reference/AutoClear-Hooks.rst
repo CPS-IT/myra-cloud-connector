@@ -79,4 +79,5 @@ TYPO3's :php:`pages` cache group. Whenever that group is flushed:
     A page can only be resolved from a cache tag once it has actually been
     rendered and cached at least once. Pages that were never cached, or
     whose cache entry has already expired or been flushed, cannot be
-    resolved this way.
+    resolved this way. How long an entry is kept: see
+    :ref:`Lifetime of the page cache entries <myra-cache-lifetime>`.

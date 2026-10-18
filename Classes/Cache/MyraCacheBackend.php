@@ -48,8 +48,25 @@ final class MyraCacheBackend extends Typo3DatabaseBackend
             throw new InvalidCacheEntry($data);
         }
 
-        // Ignore lifetime since this is handled by MyraCloud
-        parent::set($entryIdentifier, $data, $tags);
+        parent::set($entryIdentifier, $data, $tags, $this->getEntryLifetime($lifetime));
+    }
+
+    /**
+     * As long as the page's cache entry, and at least the default lifetime: Myra may serve the
+     * page longer than TYPO3 caches it, and then no request reaches TYPO3 that would store the
+     * entry again. 0 is unlimited, as in TYPO3.
+     */
+    private function getEntryLifetime(?int $lifetime): int
+    {
+        if ($lifetime === null) {
+            return $this->defaultLifetime;
+        }
+
+        if ($lifetime === 0 || $this->defaultLifetime === 0) {
+            return 0;
+        }
+
+        return max($lifetime, $this->defaultLifetime);
     }
 
     public function flush(): void

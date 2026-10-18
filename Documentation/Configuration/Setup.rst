@@ -132,3 +132,30 @@ as a base variant or a language base.
 ..  versionchanged:: 3.3.3 / 4.1.4
     Before, every clear reached all active DNS records of the Myra domain,
     including the hosts of other sites and environments.
+
+..  _myra-cache-lifetime:
+
+Lifetime of the page cache entries
+----------------------------------
+
+For the :ref:`Cache Tag Flush <cache-tag-flush-hook>`, the extension keeps an
+entry for every rendered page in its own cache (:php:`myracloud`). An entry
+lives as long as the page's cache entry in TYPO3, and at least the default
+lifetime of the :php:`myracloud` cache: 3600 seconds unless configured.
+
+If Myra Cloud keeps pages longer than that, set the default lifetime to at
+least the Myra Cloud cache time, for example in
+:file:`config/system/additional.php`:
+
+..  code-block:: php
+
+    $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['myracloud']['options']['defaultLifetime'] = 86400;
+
+Otherwise a cache tag flush no longer clears a page in Myra Cloud once its
+entry has expired, while Myra Cloud still serves the page: no request reaches
+TYPO3 that would store the entry again. :php:`0` keeps the entries without
+expiry.
+
+..  versionchanged:: 3.4.0 / 4.2.0
+    Before, every entry lived 3600 seconds, also when TYPO3 cached the page
+    longer, and the default lifetime could not be configured.
