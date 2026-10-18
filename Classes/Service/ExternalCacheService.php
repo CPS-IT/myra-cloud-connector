@@ -29,6 +29,7 @@ use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\File\Typo3Temp;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\PageSlugInterface;
 use CPSIT\MyraCloudConnector\Domain\DTO\Typo3\SiteConfigInterface;
 use CPSIT\MyraCloudConnector\Domain\Enum\Typo3CacheType;
+use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\StorageRepository;
@@ -41,6 +42,7 @@ final readonly class ExternalCacheService
         private AdapterProvider $provider,
         private ResourceFactory $resourceFactory,
         private StorageRepository $storageRepository,
+        private LoggerInterface $logger,
     ) {}
 
     /**
@@ -82,6 +84,16 @@ final readonly class ExternalCacheService
     private function clearPage(ProviderItemRegisterInterface $provider, int $pageUid, ?int $languageId = null): bool
     {
         $page = $this->pageService->getPage($pageUid, $languageId);
+        if ($page === null) {
+            // Not "/" of every site, as up to 3.3 / 4.1: without the page, there is no URL to clear.
+            $this->logger->warning(
+                'Myra Cloud cache of page {page} (language {language}) not cleared: the page does not exist, or was not public when it was deleted',
+                ['page' => $pageUid, 'language' => $languageId ?? 0],
+            );
+
+            return false;
+        }
+
         $sites = $this->siteService->getSitesForClearance($page);
         return $this->clearCacheWithAdapter($provider->getAdapter(), $sites, $page);
     }

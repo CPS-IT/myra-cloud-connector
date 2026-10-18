@@ -75,17 +75,14 @@ final readonly class ExternalClearCacheListener
     }
 
     /**
-     * @return array{string|null, int}
+     * @return array{string, int}
      */
     private function resolveParametersForPage(int $recordUid): array
     {
         $page = $this->pageService->getPage($recordUid);
-        $pageUid = $page?->getOriginalPageId();
+        // An unknown page keeps its uid: the clear then logs which page it could not clear.
+        $pageUid = (string)($page?->getOriginalPageId() ?? $recordUid);
         $languageId = $page?->getLanguageId() ?? 0;
-
-        if ($pageUid !== null) {
-            $pageUid = (string)$pageUid;
-        }
 
         return [$pageUid, $languageId];
     }
