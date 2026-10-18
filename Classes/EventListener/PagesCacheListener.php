@@ -44,7 +44,12 @@ final readonly class PagesCacheListener
             // middleware with its own, earlier request, which has no "site" or "language".
             $languageId = $this->context->getAspect('language')->getId();
 
-            $this->myraCache->set($event->getCacheIdentifier(), new PageCacheEntry((int)$pageId, $languageId), $cacheTags);
+            $this->myraCache->set(
+                $event->getCacheIdentifier(),
+                new PageCacheEntry((int)$pageId, $languageId),
+                $cacheTags,
+                $event->getCacheLifetime(),
+            );
         }
     }
 }

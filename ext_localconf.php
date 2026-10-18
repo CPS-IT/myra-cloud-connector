@@ -20,12 +20,15 @@ use CPSIT\MyraCloudConnector\Extension;
 
 defined('TYPO3') or die();
 
-// Configure myracloud cache
-$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['myracloud'] = [
-    'backend' => MyraCacheBackend::class,
-    'frontend' => MyraCacheFrontend::class,
-    'groups' => ['pages'],
-];
+// Configure myracloud cache; options set in config/system, e.g. the default lifetime, are kept
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['myracloud'] = array_replace(
+    $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['myracloud'] ?? [],
+    [
+        'backend' => MyraCacheBackend::class,
+        'frontend' => MyraCacheFrontend::class,
+        'groups' => ['pages'],
+    ],
+);
 
 // Hooks belong here: ext_tables.php is not loaded for frontend requests without a backend
 // user, so records saved by DataHandler there did not clear Myra.
