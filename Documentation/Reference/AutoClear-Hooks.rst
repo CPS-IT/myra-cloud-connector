@@ -74,3 +74,13 @@ TYPO3's :php:`pages` cache group. Whenever that group is flushed:
     rendered and cached at least once. Pages that were never cached, or
     whose cache entry has already expired or been flushed, cannot be
     resolved this way.
+
+..  note::
+    The ``cache:flushtags`` command of TYPO3 14 (`Feature #104054
+    <https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/14.0/Feature-104054-AddTagOptionToCacheFlushCommand.html>`__)
+    does **not** clear Myra Cloud. It runs as a low-level command without
+    loading :file:`ext_localconf.php`, where the :php:`myracloud` cache is
+    configured, so it flushes TYPO3's own caches only. Tag flushes from the
+    backend and the DataHandler (saving records, "Clear cache for this page")
+    are not affected. On the command line, clear Myra Cloud with the
+    :ref:`CLI command <cli>`.
