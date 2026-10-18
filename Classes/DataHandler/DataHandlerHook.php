@@ -47,7 +47,7 @@ final readonly class DataHandlerHook
     ) {}
 
     /**
-     * @param array{table: string, uid: int, uid_page: int, tags?: array<string, true>}|array{cacheCmd: string, tags: list<string>} $data
+     * @param array{table: string, uid: int, uid_page: int, clearCacheEnabled?: bool}|array{cacheCmd: string, tags: list<string>} $data
      */
     public function clearCachePostProc(array $data): void
     {
@@ -58,14 +58,16 @@ final readonly class DataHandlerHook
             return;
         }
 
-        if (isset($data['tags'])) {
+        if (isset($data['cacheCmd'])) {
             // clear_cacheCmd() ("Clear cache for this page", TCEMAIN.clearCacheCmd) passes the tags
-            // as a list, record changes as keys (tag => true). The keys of a list are ints (as are
-            // numeric tags): that flushed tag "0", and fails the typed cache frontend of TYPO3 14.
-            $tags = isset($data['cacheCmd']) ? $data['tags'] : array_keys($data['tags']);
-            $this->flushByTags(array_values(array_map(strval(...), $tags)));
-        } else {
-            $this->flushByRecord((int)$data['uid'], $data['table'], $data['uid_page']);
+            // as a list. As strings: the typed cache frontend of TYPO3 14 rejects an int tag.
+            $this->flushByTags(array_map(strval(...), $data['tags']));
+        } elseif (($data['clearCacheEnabled'] ?? true) !== false) {
+            // A record change. Core passes its cache tags as well, and flushes them right after
+            // this hook, which reaches Myra through the myracloud cache for the pages cached with
+            // them. The record's page is cleared here, also without such a cache entry. Not with
+            // TCEMAIN.clearCache_disable or for a workspace version: core does not clear them.
+            $this->flushByRecord((int)$data['uid'], $data['table'], (int)$data['uid_page']);
         }
     }
 
@@ -95,7 +97,8 @@ final readonly class DataHandlerHook
         };
 
         try {
-            if ($pageUid !== null) {
+            // Not for records on the root page (pid 0): they have no page to clear.
+            if ($pageUid !== null && $pageUid > 0) {
                 $this->eventDispatcher->dispatch(
                     new ClearMyraCloudCacheEvent(Typo3CacheType::PAGE, (string)$pageUid, $languageId),
                 );
@@ -131,7 +134,8 @@ final readonly class DataHandlerHook
      */
     private function resolveParametersForRecord(string $tableName, int $recordUid, int $pageUid): array
     {
-        $record = BackendUtility::getRecord($tableName, $recordUid);
+        // Deleted records too: deleting a translated record clears its language.
+        $record = BackendUtility::getRecord($tableName, $recordUid, '*', '', false);
         $tcaSchema = $this->tcaSchemaFactory->get($tableName);
         $languageField = $tcaSchema->isLanguageAware() ? $tcaSchema->getCapability(TcaSchemaCapability::Language)->getLanguageField()->getName() : null;
         $languageId = $languageField !== null ? ($record[$languageField] ?? 0) : 0;
