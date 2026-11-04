@@ -27,6 +27,7 @@ readonly class Page implements PageInterface
         private string $slug,
         private int $language = 0,
         private ?int $translationSource = null,
+        private bool $needsRecursiveCacheClear = false,
     ) {}
 
     public function getPageId(): int
@@ -67,5 +68,10 @@ readonly class Page implements PageInterface
     public function getTranslationSource(): ?int
     {
         return $this->translationSource;
+    }
+
+    public function needsRecursiveCacheClear(): bool
+    {
+        return $this->needsRecursiveCacheClear;
     }
 }

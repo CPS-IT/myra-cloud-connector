@@ -61,6 +61,7 @@ readonly class PageRepository implements SingletonInterface
             slug: $this->resolvePageSlug($row, $resolvedPageUid),
             language: (int)$row['sys_language_uid'],
             translationSource: (int)$row['l10n_parent'] > 0 ? (int)$row['l10n_parent'] : null,
+            needsRecursiveCacheClear: (bool)($row['tx_myracloud_require_recursive_cache_clear'] ?? false),
         );
     }
 
