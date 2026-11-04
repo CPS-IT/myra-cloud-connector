@@ -70,7 +70,13 @@ final readonly class ExternalCacheService
     {
         $page = $this->pageService->getPage($pageUid, $languageId);
         $sites = $this->siteService->getSitesForClearance($page);
-        return $this->clearCacheWithAdapter($provider->getAdapter(), $sites, $page);
+
+        return $this->clearCacheWithAdapter(
+            $provider->getAdapter(),
+            $sites,
+            $page,
+            $page?->needsRecursiveCacheClear() ?? false,
+        );
     }
 
     private function clearAllPages(ProviderItemRegisterInterface $provider, ?int $languageId = null): bool
