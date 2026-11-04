@@ -29,4 +29,6 @@ interface PageIdInterface
     public function getLanguageId(): int;
 
     public function getTranslationSource(): ?int;
+
+    public function needsRecursiveCacheClear(): bool;
 }
