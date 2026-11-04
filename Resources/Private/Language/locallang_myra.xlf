@@ -18,6 +18,9 @@
       <trans-unit id="tca.site.cache.identifier" resname="tca.site.cache.identifier">
         <source>Myra Domain List (comma separated)</source>
       </trans-unit>
+      <trans-unit id="tca.pages.require_recursive_cache_clear" resname="tca.pages.require_recursive_cache_clear">
+        <source>Require recursive cache clear</source>
+      </trans-unit>
     </body>
   </file>
 </xliff>
