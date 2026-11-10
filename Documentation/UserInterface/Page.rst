@@ -13,7 +13,8 @@ There are 4 ways to clear a page from the cache:
 
 ..  note::
     Apart from the topbar clear cache menu, the page clear cache options clear a single page only
-    and are non-recursive.
+    and are non-recursive, unless the page is configured to require a
+    :ref:`recursive cache clear <recursive-page-clear>`.
 
 ..  _topbar-page:
 
@@ -43,7 +44,8 @@ Context menu in page tree
     :width: 278 px
     :alt: Screenshot of the page context menu showing Myra Clear Cache option
 
-This will clear the selected page only (no child pages). The option will not clear file resources.
+This will clear the selected page only (no child pages, unless :ref:`configured otherwise
+<recursive-page-clear>`). The option will not clear file resources.
 
 ..  _buttonbar-page:
 
@@ -54,7 +56,29 @@ Button bar
     :width: 234 px
     :alt: Screenshot of the page buttonbar showing Myra Clear Cache option
 
-This will clear the current page only (no child pages). The option will not clear file resources.
+This will clear the current page only (no child pages, unless :ref:`configured otherwise
+<recursive-page-clear>`). The option will not clear file resources.
+
+..  _recursive-page-clear:
+
+Recursive cache clear per page
+------------------------------
+
+..  versionadded:: 4.2.0 / 3.4.0
+    `Feature #176 - Allow recursive page cache clear via page setting <https://github.com/CPS-IT/myra-cloud-connector/pull/176>`__
+
+By default, clearing a page only clears that single page in Myra Cloud. For pages
+whose output also affects other URLs (e.g. a new detail page), the page can be
+flagged to be cleared recursively:
+
+1.  Edit the page properties and switch to the tab **Myra Cloud**.
+2.  Enable **Require recursive cache clear** and save.
+
+From then on, every clear request for this page (context menu, button bar,
+:ref:`AutoClear hooks <auto-clear-hooks>`, CLI command with ``-t page``) also clears
+all paths below the page's URL in Myra Cloud. The setting is stored per page
+record (field :php:`tx_myracloud_require_recursive_cache_clear`) and is not
+inherited by child pages.
 
 See also
 =========
