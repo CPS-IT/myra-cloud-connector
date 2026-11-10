@@ -26,8 +26,11 @@ Page Update
 
 This hook listens on the :php:`DataHandler->clearCachePostProc` interface.
 
-It will only clear the page itself, when the page or its elements are edited (created/updated/deleted).
-It will **not** clear subpages and file resources (non-recursive).
+It will only clear the page itself, when the page or its elements are edited
+(created/updated/deleted). It will **not** clear subpages and file resources
+(non-recursive), unless the page has the option :ref:`Require recursive cache
+clear <recursive-page-clear>` enabled in its page properties. File resources
+are never cleared by this hook.
 
 ..  note::
     When TYPO3 requests a cache tag based clear instead of a single-record
